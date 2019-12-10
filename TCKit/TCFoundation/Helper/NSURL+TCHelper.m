@@ -331,19 +331,31 @@ done:
 
 - (BOOL)linkCopyItemAtURL:(NSURL *)srcURL toURL:(NSURL *)dstURL error:(NSError **)error
 {
-    BOOL suc = [self linkItemAtURL:srcURL toURL:dstURL error:error];
-    if (!suc) {
-        // !!!: may create an empty directory
+    NSError *err = nil;
+    BOOL suc = [self linkItemAtURL:srcURL toURL:dstURL error:&err];
+    if (suc) {
+        return YES;
+    }
+    
+    if (NULL != error) {
+        *error = err;
+    }
+    if (err.code == NSFileWriteFileExistsError && [err.domain isEqualToString:NSCocoaErrorDomain]) {
+        return NO;
+    }
+    
+    // !!!: may create an empty directory
+    if (![srcURL.standardizedURL isEqual:dstURL.standardizedURL]) {
         [self removeItemAtURL:dstURL error:NULL];
-        suc = [self copyItemAtURL:srcURL toURL:dstURL error:error];
-        if (suc) {
-            if (NULL != error) {
-                *error = nil;
-            }
-            NSDictionary<NSFileAttributeKey, id> *attributes = [self attributesOfItemAtPath:srcURL.path error:NULL];
-            if (attributes.count > 0) {
-                [self setAttributes:attributes ofItemAtPath:dstURL.path error:NULL];
-            }
+    }
+    suc = [self copyItemAtURL:srcURL toURL:dstURL error:error];
+    if (suc) {
+        if (NULL != error) {
+            *error = nil;
+        }
+        NSDictionary<NSFileAttributeKey, id> *attributes = [self attributesOfItemAtPath:srcURL.path error:NULL];
+        if (attributes.count > 0) {
+            [self setAttributes:attributes ofItemAtPath:dstURL.path error:NULL];
         }
     }
     return suc;
@@ -351,8 +363,16 @@ done:
 
 - (BOOL)moveItemMustAtURL:(NSURL *)srcURL toURL:(NSURL *)dstURL error:(NSError **)error
 {
-    if ([self moveItemAtURL:srcURL toURL:dstURL error:error]) {
+    NSError *err = nil;
+    if ([self moveItemAtURL:srcURL toURL:dstURL error:&err]) {
         return YES;
+    }
+    
+    if (NULL != error) {
+        *error = err;
+    }
+    if (err.code == NSFileWriteFileExistsError && [err.domain isEqualToString:NSCocoaErrorDomain]) {
+        return NO;
     }
     
     BOOL suc = [self linkCopyItemAtURL:srcURL toURL:dstURL error:NULL];
