@@ -247,10 +247,10 @@ static NSObject *codingObject(NSObject *obj, TCPersisentStyle const style, Class
 - (NSData *)tc_JSONData
 {
     id obj = self.tc_JSONObject;
-    if (![NSJSONSerialization isValidJSONObject:obj]) {
+    if (nil == obj || ![NSJSONSerialization isValidJSONObject:obj]) {
         return nil;
     }
-    return nil != obj ? [NSJSONSerialization dataWithJSONObject:obj options:NSJSONWritingFragmentsAllowed error:NULL] : nil;
+    return [NSJSONSerialization dataWithJSONObject:obj options:NSJSONWritingFragmentsAllowed error:NULL];
 }
 
 - (NSString *)tc_JSONString
