@@ -94,7 +94,8 @@ NSString * TCPercentEscapedStringFromFileName(NSString *string)
     static NSCharacterSet *set = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        NSMutableCharacterSet *notAllowedCharacterSet = [NSMutableCharacterSet characterSetWithCharactersInString:@"/\\?%*|\"<>:"];
+        // https://www.cnblogs.com/Smart_Joe/archive/2013/01/31/2886774.html
+        NSMutableCharacterSet *notAllowedCharacterSet = [NSMutableCharacterSet characterSetWithCharactersInString:@"/\\?*|<>:"]; // @"/\\?%*|\"<>:"
         set = notAllowedCharacterSet;
     });
     
