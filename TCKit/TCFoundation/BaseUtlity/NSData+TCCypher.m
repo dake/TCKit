@@ -181,7 +181,14 @@ NSString *const TCCommonCryptoErrorDomain = @"TCCommonCryptoErrorDomain";
 
 - (NSData *)base64Encode
 {
-    return [self base64EncodedDataWithOptions:kNilOptions];
+    NSData *data = nil;
+    @try {
+        data = [self base64EncodedDataWithOptions:kNilOptions];
+    } @catch (NSException *exception) {
+        
+    } @finally {
+        return data;
+    }
 }
 
 - (NSData *)base64DecodeWithOptions:(NSDataBase64DecodingOptions)ops
