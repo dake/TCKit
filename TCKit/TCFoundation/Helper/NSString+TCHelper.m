@@ -140,16 +140,34 @@
 
 - (nullable NSString *)fixedFileExtension
 {
-    NSString *decodeUrl = self.stringByRemovingPercentEncoding;
-    if (nil == decodeUrl) {
-        decodeUrl = self;
-    }
+    static NSCharacterSet *s_wsChar = nil;
+    static NSCharacterSet *s_urlChar = nil;
+    static NSCharacterSet *s_queryBeginChar = nil;
+    static NSCharacterSet *s_queryChar = nil;
+    static NSCharacterSet *s_invalidChar = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        s_wsChar = NSCharacterSet.whitespaceAndNewlineCharacterSet;
+        s_urlChar = NSCharacterSet.URLQueryAllowedCharacterSet;
+        s_queryBeginChar = [NSCharacterSet characterSetWithCharactersInString:@"&,;(=?"];
+        s_queryChar = [NSCharacterSet characterSetWithCharactersInString:@"&,;!#"];
+        
+        NSMutableCharacterSet *set = [NSMutableCharacterSet characterSetWithCharactersInString:@".$=+-_^~@#0123456789"];
+        [set addCharactersInRange:NSMakeRange(0x1F300, 0x1F700 - 0x1F300)]; // Add most of the Emoji characters
+        // letterCharacterSet 含多字符集中的单字符，如汉字
+        [set formUnionWithCharacterSet:NSCharacterSet.lowercaseLetterCharacterSet];
+        [set formUnionWithCharacterSet:NSCharacterSet.uppercaseLetterCharacterSet];
+//        [set removeCharactersInString:@"/%& "];
+        s_invalidChar = set.invertedSet;
+    });
     
     NSString *ext = nil;
-    if ([decodeUrl hasPrefix:@"http"]) {
+    NSString *decodeUrl = self.stringByRemovingPercentEncoding ?: self;
+    decodeUrl = [decodeUrl stringByTrimmingCharactersInSet:s_wsChar];
+    if (0 == [decodeUrl rangeOfString:@"http" options:NSLiteralSearch|NSAnchoredSearch].location) {
         NSURL *url = [NSURL URLWithString:decodeUrl];
         if (nil == url) {
-            NSString *tmp = [decodeUrl stringByAddingPercentEncodingWithAllowedCharacters:NSCharacterSet.URLQueryAllowedCharacterSet];
+            NSString *tmp = [decodeUrl stringByAddingPercentEncodingWithAllowedCharacters:s_urlChar];
             if (nil != tmp) {
                 url = [NSURL URLWithString:tmp];
             }
@@ -182,9 +200,9 @@
     
     if (!findeDot) {
         // /Img/?img=1472541690-6672-2065-1.jpg&img_size=, self.pathExtension 为空
-        NSUInteger loc = [ext rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"."]].location;
+        NSUInteger loc = [ext rangeOfString:@"."].location;
         if (loc != NSNotFound) {
-            ext = [ext substringFromIndex:loc+1];
+            ext = [ext substringFromIndex:loc + 1];
         } else {
             return nil;
         }
@@ -194,19 +212,19 @@
     if (lastDot == NSNotFound) {
         lastDot = 0;
     }
-    NSUInteger loc = [ext rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"&,;(=?"] options:0 range:NSMakeRange(lastDot, ext.length - lastDot)].location;
+    NSUInteger loc = [ext rangeOfCharacterFromSet:s_queryBeginChar options:0 range:NSMakeRange(lastDot, ext.length - lastDot)].location;
     if (loc != NSNotFound) {
         ext = [ext substringToIndex:loc];
     }
     
-    if ([ext isEqualToString:@"."]) {
+    if (ext.length < 1 || [ext isEqualToString:@"."]) {
         return nil;
     }
     
     NSArray<NSString *> *exts = [ext componentsSeparatedByString:@"."];
     if (exts.count > 2) {
         exts = [exts subarrayWithRange:NSMakeRange(exts.count - 2, 2)];
-        if ([exts.firstObject isEqualToString:@"tar"]/*exts.firstObject.isPureAlphabet*/) {
+        if (NSOrderedSame == [exts.firstObject compare:@"tar" options:NSCaseInsensitiveSearch]/*exts.firstObject.isPureAlphabet*/) {
             ext = [exts componentsJoinedByString:@"."];
         } else {
             ext = exts.lastObject;
@@ -216,17 +234,22 @@
             ext = exts[1];
         } else if (exts[1].length < 1) {
             ext = exts[0];
-        } else if (![exts.firstObject isEqualToString:@"tar"]/*!exts[0].isPureAlphabet*/) {
+        } else if (NSOrderedSame != [exts.firstObject compare:@"tar" options:NSCaseInsensitiveSearch]/*!exts[0].isPureAlphabet*/) {
             ext = exts[1];
         }
     }
     
-    loc = [ext rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"&,;!#"]].location;
+    loc = [ext rangeOfCharacterFromSet:s_queryChar].location;
     if (loc != NSNotFound) {
         ext = [ext substringToIndex:loc];
     }
     
-    if (NSNotFound != [ext rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"/%"]].location) {
+    if (ext.length < 1) {
+        return nil;
+    }
+    
+    NSUInteger invalidLoc = [ext rangeOfCharacterFromSet:s_invalidChar].location;
+    if (NSNotFound != invalidLoc) {
         return nil;
     }
     
@@ -234,14 +257,10 @@
         return nil;
     }
     
-    if (ext.length < 1) {
-        return nil;
-    }
-    
     if (NSNotFound != [ext rangeOfString:@"_"].location && ![ext isEqualToString:@"thor_bak"]) {
         return nil;
     }
-    return ext.length < 1 ? nil : ext;
+    return ext;
 }
 
 
@@ -257,12 +276,11 @@
     static NSCharacterSet *charSet = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        NSMutableCharacterSet *trimSet = [[NSMutableCharacterSet alloc] init];
+        NSMutableCharacterSet *trimSet = [NSMutableCharacterSet characterSetWithCharactersInString:@"　"]; // 全角空格
         [trimSet formUnionWithCharacterSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
         [trimSet formUnionWithCharacterSet:NSCharacterSet.punctuationCharacterSet];
         [trimSet formUnionWithCharacterSet:NSCharacterSet.controlCharacterSet];
         [trimSet formUnionWithCharacterSet:NSCharacterSet.symbolCharacterSet];
-        [trimSet addCharactersInString:@"　"]; // 全角空格
         charSet = trimSet.copy;
     });
     
