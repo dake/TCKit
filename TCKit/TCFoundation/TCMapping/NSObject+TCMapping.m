@@ -559,6 +559,9 @@ static id databaseInstanceWithValue(NSDictionary *value, NSDictionary *primaryKe
 + (instancetype)tc_mappingWithDictionaryOfJSONFile:(NSString *)path error:(NSError * _Nullable __strong * _Nullable)error
 {
     NSCParameterAssert(path);
+    if (nil == path) {
+        return nil;
+    }
     NSInputStream *stream = [NSInputStream inputStreamWithFileAtPath:path];
     if (nil == stream) {
         return nil;
@@ -588,6 +591,9 @@ static id databaseInstanceWithValue(NSDictionary *value, NSDictionary *primaryKe
 + (NSMutableArray *)tc_mappingWithArrayOfJSONFile:(NSString *)path error:(NSError * _Nullable __strong * _Nullable)error
 {
     NSCParameterAssert(path);
+    if (nil == path) {
+        return nil;
+    }
     NSInputStream *stream = [NSInputStream inputStreamWithFileAtPath:path];
     if (nil == stream) {
         return nil;
