@@ -153,6 +153,9 @@ extern uint32_t tc_crc32_formula_reflect(size_t len, const unsigned char *buffer
 
 @interface NSData (TCHelper)
 
++ (nullable instancetype)dataWithContentsOfAlwaysMappedFile:(NSString *)path error:(NSError **)errorPtr;
++ (nullable instancetype)dataWithContentsOfAlwaysMappedURL:(NSURL *)url error:(NSError **)errorPtr;
+
 - (NSRange)rangeOfString:(NSString *)strToFind encoding:(NSStringEncoding)encoding options:(NSDataSearchOptions)mask range:(NSRange * _Nullable)searchRange;
 
 @end

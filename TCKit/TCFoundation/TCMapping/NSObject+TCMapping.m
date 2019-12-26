@@ -559,16 +559,17 @@ static id databaseInstanceWithValue(NSDictionary *value, NSDictionary *primaryKe
 + (instancetype)tc_mappingWithDictionaryOfJSONFile:(NSString *)path error:(NSError * _Nullable __strong * _Nullable)error
 {
     NSCParameterAssert(path);
-    
-    NSData *data = [NSData dataWithContentsOfFile:path options:NSDataReadingUncached|NSDataReadingMappedAlways error:NULL];
-    if (nil == data) {
+    NSInputStream *stream = [NSInputStream inputStreamWithFileAtPath:path];
+    if (nil == stream) {
         return nil;
     }
-    
+    [stream scheduleInRunLoop:NSRunLoop.currentRunLoop forMode:NSDefaultRunLoopMode];
+    [stream open];
     NSError *err = nil;
-    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:data
-                                                        options:kNilOptions
-                                                          error:&err];
+    NSDictionary *dic = [NSJSONSerialization JSONObjectWithStream:stream
+                                                          options:kNilOptions
+                                                            error:&err];
+    [stream close];
     if (NULL != error) {
         *error = err;
     }
@@ -587,15 +588,17 @@ static id databaseInstanceWithValue(NSDictionary *value, NSDictionary *primaryKe
 + (NSMutableArray *)tc_mappingWithArrayOfJSONFile:(NSString *)path error:(NSError * _Nullable __strong * _Nullable)error
 {
     NSCParameterAssert(path);
-    NSError *err = nil;
-    NSData *data = [NSData dataWithContentsOfFile:path options:NSDataReadingUncached|NSDataReadingMappedAlways error:&err];
-    if (nil == data) {
+    NSInputStream *stream = [NSInputStream inputStreamWithFileAtPath:path];
+    if (nil == stream) {
         return nil;
     }
-    
-    NSArray *arry = [NSJSONSerialization JSONObjectWithData:data
-                                                    options:kNilOptions
-                                                      error:&err];
+    [stream scheduleInRunLoop:NSRunLoop.currentRunLoop forMode:NSDefaultRunLoopMode];
+    [stream open];
+    NSError *err = nil;
+    NSArray *arry = [NSJSONSerialization JSONObjectWithStream:stream
+                                                      options:kNilOptions
+                                                        error:&err];
+    [stream close];
     if (NULL != error) {
         *error = err;
     }

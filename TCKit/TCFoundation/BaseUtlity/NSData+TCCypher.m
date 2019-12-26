@@ -802,6 +802,16 @@ static uint8_t nibbleFromChar(unichar c) {
 
 @implementation NSData (TCHelper)
 
++ (nullable instancetype)dataWithContentsOfAlwaysMappedFile:(NSString *)path error:(NSError **)errorPtr
+{
+    return [self dataWithContentsOfFile:path options:NSDataReadingUncached|NSDataReadingMappedAlways error:errorPtr];
+}
+
++ (nullable instancetype)dataWithContentsOfAlwaysMappedURL:(NSURL *)url error:(NSError **)errorPtr
+{
+    return [self dataWithContentsOfURL:url options:NSDataReadingUncached|NSDataReadingMappedAlways error:errorPtr];
+}
+
 - (NSRange)rangeOfString:(NSString *)strToFind encoding:(NSStringEncoding)encoding options:(NSDataSearchOptions)mask range:(NSRange * _Nullable)searchRange
 {
     NSCParameterAssert(strToFind);
