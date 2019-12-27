@@ -246,16 +246,26 @@ static NSObject *codingObject(NSObject *obj, TCPersisentStyle const style, Class
 
 - (NSData *)tc_JSONData
 {
+    return [self tc_JSONData:NSJSONWritingFragmentsAllowed];
+}
+
+- (NSData *)tc_JSONData:(NSJSONWritingOptions)opt
+{
     id obj = self.tc_JSONObject;
     if (nil == obj || ![NSJSONSerialization isValidJSONObject:obj]) {
         return nil;
     }
-    return [NSJSONSerialization dataWithJSONObject:obj options:NSJSONWritingFragmentsAllowed error:NULL];
+    return [NSJSONSerialization dataWithJSONObject:obj options:opt error:NULL];
 }
 
 - (NSString *)tc_JSONString
 {
-    NSData *data = self.tc_JSONData;
+    return [self tc_JSONString:NSJSONWritingFragmentsAllowed];
+}
+
+- (NSString *)tc_JSONString:(NSJSONWritingOptions)opt
+{
+    NSData *data = [self tc_JSONData:opt];
     if (nil == data || data.length < 1) {
         return nil;
     }

@@ -31,7 +31,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable id/*NSArray or NSDictionary*/)tc_JSONObject;
 - (nullable NSData *)tc_JSONData;
+- (nullable NSData *)tc_JSONData:(NSJSONWritingOptions)opt;
 - (nullable NSString *)tc_JSONString;
+- (nullable NSString *)tc_JSONString:(NSJSONWritingOptions)opt;
 - (BOOL)tc_writeJSONToFile:(NSString *)path atomically:(BOOL)useAuxiliaryFile;
 
 - (nullable id/*NSArray or NSDictionary*/)tc_JSONObjectWithOption:(TCMappingOption * __nullable)option;
