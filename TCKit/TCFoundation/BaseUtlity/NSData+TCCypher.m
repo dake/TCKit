@@ -378,11 +378,11 @@ NSString *const TCCommonCryptoErrorDomain = @"TCCommonCryptoErrorDomain";
     
     const unsigned char *result = data.bytes;
     NSUInteger dataLen = data.length;
-    NSMutableString *outputString = [NSMutableString stringWithCapacity:dataLen * 2];
+    NSMutableString *str = [NSMutableString stringWithCapacity:dataLen * 2];
     for (NSUInteger i = 0; i < dataLen; ++i) {
-        [outputString appendFormat:@"%02x", result[i]];
+        [str appendFormat:@"%02x", result[i]];
     }
-    return outputString;
+    return str;
 }
 
 - (nullable NSData *)Hmac:(CCHmacAlgorithm)alg key:(nullable NSData *)key

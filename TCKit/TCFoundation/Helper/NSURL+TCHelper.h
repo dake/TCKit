@@ -29,7 +29,7 @@ extern NSString *_Nullable TCPercentEscapedStringFromFileName(NSString *string);
 // "http://bid.cn/path/?er=1" 这种为 .path 补全最后的 /
 - (nullable NSString *)fixedPath;
 
-- (nullable NSString *)tc_fileMD5;
+- (void)tc_fileMD5:(NSString *_Nullable *_Nullable)md5 sha256:(NSString *_Nullable *_Nullable)sha256;
 
 - (NSURL *)safeURLByResolvingSymlinksInPath;
 

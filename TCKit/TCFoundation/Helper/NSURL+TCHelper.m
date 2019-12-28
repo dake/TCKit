@@ -250,79 +250,85 @@ NSString * TCPercentEscapedStringFromFileName(NSString *string)
 // http://www.cnblogs.com/visen-0/p/3160907.html
 
 #define FileHashDefaultChunkSizeForReadingData 1024*8
-static CFStringRef FileMD5HashCreateWithPath(CFURLRef fileURL,
-                                             size_t chunkSizeForReadingData) {
-    // Declare needed variables
-    CFStringRef result = NULL;
-    CFReadStreamRef readStream = NULL;
-    if (!fileURL) goto done;
-    
-    // Create and open the read stream
-    readStream = CFReadStreamCreateWithFile(kCFAllocatorDefault,
-                                            (CFURLRef)fileURL);
-    if (!readStream) goto done;
-    bool didSucceed = (bool)CFReadStreamOpen(readStream);
-    if (!didSucceed) goto done;
-    
-    // Initialize the hash object
-    CC_MD5_CTX hashObject;
-    CC_MD5_Init(&hashObject);
-    
-    // Make sure chunkSizeForReadingData is valid
-    if (chunkSizeForReadingData < 1) {
-        chunkSizeForReadingData = FileHashDefaultChunkSizeForReadingData;
+
+- (void)tc_fileMD5:(NSString *_Nullable *_Nullable)md5 sha256:(NSString *_Nullable *_Nullable)sha256
+{
+    if (!self.isFileURL || self.hasDirectoryPath || (NULL == md5 && NULL == sha256)) {
+        return;
     }
     
-    // Feed the data to the hash object
-    bool hasMoreData = true;
-    while (hasMoreData) {
-        uint8_t buffer[chunkSizeForReadingData];
+    NSURL *url = self.safeURLByResolvingSymlinksInPath;
+    CFReadStreamRef readStream = CFReadStreamCreateWithFile(kCFAllocatorDefault, (CFURLRef)url);
+    if (NULL == readStream) {
+        return;
+    }
+    if (!CFReadStreamOpen(readStream)) {
+        CFReadStreamClose(readStream);
+        CFRelease(readStream);
+        return;
+    }
+    
+    BOOL calcMD5 = NULL != md5;
+    BOOL calcSHA256 = NULL != sha256;
+    CC_MD5_CTX md5Hash;
+    CC_SHA256_CTX sha256Hash;
+    if (calcMD5) {
+        CC_MD5_Init(&md5Hash);
+    }
+    if (calcSHA256) {
+        CC_SHA256_Init(&sha256Hash);
+    }
+    
+    bool hasMore = true;
+    do {
+        uint8_t buffer[FileHashDefaultChunkSizeForReadingData];
         CFIndex readBytesCount = CFReadStreamRead(readStream,
                                                   (UInt8 *)buffer,
                                                   (CFIndex)sizeof(buffer));
-        if (readBytesCount == -1) break;
-        if (readBytesCount == 0) {
-            hasMoreData = false;
-            continue;
+        if (readBytesCount == -1) {
+            break;
         }
-        CC_MD5_Update(&hashObject,(const void *)buffer,(CC_LONG)readBytesCount);
-    }
+        if (readBytesCount == 0) {
+            hasMore = false;
+            break;
+        }
+        if (calcMD5) {
+            CC_MD5_Update(&md5Hash,(const void *)buffer,(CC_LONG)readBytesCount);
+        }
+        if (calcSHA256) {
+            CC_SHA256_Update(&sha256Hash,(const void *)buffer,(CC_LONG)readBytesCount);
+        }
+        
+    } while (hasMore);
     
-    // Check if the read operation succeeded
-    didSucceed = !hasMoreData;
-    
-    // Compute the hash digest
-    unsigned char digest[CC_MD5_DIGEST_LENGTH];
-    CC_MD5_Final(digest, &hashObject);
-    
-    // Abort if the read operation failed
-    if (!didSucceed) goto done;
-    
-    // Compute the string result
-    char hash[2 * sizeof(digest) + 1];
-    for (size_t i = 0; i < sizeof(digest); ++i) {
-        snprintf(hash + (2 * i), 3, "%02x", (int)(digest[i]));
-    }
-    result = CFStringCreateWithCString(kCFAllocatorDefault,
-                                       (const char *)hash,
-                                       kCFStringEncodingUTF8);
-    
-done:
-    
-    if (readStream) {
+    if (hasMore) {
         CFReadStreamClose(readStream);
         CFRelease(readStream);
+        return;
     }
-    return result;
-}
+    
+    if (calcMD5) {
+        unsigned char digest[CC_MD5_DIGEST_LENGTH];
+        CC_MD5_Final(digest, &md5Hash);
+        NSMutableString *str = [NSMutableString stringWithCapacity:sizeof(digest) * 2];
+        for (size_t i = 0; i < sizeof(digest); ++i) {
+            [str appendFormat:@"%02x", digest[i]];
+        }
+        *md5 = str;
+    }
+    
+    if (calcSHA256) {
+        unsigned char digest[CC_SHA256_DIGEST_LENGTH];
+        CC_SHA256_Final(digest, &sha256Hash);
+        NSMutableString *str = [NSMutableString stringWithCapacity:sizeof(digest) * 2];
+        for (size_t i = 0; i < sizeof(digest); ++i) {
+            [str appendFormat:@"%02x", digest[i]];
+        }
+        *sha256 = str;
+    }
 
-- (NSString *)tc_fileMD5
-{
-    if (!self.isFileURL || self.hasDirectoryPath) {
-        return nil;
-    }
-    NSURL *url = self.safeURLByResolvingSymlinksInPath;
-    return (__bridge_transfer NSString *)FileMD5HashCreateWithPath((__bridge CFURLRef)url, FileHashDefaultChunkSizeForReadingData);
+    CFReadStreamClose(readStream);
+    CFRelease(readStream);
 }
 
 @end
