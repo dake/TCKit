@@ -301,9 +301,10 @@ NSString * TCPercentEscapedStringFromFileName(NSString *string)
         
     } while (hasMore);
     
+    CFReadStreamClose(readStream);
+    CFRelease(readStream);
+    
     if (hasMore) {
-        CFReadStreamClose(readStream);
-        CFRelease(readStream);
         return;
     }
     
@@ -326,9 +327,6 @@ NSString * TCPercentEscapedStringFromFileName(NSString *string)
         }
         *sha256 = str;
     }
-
-    CFReadStreamClose(readStream);
-    CFRelease(readStream);
 }
 
 @end
