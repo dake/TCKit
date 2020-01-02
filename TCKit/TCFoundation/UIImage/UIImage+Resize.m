@@ -140,30 +140,28 @@ static CGImageRef TC_CGImageCreateOrientationUp(UIImage *img, CGBitmapInfo destB
     CGFloat w = width;
     CGFloat h = height;
     
-    if (ratio < 1.0f) {
+//    if (ratio < 1.0f) {
         w *= ratio;
         h *= ratio;
-    }
+//    }
     
     CGFloat bigger = MAX(w, h);
-    
     if (bigger > maxWidth) {
         CGFloat ratio2 = maxWidth / bigger;
         w *= ratio2;
         h *= ratio2;
     }
     
-    
     size_t fix_w = TC_FixedWidth((size_t)w);
     size_t fix_h = (size_t)(h / w * fix_w);
     
-    return CGSizeMake((size_t)fix_w, (size_t)fix_h);
+    return CGSizeMake(fix_w, fix_h);
 }
 
 - (CGSize)calculateSizeScaleToPixel:(CGFloat)pixelSize maxWidth:(NSInteger)maxWidth
 {
     CGSize size = CGSizeMake(self.size.width * self.scale, self.size.height * self.scale);
-    if (maxWidth == NSIntegerMax && size.width * size.height <= pixelSize) {
+    if (maxWidth == NSIntegerMax && ABS(size.width * size.height - pixelSize) <= 2.0f) {
         return size;
     }
     return [self.class calculateSize:size scaleToPixel:pixelSize maxWidth:maxWidth];
@@ -173,10 +171,10 @@ static CGImageRef TC_CGImageCreateOrientationUp(UIImage *img, CGBitmapInfo destB
 {
     CGSize size = [self calculateSizeScaleToPixel:pixelSize maxWidth:maxWidth];
     
-    if (self.size.width * self.scale <= size.width) {
-        // FIXME: 原图width 可能不是 8 像素对齐
-        return self;
-    }
+//    if (self.size.width * self.scale <= size.width) {
+//        // FIXME: 原图width 可能不是 8 像素对齐
+//        return self;
+//    }
     
     CGFloat w = CGImageGetWidth(self.CGImage);
     CGFloat h = CGImageGetHeight(self.CGImage);
@@ -190,7 +188,6 @@ static CGImageRef TC_CGImageCreateOrientationUp(UIImage *img, CGBitmapInfo destB
         rawSize.height = MAX(size.width, size.height);
     }
     
-   
     CGContextRef ctx = [UIImage createImageContext:rawSize];
     CGRect rect = TC_CGRectFloorIntegral(CGRectMake(0, 0, rawSize.width, rawSize.height));
     if (rect.size.width * rect.size.height > 1024 * 1024) {
@@ -223,7 +220,7 @@ static CGImageRef TC_CGImageCreateOrientationUp(UIImage *img, CGBitmapInfo destB
     CGFloat height = self.size.height * self.scale;
     CGFloat ratio = minSize / MIN(width, height);
     
-    if (ratio >= 1) {
+    if (ABS(ratio - 1.0f) <= 1e-4) {
         return self;
     }
     
