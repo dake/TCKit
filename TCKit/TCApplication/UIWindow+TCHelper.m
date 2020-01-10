@@ -67,7 +67,9 @@
     
     if ([controller isKindOfClass:UITabBarController.class]) {
         UIViewController *ctrler = ((UITabBarController *)controller).selectedViewController;
-        controller = [self topViewController:ctrler];
+        if (nil != ctrler) {
+            controller = [self topViewController:ctrler];
+        }
         
     } else if ([controller isKindOfClass:UINavigationController.class]) {
         UINavigationController *navi = (typeof(navi))controller;
@@ -75,14 +77,19 @@
         if (ctrler.isBeingDismissed || ctrler.isMovingFromParentViewController) {
             ctrler = navi.topViewController;
         }
-        controller = [self topViewController:ctrler];
+        if (nil != ctrler) {
+            controller = [self topViewController:ctrler];
+        }
         
     } else if ([controller isKindOfClass:UIPageViewController.class]) {
         UIPageViewController *page = (typeof(page))controller;
         UIViewController *ctrler = page.viewControllers.firstObject;
-        controller = [self topViewController:ctrler];
+        if (nil != ctrler) {
+            controller = [self topViewController:ctrler];
+        }
     }
     
+    NSCParameterAssert(controller);
     return controller;
 }
 
