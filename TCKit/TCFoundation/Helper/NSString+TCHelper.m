@@ -224,8 +224,10 @@
     NSArray<NSString *> *exts = [ext componentsSeparatedByString:@"."];
     if (exts.count > 2) {
         exts = [exts subarrayWithRange:NSMakeRange(exts.count - 2, 2)];
-        if (NSOrderedSame == [exts.firstObject compare:@"tar" options:NSCaseInsensitiveSearch]/*exts.firstObject.isPureAlphabet*/) {
-            ext = [exts componentsJoinedByString:@"."];
+        NSString *tmp = [exts componentsJoinedByString:@"."];
+        if (NSOrderedSame == [tmp compare:@"ips.beta" options:NSCaseInsensitiveSearch]
+            || NSOrderedSame == [exts.firstObject compare:@"tar" options:NSCaseInsensitiveSearch]/*exts.firstObject.isPureAlphabet*/) {
+            ext = tmp;
         } else {
             ext = exts.lastObject;
         }
@@ -234,7 +236,8 @@
             ext = exts[1];
         } else if (exts[1].length < 1) {
             ext = exts[0];
-        } else if (NSOrderedSame != [exts.firstObject compare:@"tar" options:NSCaseInsensitiveSearch]/*!exts[0].isPureAlphabet*/) {
+        } else if (NSOrderedSame != [ext compare:@"ips.beta" options:NSCaseInsensitiveSearch]
+                   && NSOrderedSame != [exts.firstObject compare:@"tar" options:NSCaseInsensitiveSearch]/*!exts[0].isPureAlphabet*/) {
             ext = exts[1];
         }
     }
@@ -257,7 +260,7 @@
         return nil;
     }
     
-    if (NSNotFound != [ext rangeOfString:@"_"].location && ![ext isEqualToString:@"thor_bak"]) {
+    if (NSNotFound != [ext rangeOfString:@"_"].location && NSOrderedSame != [ext compare:@"thor_bak" options:NSCaseInsensitiveSearch]) {
         return nil;
     }
     return ext;
