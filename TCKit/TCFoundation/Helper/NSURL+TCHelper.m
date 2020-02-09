@@ -10,8 +10,9 @@
 #import "NSString+TCHelper.h"
 #import <CommonCrypto/CommonCrypto.h>
 #import <sys/stat.h>
+#import <zlib.h>
 
-NSString * TCPercentEscapedStringFromString(NSString *string) {
+NSString *TCPercentEscapedStringFromString(NSString *string) {
     NSCharacterSet *allowedCharacterSet = NSCharacterSet.urlComponentAllowedCharacters;
     
     // FIXME: https://github.com/AFNetworking/AFNetworking/pull/3028
@@ -39,7 +40,7 @@ NSString * TCPercentEscapedStringFromString(NSString *string) {
     return escaped;
 }
 
-NSString * TCPercentEscapedStringFromFileName(NSString *string)
+NSString *TCPercentEscapedStringFromFileName(NSString *string)
 {
     if (string.length < 1) {
         return nil;
@@ -52,6 +53,105 @@ NSString * TCPercentEscapedStringFromFileName(NSString *string)
         return nil;
     }
     return name.length < 1 ? nil : name;
+}
+
+
+#define FileHashDefaultChunkSizeForReadingData (1024 * 8U)
+
+static NSString *tc_file_hash(NSURL *url, void *ctx, int (*fun_init)(void *c), int (*fun_update)(void *c, const void *data, CC_LONG len), int (*fun_final)(unsigned char *md, void *c), size_t digest_len)
+{
+    if (!url.isFileURL || url.hasDirectoryPath) {
+        return nil;
+    }
+    
+    CFReadStreamRef readStream = CFReadStreamCreateWithFile(kCFAllocatorDefault, (CFURLRef)url);
+    if (NULL == readStream) {
+        return nil;
+    }
+    if (!CFReadStreamOpen(readStream)) {
+        CFReadStreamClose(readStream);
+        CFRelease(readStream);
+        return nil;
+    }
+
+    if (NULL != fun_init) {
+        fun_init(ctx);
+    }
+    
+    bool hasMore = true;
+    do {
+        uint8_t buffer[FileHashDefaultChunkSizeForReadingData];
+        CFIndex readBytesCount = CFReadStreamRead(readStream,
+                                                  (UInt8 *)buffer,
+                                                  (CFIndex)sizeof(buffer));
+        if (readBytesCount == -1) {
+            break;
+        }
+        if (readBytesCount == 0) {
+            hasMore = false;
+            break;
+        }
+        fun_update(ctx, (const void *)buffer, (CC_LONG)readBytesCount);
+        
+    } while (hasMore);
+    
+    CFReadStreamClose(readStream);
+    CFRelease(readStream);
+    
+    if (hasMore) {
+        return nil;
+    }
+    
+    unsigned char digest[digest_len];
+    fun_final(digest, ctx);
+    NSMutableString *str = [NSMutableString stringWithCapacity:sizeof(digest) * 2];
+    for (size_t i = 0; i < sizeof(digest); ++i) {
+        [str appendFormat:@"%02x", digest[i]];
+    }
+    return str;
+}
+
+static uLong tc_file_crc(NSURL *url, uLong (*fun_init)(uLong crc, const Bytef *buf, uInt len), uLong (*fun_update)(uLong crc, const Bytef *buf, uInt len))
+{
+    if (!url.isFileURL || url.hasDirectoryPath) {
+        return 0UL;
+    }
+    
+    CFReadStreamRef readStream = CFReadStreamCreateWithFile(kCFAllocatorDefault, (CFURLRef)url);
+    if (NULL == readStream) {
+        return 0UL;
+    }
+    if (!CFReadStreamOpen(readStream)) {
+        CFReadStreamClose(readStream);
+        CFRelease(readStream);
+        return 0UL;
+    }
+    
+    uLong crc = fun_init(0L, Z_NULL, 0);
+    bool hasMore = true;
+    do {
+        Bytef buffer[FileHashDefaultChunkSizeForReadingData];
+        CFIndex readBytesCount = CFReadStreamRead(readStream,
+                                                  (UInt8 *)buffer,
+                                                  (CFIndex)sizeof(buffer));
+        if (readBytesCount == -1) {
+            break;
+        }
+        if (readBytesCount == 0) {
+            hasMore = false;
+            break;
+        }
+        crc = fun_update(crc, buffer, (uInt)readBytesCount);
+        
+    } while (hasMore);
+    
+    CFReadStreamClose(readStream);
+    CFRelease(readStream);
+    
+    if (hasMore) {
+        return 0UL;
+    }
+    return crc;
 }
 
 @implementation NSCharacterSet (TCHelper)
@@ -249,7 +349,142 @@ NSString * TCPercentEscapedStringFromFileName(NSString *string)
 // http://siruoxian.iteye.com/blog/2013601
 // http://www.cnblogs.com/visen-0/p/3160907.html
 
-#define FileHashDefaultChunkSizeForReadingData 1024*8
+
+- (unsigned long)fileCRC32
+{
+    return tc_file_crc(self, tc_crc32_formula_reflect, tc_crc32_formula_reflect);
+}
+
+- (nullable NSString *)fileCRC32String
+{
+    uLong c = tc_file_crc(self, tc_crc32_formula_reflect, tc_crc32_formula_reflect);
+    if (0UL == c) {
+        return nil;
+    }
+    return [NSString stringWithFormat:@"%08lx", c];
+}
+
+- (unsigned long)fileCRC32B
+{
+    return tc_file_crc(self, crc32, crc32);
+}
+
+- (nullable NSString *)fileCRC32BString
+{
+    uLong c = tc_file_crc(self, crc32, crc32);
+    if (0UL == c) {
+        return nil;
+    }
+    return [NSString stringWithFormat:@"%08lx", c];
+}
+
+- (unsigned long)fileAdler32
+{
+    return tc_file_crc(self, adler32, adler32);
+}
+
+- (nullable NSString *)fileAdler32String
+{
+    uLong c = tc_file_crc(self, adler32, adler32);
+    if (0UL == c) {
+        return nil;
+    }
+    return [NSString stringWithFormat:@"%08lx", c];
+}
+
+- (nullable NSString *)fileSHA:(NSUInteger)digestLen
+{
+    switch (digestLen) {
+        case CC_SHA1_DIGEST_LENGTH: {
+            CC_SHA1_CTX hash;
+            return tc_file_hash(self, &hash, (int (*)(void *))CC_SHA1_Init,  (int (*)(void *, const void *, CC_LONG))CC_SHA1_Update, (int (*)(unsigned char *, void *))CC_SHA1_Final, digestLen);
+        }
+            
+        case CC_SHA256_DIGEST_LENGTH: {
+            CC_SHA256_CTX hash;
+            return tc_file_hash(self, &hash, (int (*)(void *))CC_SHA256_Init,  (int (*)(void *, const void *, CC_LONG))CC_SHA256_Update, (int (*)(unsigned char *, void *))CC_SHA256_Final, digestLen);
+        }
+            
+        case CC_SHA224_DIGEST_LENGTH: {
+            CC_SHA256_CTX hash;
+            return tc_file_hash(self, &hash, (int (*)(void *))CC_SHA224_Init,  (int (*)(void *, const void *, CC_LONG))CC_SHA224_Update, (int (*)(unsigned char *, void *))CC_SHA224_Final, digestLen);
+        }
+            
+        case CC_SHA384_DIGEST_LENGTH: {
+            CC_SHA512_CTX hash;
+            return tc_file_hash(self, &hash, (int (*)(void *))CC_SHA384_Init,  (int (*)(void *, const void *, CC_LONG))CC_SHA384_Update, (int (*)(unsigned char *, void *))CC_SHA384_Final, digestLen);
+        }
+            
+        case CC_SHA512_DIGEST_LENGTH: {
+            CC_SHA512_CTX hash;
+            return tc_file_hash(self, &hash, (int (*)(void *))CC_SHA512_Init,  (int (*)(void *, const void *, CC_LONG))CC_SHA512_Update, (int (*)(unsigned char *, void *))CC_SHA512_Final, digestLen);
+        }
+            
+        default:
+            return nil;
+    }
+}
+
+static int tc_CCHmacFinal(unsigned char *md, void *c)
+{
+    CCHmacFinal(c, md);
+    return 1;
+}
+
+static int tc_CCHmacUpdate(void *c, const void *data, CC_LONG len)
+{
+    CCHmacUpdate(c, data, len);
+    return 1;
+}
+
+- (nullable NSString *)fileHmac:(CCHmacAlgorithm)alg key:(nullable NSData *)key
+{
+    NSUInteger digestLen = 0;
+    switch (alg) {
+        case kCCHmacAlgSHA1:
+            digestLen = CC_SHA1_DIGEST_LENGTH;
+            break;
+        case kCCHmacAlgMD5:
+            digestLen = CC_MD5_DIGEST_LENGTH;
+            break;
+        case kCCHmacAlgSHA224:
+            digestLen = CC_SHA224_DIGEST_LENGTH;
+            break;
+        case kCCHmacAlgSHA256:
+            digestLen = CC_SHA256_DIGEST_LENGTH;
+            break;
+        case kCCHmacAlgSHA384:
+            digestLen = CC_SHA384_DIGEST_LENGTH;
+            break;
+        case kCCHmacAlgSHA512:
+            digestLen = CC_SHA512_DIGEST_LENGTH;
+            break;
+        default:
+            return nil;
+    }
+    
+    CCHmacContext hash;
+    CCHmacInit(&hash, alg, key.bytes, key.length);
+    return tc_file_hash(self, &hash, NULL,  (int (*)(void *, const void *, CC_LONG))tc_CCHmacUpdate, (int (*)(unsigned char *, void *))tc_CCHmacFinal, digestLen);
+}
+
+- (nullable NSString *)fileMD5_32
+{
+    CC_MD5_CTX hash;
+    return tc_file_hash(self, &hash, (int (*)(void *))CC_MD5_Init,  (int (*)(void *, const void *, CC_LONG))CC_MD5_Update, (int (*)(unsigned char *, void *))CC_MD5_Final, CC_MD5_DIGEST_LENGTH);
+}
+
+- (nullable NSString *)fileMD2
+{
+    CC_MD2_CTX hash;
+    return tc_file_hash(self, &hash, (int (*)(void *))CC_MD2_Init,  (int (*)(void *, const void *, CC_LONG))CC_MD2_Update, (int (*)(unsigned char *, void *))CC_MD2_Final, CC_MD2_DIGEST_LENGTH);
+}
+
+- (nullable NSString *)fileMD4
+{
+    CC_MD4_CTX hash;
+    return tc_file_hash(self, &hash, (int (*)(void *))CC_MD4_Init,  (int (*)(void *, const void *, CC_LONG))CC_MD4_Update, (int (*)(unsigned char *, void *))CC_MD4_Final, CC_MD4_DIGEST_LENGTH);
+}
 
 - (void)tc_fileMD5:(NSString *_Nullable *_Nullable)md5 sha256:(NSString *_Nullable *_Nullable)sha256
 {
@@ -257,7 +492,7 @@ NSString * TCPercentEscapedStringFromFileName(NSString *string)
         return;
     }
     
-    NSURL *url = self.safeURLByResolvingSymlinksInPath;
+    NSURL *url = self;
     CFReadStreamRef readStream = CFReadStreamCreateWithFile(kCFAllocatorDefault, (CFURLRef)url);
     if (NULL == readStream) {
         return;
@@ -293,10 +528,10 @@ NSString * TCPercentEscapedStringFromFileName(NSString *string)
             break;
         }
         if (calcMD5) {
-            CC_MD5_Update(&md5Hash,(const void *)buffer,(CC_LONG)readBytesCount);
+            CC_MD5_Update(&md5Hash, (const void *)buffer, (CC_LONG)readBytesCount);
         }
         if (calcSHA256) {
-            CC_SHA256_Update(&sha256Hash,(const void *)buffer,(CC_LONG)readBytesCount);
+            CC_SHA256_Update(&sha256Hash, (const void *)buffer, (CC_LONG)readBytesCount);
         }
         
     } while (hasMore);

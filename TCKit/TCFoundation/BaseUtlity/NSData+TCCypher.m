@@ -7,22 +7,22 @@
 //
 
 #import "NSData+TCCypher.h"
-#import <zlib.h>
 
 #if ! __has_feature(objc_arc)
 #error this file is ARC only. Either turn on ARC for the project or use -fobjc-arc flag
 #endif
 
-uint32_t tc_crc32_formula_reflect(size_t len, const unsigned char *buffer)
+
+uLong tc_crc32_formula_reflect(uLong crc0, const Bytef *buffer, uInt len)
 {
     if (NULL == buffer || len < 1) {
-        return 0U;
+        return crc0;
     }
     
-    static const uint32_t POLY = 0x04C11DB7;
-    uint32_t crc = UINT32_MAX;
-    while (len-- > 0) {
-        crc = crc ^ ((uint32_t)(*buffer++) << 24);
+    static const uLong POLY = 0x04C11DB7UL;
+    uLong crc = crc0 > 0 ? htonl(~crc0) : ULONG_MAX;
+    do {
+        crc = crc ^ ((uLong)(*buffer++) << 24);
         for (int bit = 0; bit < 8; bit++) {
             if ((crc & (1U << 31)) != 0) {
                 crc = (crc << 1) ^ POLY;
@@ -30,8 +30,7 @@ uint32_t tc_crc32_formula_reflect(size_t len, const unsigned char *buffer)
                 crc = (crc << 1);
             }
         }
-    }
-    
+    } while (--len > 0);    
     return ntohl(~crc);
 }
 
@@ -479,23 +478,22 @@ NSString *const TCCommonCryptoErrorDomain = @"TCCommonCryptoErrorDomain";
     if (self.length < 1) {
         return nil;
     }
-    uLong crc = crc32(0L, Z_NULL, 0);
-    uLong c = crc32(crc, self.bytes, (uInt)self.length);
+    uLong c = self.CRC32B;
     return [NSString stringWithFormat:@"%08lx", c];
 }
 
-- (uint32_t)CRC32
+- (unsigned long)CRC32
 {
     if (self.length < 1) {
         return 0U;
     }
 
-    return tc_crc32_formula_reflect(self.length, self.bytes);
+    return tc_crc32_formula_reflect(0L, (const Bytef *)self.bytes, (uInt)self.length);
 }
 
 - (nullable NSString *)CRC32String
 {
-    return [NSString stringWithFormat:@"%08x", self.CRC32];
+    return [NSString stringWithFormat:@"%08lx", self.CRC32];
 }
 
 - (unsigned long)adler32

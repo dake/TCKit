@@ -195,7 +195,7 @@
     return [NSString stringWithFormat:@"%08lx", c];
 }
 
-- (uint32_t)CRC32
+- (unsigned long)CRC32
 {
     if (self.length < 1) {
         return 0U;
@@ -208,12 +208,12 @@
     if (NULL == input) {
         return 0U;
     }
-    return tc_crc32_formula_reflect(strlen(input), (const unsigned char *)input);
+    return tc_crc32_formula_reflect(0L, (const Bytef *)input, (uInt)strlen(input));
 }
 
 - (nullable NSString *)CRC32String
 {
-    return [NSString stringWithFormat:@"%08x", self.CRC32];
+    return [NSString stringWithFormat:@"%08lx", self.CRC32];
 }
 
 - (unsigned long)adler32

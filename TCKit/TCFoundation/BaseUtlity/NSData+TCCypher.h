@@ -10,7 +10,7 @@
 #import <CommonCrypto/CommonDigest.h>
 #import <CommonCrypto/CommonCryptor.h>
 #import <CommonCrypto/CommonHMAC.h>
-
+#import <zlib.h>
 
 #ifdef __IPHONE_13_0
 
@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 extern NSString *const TCCommonCryptoErrorDomain;
 
-extern uint32_t tc_crc32_formula_reflect(size_t len, const unsigned char *buffer);
+extern uLong tc_crc32_formula_reflect(uLong crc0, const Bytef *buffer, uInt len);
 
 @interface NSData (TCCypher)
 
@@ -104,7 +104,7 @@ extern uint32_t tc_crc32_formula_reflect(size_t len, const unsigned char *buffer
 
 - (unsigned long)CRC32B;
 - (nullable NSString *)CRC32BString;
-- (uint32_t)CRC32;
+- (unsigned long)CRC32;
 - (nullable NSString *)CRC32String;
 - (unsigned long)adler32;
 - (nullable NSString *)adler32String;
