@@ -1161,7 +1161,8 @@
 				B76A7F501F13568F0010FBD3 /* iConsole.h */,
 				B76A7F511F13568F0010FBD3 /* iConsole.m */,
 			);
-			path = iConsole;
+			name = iConsole;
+			path = ../TCKit/TCDebug/iConsole;
 			sourceTree = "<group>";
 		};
 		B76A7F531F13568F0010FBD3 /* TCFoundation */ = {

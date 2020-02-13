@@ -53,7 +53,7 @@
 
 
 
-#define EDITFIELD_HEIGHT 28
+#define EDITFIELD_HEIGHT 32 //28
 #define ACTION_BUTTON_WIDTH 44
 
 static NSString *const kSaveKey = @"iConsoleLog";
@@ -517,25 +517,25 @@ static void exceptionHandler(NSException *exception)
         [NSUserDefaults.standardUserDefaults synchronize];
         self.log = [NSMutableArray arrayWithArray:[NSUserDefaults.standardUserDefaults objectForKey:kSaveKey]];
         
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(saveSettings)
-                                                     name:UIApplicationDidEnterBackgroundNotification
-                                                   object:nil];
+        [NSNotificationCenter.defaultCenter addObserver:self
+                                               selector:@selector(saveSettings)
+                                                   name:UIApplicationDidEnterBackgroundNotification
+                                                 object:nil];
         
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(saveSettings)
-                                                     name:UIApplicationWillTerminateNotification
-                                                   object:nil];
+        [NSNotificationCenter.defaultCenter addObserver:self
+                                               selector:@selector(saveSettings)
+                                                   name:UIApplicationWillTerminateNotification
+                                                 object:nil];
         
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(rotateView:)
-                                                     name:UIApplicationDidChangeStatusBarOrientationNotification
-                                                   object:nil];
+        [NSNotificationCenter.defaultCenter addObserver:self
+                                               selector:@selector(rotateView:)
+                                                   name:UIApplicationDidChangeStatusBarOrientationNotification
+                                                 object:nil];
         
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(resizeView:)
-                                                     name:UIApplicationWillChangeStatusBarFrameNotification
-                                                   object:nil];
+        [NSNotificationCenter.defaultCenter addObserver:self
+                                               selector:@selector(resizeView:)
+                                                   name:UIApplicationWillChangeStatusBarFrameNotification
+                                                 object:nil];
     }
     return self;
 }
@@ -551,7 +551,7 @@ static void exceptionHandler(NSException *exception)
     CGRect frame = self.view.bounds;
     frame.size.height -= EDITFIELD_HEIGHT;
     _consoleView = [[UITextView alloc] initWithFrame:frame];
-    _consoleView.font = [UIFont fontWithName:@"Courier" size:12];
+    _consoleView.font = [UIFont fontWithName:@"Menlo" size:12] ?: [UIFont fontWithName:@"Courier" size:12];
     _consoleView.textColor = _textColor;
     _consoleView.backgroundColor = UIColor.clearColor;
     _consoleView.editable = NO;
@@ -568,7 +568,7 @@ static void exceptionHandler(NSException *exception)
                                                                 self.view.frame.size.width - 20,
                                                                 EDITFIELD_HEIGHT)];
     _inputField.borderStyle = UITextBorderStyleRoundedRect;
-    _inputField.font = [UIFont fontWithName:@"Courier" size:12];
+    _inputField.font = [UIFont fontWithName:@"Menlo" size:12] ?: [UIFont fontWithName:@"Courier" size:12];
     _inputField.autocapitalizationType = UITextAutocapitalizationTypeNone;
     _inputField.autocorrectionType = UITextAutocorrectionTypeNo;
     _inputField.returnKeyType = UIReturnKeyDone;
@@ -584,12 +584,9 @@ static void exceptionHandler(NSException *exception)
     _consoleView.frame = frame;
     [self.view addSubview:_inputField];
     
-    
-    _actionButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    _actionButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
-    [_actionButton setTitle:@"⚙" forState:UIControlStateNormal];
+    _actionButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [_actionButton setTitle:@"⚙  " forState:UIControlStateNormal];
     [_actionButton setTitleColor:_textColor forState:UIControlStateNormal];
-    [_actionButton setTitleColor:[_textColor colorWithAlphaComponent:0.5f] forState:UIControlStateHighlighted];
     _actionButton.frame = CGRectMake(0, 0, ACTION_BUTTON_WIDTH, EDITFIELD_HEIGHT);
     [_actionButton addTarget:self action:@selector(infoAction) forControlEvents:UIControlEventTouchUpInside];
     _inputField.rightViewMode = UITextFieldViewModeAlways;
@@ -597,16 +594,15 @@ static void exceptionHandler(NSException *exception)
     
     [self.consoleView scrollRangeToVisible:NSMakeRange(self.consoleView.text.length, 0)];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(keyboardWillShow:)
-                                                 name:UIKeyboardWillShowNotification
-                                               object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(keyboardWillShow:)
+                                               name:UIKeyboardWillShowNotification
+                                             object:nil];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(keyboardWillHide:)
-                                                 name:UIKeyboardWillHideNotification
-                                               object:nil];
-    
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(keyboardWillHide:)
+                                               name:UIKeyboardWillHideNotification
+                                             object:nil];
 }
 
 
