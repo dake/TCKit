@@ -1704,7 +1704,8 @@
 			children = (
 				B76D758B1F1322F200CF77FA /* TCDebug */,
 			);
-			path = TCDebug;
+			name = TCDebug;
+			path = ../TCKit/TCDebug;
 			sourceTree = "<group>";
 		};
 		B76D758B1F1322F200CF77FA /* TCDebug */ = {
