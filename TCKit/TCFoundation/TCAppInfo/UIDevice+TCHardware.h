@@ -160,7 +160,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)fetchMemoryStatistics:(void (^)(size_t total, size_t wired, size_t active, size_t inactive, size_t free))block;
 + (nullable NSDate *)systemUpTime;
 + (float)cpuUsage;
-+ (void)diskTotalSpace:(uint64_t *_Nullable)pTotal freeSpace:(uint64_t *_Nullable)pFree;
++ (BOOL)diskTotalSpace:(uint64_t *_Nullable)pTotal freeSpace:(uint64_t *_Nullable)pFree error:(NSError **)error;
 + (BOOL)isVPNOn;
 
 + (BOOL)hasRetinaDisplay;

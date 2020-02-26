@@ -1049,30 +1049,48 @@ static NSString *s_device_names[kTCDeviceCount] = {
 //    }
 //}
 
-+ (void)diskTotalSpace:(uint64_t *)pTotal freeSpace:(uint64_t *)pFree
++ (BOOL)diskTotalSpace:(uint64_t *)pTotal freeSpace:(uint64_t *)pFree error:(NSError **)error
 {
     if (NULL == pTotal && NULL == pFree) {
-        return;
+        return NO;
     }
     
-    NSError *error = nil;
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSDictionary *attributes = [NSFileManager.defaultManager attributesOfFileSystemForPath:paths.lastObject
-                                                                                     error:&error];
+    if (@available(iOS 11.0, *)) {
+        BOOL ret = YES;
+        if (NULL != pTotal) {
+            NSDictionary *attributes = [NSFileManager.defaultManager attributesOfFileSystemForPath:NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).lastObject
+                                                                                             error:error];
+            if (nil != attributes) {
+                *pTotal = [attributes[NSFileSystemSize] unsignedLongLongValue];
+            } else {
+                ret = NO;
+            }
+        }
+        if (NULL != pFree) {
+            NSDictionary *attributes = [[NSURL fileURLWithPath:NSTemporaryDirectory()] resourceValuesForKeys:@[NSURLVolumeAvailableCapacityForImportantUsageKey]
+                                                                error:error];
+            if (nil != attributes) {
+                *pFree = [attributes[NSURLVolumeAvailableCapacityForImportantUsageKey] unsignedLongLongValue];
+            } else {
+                ret = NO;
+            }
+        }
+        return ret;
+    }
+    
+    NSDictionary *attributes = [NSFileManager.defaultManager attributesOfFileSystemForPath:NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).lastObject
+                                                                                     error:error];
+    if (nil == attributes) {
+        return NO;
+    }
+    
     if (NULL != pTotal) {
         *pTotal = [attributes[NSFileSystemSize] unsignedLongLongValue];
     }
-    
     if (NULL != pFree) {
         *pFree = [attributes[NSFileSystemFreeSize] unsignedLongLongValue];
-        // iOS 11 新方法修正
-        if (@available(iOS 11.0, *)) {
-            NSURL *fileURL = [[NSURL alloc] initFileURLWithPath:NSTemporaryDirectory()];
-            NSDictionary *results = [fileURL resourceValuesForKeys:@[NSURLVolumeAvailableCapacityForImportantUsageKey]
-                                                             error:&error];
-            *pFree = [results[NSURLVolumeAvailableCapacityForImportantUsageKey] unsignedLongLongValue];
-        }
     }
+    return YES;
 }
 
 + (float)cpuUsage
