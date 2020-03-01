@@ -810,7 +810,7 @@ NSTimeInterval const kAFUploadStream3GSuggestedDelay = 0.2;
     bodyPart.stringEncoding = self.stringEncoding;
     bodyPart.headers = headers;
     bodyPart.boundary = self.boundary;
-    bodyPart.bodyContentLength = [body length];
+    bodyPart.bodyContentLength = body.length;
     bodyPart.body = body;
 
     [self.bodyStream appendHTTPBodyPart:bodyPart];
