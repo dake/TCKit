@@ -23,6 +23,7 @@
 #define NSSecondCalendarUnit                NSCalendarUnitSecond
 #define NSWeekdayCalendarUnit               NSCalendarUnitWeekday
 #define NSWeekdayOrdinalCalendarUnit        NSCalendarUnitWeekdayOrdinal
+#define NSNanosecondCalendarUnit            NSCalendarUnitNanosecond
 #define NSWeekCalendarUnit                  (NSCalendarUnitWeekOfYear|NSCalendarUnitWeekOfMonth)
 
 #define NSGregorianCalendar  NSCalendarIdentifierGregorian
@@ -36,7 +37,7 @@ NSInteger const D_WEEK = 604800;
 NSInteger const D_YEAR = 31556926;
 
 // Thanks, AshFurrow
-static const NSUInteger kComponentFlags = (NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit | NSWeekCalendarUnit |  NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit | NSWeekdayCalendarUnit | NSWeekdayOrdinalCalendarUnit);
+static const NSUInteger kComponentFlags = (NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit | NSWeekCalendarUnit |  NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit | NSNanosecondCalendarUnit | NSWeekdayCalendarUnit | NSWeekdayOrdinalCalendarUnit);
 
 
 /*
@@ -624,6 +625,13 @@ NSString *const kTCDateRubyFormat = @"EEE MMM dd HH:mm:ss ZZZ yyyy";
 	NSDateComponents *components = [self.class.currentCalendar components:kComponentFlags fromDate:self];
 	return components.second;
 }
+
+- (NSInteger)nanosecond
+{
+    NSDateComponents *components = [self.class.currentCalendar components:kComponentFlags fromDate:self];
+    return components.nanosecond;
+}
+
 
 - (NSInteger)day
 {

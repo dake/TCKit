@@ -220,6 +220,7 @@ extern NSInteger const D_YEAR;
 @property (nonatomic, readonly) NSInteger hour;
 @property (nonatomic, readonly) NSInteger minute;
 @property (nonatomic, readonly) NSInteger seconds;
+@property (nonatomic, readonly) NSInteger nanosecond;
 @property (nonatomic, readonly) NSInteger day;
 @property (nonatomic, readonly) NSInteger month;
 @property (nonatomic, readonly) NSInteger weekOfYear;
