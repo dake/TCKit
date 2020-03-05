@@ -23,7 +23,7 @@ NS_CLASS_AVAILABLE_IOS(7_0) @interface TCHTTPRequestCenter : NSObject <TCHTTPReq
 @property (nonatomic, assign, readonly) BOOL networkReachable;
 // default: 0, use Max(TCHTTPRequestCenter.timeoutInterval, TCHTTPRequest.timeoutInterval)
 @property (nonatomic, assign) NSTimeInterval timeoutInterval;
-@property (nonatomic, strong, nullable) NSSet *acceptableContentTypes;
+@property (nonatomic, strong, nullable) NSSet<NSString *> *acceptableContentTypes;
 
 @property (nonatomic, copy, readonly) NSURLSessionConfiguration *sessionConfiguration;
 @property (nullable, nonatomic, strong) AFHTTPSessionManager *requestManager;
