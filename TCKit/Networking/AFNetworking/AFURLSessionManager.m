@@ -192,9 +192,6 @@ typedef void (^AFURLSessionTaskCompletionHandler)(NSURLResponse *response, id re
 didCompleteWithError:(NSError *)error
 {
     __strong AFURLSessionManager *manager = self.manager;
-
-    __block id responseObject = nil;
-
     __block NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
     userInfo[AFNetworkingTaskDidCompleteResponseSerializerKey] = manager.responseSerializer;
 
@@ -206,39 +203,46 @@ didCompleteWithError:(NSError *)error
         self.mutableData = nil;
     }
 
-    if (self.downloadFileURL) {
+    if (nil != self.downloadFileURL) {
         userInfo[AFNetworkingTaskDidCompleteAssetPathKey] = self.downloadFileURL;
-    } else if (data) {
+    } else if (nil != data) {
         userInfo[AFNetworkingTaskDidCompleteResponseDataKey] = data;
     }
 
-    if (error) {
+    if (nil != error) {
         userInfo[AFNetworkingTaskDidCompleteErrorKey] = error;
-
+        
         dispatch_group_async(manager.completionGroup ?: url_session_manager_completion_group(), manager.completionQueue ?: dispatch_get_main_queue(), ^{
-            if (self.completionHandler) {
+            id responseObject = nil;
+            if (nil != self.downloadFileURL) {
+                responseObject = self.downloadFileURL;
+            } else {
+                responseObject = data;
+            }
+            
+            if (nil != self.completionHandler) {
                 self.completionHandler(task.response, responseObject, error);
             }
-
+            
             dispatch_async(dispatch_get_main_queue(), ^{
                 [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingTaskDidCompleteNotification object:task userInfo:userInfo];
             });
         });
     } else {
         dispatch_async(url_session_manager_processing_queue(), ^{
+            id responseObject = nil;
             NSError *serializationError = nil;
-            responseObject = [manager.responseSerializer responseObjectForResponse:task.response data:data error:&serializationError];
-
-            if (self.downloadFileURL) {
+            if (nil != self.downloadFileURL) {
                 responseObject = self.downloadFileURL;
+            } else {
+                responseObject = [manager.responseSerializer responseObjectForResponse:task.response data:data error:&serializationError];
+                if (nil != serializationError) {
+                    userInfo[AFNetworkingTaskDidCompleteErrorKey] = serializationError;
+                }
             }
 
-            if (responseObject) {
+            if (nil != responseObject) {
                 userInfo[AFNetworkingTaskDidCompleteSerializedResponseKey] = responseObject;
-            }
-
-            if (serializationError) {
-                userInfo[AFNetworkingTaskDidCompleteErrorKey] = serializationError;
             }
 
             dispatch_group_async(manager.completionGroup ?: url_session_manager_completion_group(), manager.completionQueue ?: dispatch_get_main_queue(), ^{
