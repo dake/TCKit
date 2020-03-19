@@ -321,25 +321,26 @@ static uLong tc_file_crc(NSURL *url, uLong (*fun_init)(uLong crc, const Bytef *b
         return 0;
     }
     
+    unsigned long long size = 0;
     NSURL *url = self.safeURLByResolvingSymlinksInPath;
-    NSArray<NSString *> *subPath = [NSFileManager.defaultManager subpathsOfDirectoryAtPath:url.path error:NULL];
+    NSArray<NSString *> *subPath = [NSFileManager.defaultManager contentsOfDirectoryAtPath:url.path error:NULL];
     if (subPath.count > 0) {
-        unsigned long long size = 0;
         for (NSString *fileName in subPath) {
-            size += [url URLByAppendingPathComponent:fileName].contentSizeInByte;
+            @autoreleasepool {
+                size += [url URLByAppendingPathComponent:fileName].contentSizeInByte;
+            }
         }
         return size;
     }
     
-    unsigned long long fileSize = 0;
     struct stat statbuf;
     if (stat(url.fileSystemRepresentation, &statbuf) == 0) {
-        fileSize = (unsigned long long)statbuf.st_size;
+        size = (unsigned long long)statbuf.st_size;
     } else {
-        fileSize = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:NULL].fileSize;
+        size = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:NULL].fileSize;
     }
     
-    return fileSize;
+    return size;
 }
 
 
