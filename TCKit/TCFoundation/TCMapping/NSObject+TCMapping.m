@@ -15,6 +15,7 @@
 
 #import "TCMappingMeta.h"
 #import "UIColor+TCUtilities.h"
+#import "NSString+TCHelper.h"
 
 
 #if ! __has_feature(objc_arc)
@@ -290,7 +291,7 @@ static id valueForBaseTypeOfProperty(id value, TCMappingMeta *meta, TCMappingOpt
                 if ([value isKindOfClass:NSString.class]) {
                     if (((NSString *)value).length > 0) {
                         NSString *str = value;
-                        if ([str hasPrefix:@"/"] || [str hasPrefix:@"file://"]) {
+                        if ([str hasPrefix:@"/"] || [str hasInCasePrefix:@"file://"]) {
                             ret = [klass fileURLWithPath:str];
                         } else {
                             ret = [klass URLWithString:str];
@@ -298,7 +299,7 @@ static id valueForBaseTypeOfProperty(id value, TCMappingMeta *meta, TCMappingOpt
                         
                         if (nil == ret) {
                             str = [str stringByAddingPercentEncodingWithAllowedCharacters:NSCharacterSet.URLPathAllowedCharacterSet];
-                            if ([str hasPrefix:@"/"] || [str hasPrefix:@"file://"]) {
+                            if ([str hasPrefix:@"/"] || [str hasInCasePrefix:@"file://"]) {
                                 ret = [klass fileURLWithPath:str];
                             }
                             if (nil == ret) {

@@ -171,7 +171,7 @@ static NSString *tc_md5_32(NSString *str)
 
 + (BOOL)tc_isTmpResumeCache:(NSString *)resumeDirectory
 {
-    return [resumeDirectory hasPrefix:NSTemporaryDirectory()];
+    return [resumeDirectory.stringByStandardizingPath hasPrefix:NSTemporaryDirectory().stringByStandardizingPath];
 }
 
 - (NSString *)tc_resumeCachePath

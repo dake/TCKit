@@ -704,12 +704,11 @@
         queryUrl = [self.urlFilter filteredUrlForUrl:queryUrl];
     }
     
-    if ([queryUrl.lowercaseString hasPrefix:@"http"]) {
+    if (0 == [queryUrl rangeOfString:@"http" options:NSCaseInsensitiveSearch | NSAnchoredSearch].location) {
         return [NSURL URLWithString:queryUrl];
     }
     
     NSURL *baseUrl = nil;
-    
     if (request.baseUrl.length > 0) {
         baseUrl = [NSURL URLWithString:request.baseUrl];
     } else {

@@ -22,6 +22,22 @@
 
 @implementation NSString (TCHelper)
 
+- (BOOL)hasInCasePrefix:(NSString *)str
+{
+    if (str.length < 1) {
+        return NO;
+    }
+    return 0 == [self rangeOfString:str options:NSCaseInsensitiveSearch | NSAnchoredSearch].location;
+}
+
+- (BOOL)hasInCaseSuffix:(NSString *)str
+{
+    if (str.length < 1) {
+        return NO;
+    }
+    return NSNotFound != [self rangeOfString:str options:NSCaseInsensitiveSearch | NSAnchoredSearch | NSBackwardsSearch].location;
+}
+
 - (NSString *)domainOrIPMust
 {
     NSString *url = self;
