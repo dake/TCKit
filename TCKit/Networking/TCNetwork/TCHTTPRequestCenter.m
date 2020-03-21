@@ -370,7 +370,7 @@
     void (^completionHandler)(NSURLResponse *response, NSURL *filePath, NSError *error) = ^(NSURLResponse * _Nonnull response, NSURL * _Nullable filePath, NSError * _Nullable error) {
         if (nil != error || nil == filePath) {
             if (request.streamPolicy.shouldResumeDownload && nil != error) {
-                if ([error.domain isEqualToString:NSPOSIXErrorDomain] && 2 == error.code) {
+                if ([error.domain isEqualToString:NSPOSIXErrorDomain] && ENOENT == error.code) {
                     [wSelf clearCachedResumeDataForRequest:request];
                 }
             }
