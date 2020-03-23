@@ -29,6 +29,7 @@ extern NSString *_Nullable TCPercentEscapedStringFromFileName(NSString *string);
 // "http://bid.cn/path/?er=1" 这种为 .path 补全最后的 /
 - (nullable NSString *)fixedPath;
 
+- (BOOL)isHttpURL;
 
 /**
 @brief

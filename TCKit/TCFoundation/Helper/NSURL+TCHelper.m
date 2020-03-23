@@ -206,6 +206,21 @@ static uLong tc_file_crc(NSURL *url, uLong (*fun_init)(uLong crc, const Bytef *b
 
 @implementation NSURL (TCHelper)
 
+- (BOOL)isHttpURL
+{
+    NSString *const scheme = self.scheme;
+    switch (scheme.length) {
+        case 4:
+            return NSOrderedSame == [scheme compare:@"http" options:NSCaseInsensitiveSearch];
+            
+        case 5:
+            return NSOrderedSame == [scheme compare:@"https" options:NSCaseInsensitiveSearch];
+            
+        default:
+            return NO;
+    }
+}
+
 - (NSURL *)safeURLByResolvingSymlinksInPath
 {
     NSURL *url = self.URLByResolvingSymlinksInPath;
