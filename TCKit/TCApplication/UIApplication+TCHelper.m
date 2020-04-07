@@ -6,7 +6,7 @@
 //  Copyright © 2016年 dake. All rights reserved.
 //
 
-#ifndef TARGET_IS_EXTENSION
+#if !defined(TARGET_IS_EXTENSION) && !defined(TARGET_IS_UI_EXTENSION)
 
 #import "UIApplication+TCHelper.h"
 #import <objc/runtime.h>
@@ -94,11 +94,9 @@ NSString *const kTCUIApplicationDelegateChangedNotification = @"TCUIApplicationD
 
 - (void)phoneCall:(void(^)(BOOL success))complete
 {
-    BOOL ret = self.length > 1;
-    if (ret) {
-        NSURL *phoneNumber = [NSURL URLWithString:[@"telprompt://" stringByAppendingString:self]];
-        ret = [UIApplication.sharedApplication canOpenURL:phoneNumber];
-        if (ret) {
+    if (self.length > 1) {
+        NSURL *phoneNumber = [NSURL URLWithString:[NSString stringWithFormat:@"tel%s://%@", "prompt", self]];
+        if ([UIApplication.sharedApplication canOpenURL:phoneNumber]) {
             [UIApplication.sharedApplication openURL:phoneNumber options:@{} completionHandler:complete];
         }
     }

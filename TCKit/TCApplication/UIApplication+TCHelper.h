@@ -6,7 +6,7 @@
 //  Copyright © 2016年 dake. All rights reserved.
 //
 
-#ifndef TARGET_IS_EXTENSION
+#if !defined(TARGET_IS_EXTENSION) && !defined(TARGET_IS_UI_EXTENSION)
 
 #import <UIKit/UIKit.h>
 #import <Availability.h>
