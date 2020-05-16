@@ -2,6 +2,7 @@
 https://github.com/xtcmoons/XTCCategories/blob/6df5718bc3231c268bf8c73e6b41c865fd4670a1/Categories/UIKit/UIDevice%2BXTCAdd.m
  https://github.com/p709723778/UIDevice-SPPlatform/blob/624d71bb426fc77382c1d527cdd347eed213c7ed/Objective-C/SPPlatform/SPPlatform/UIDevice%2BCategory/UIDevice%2BSPPlatform.m
  https://github.com/lmirosevic/GBDeviceInfo
+ https://github.com/SlaunchaMan/Orchard/blob/cf8bb36aa7f1821703b8e7cda3eada1d853c70f5/Orchard-ObjC/iOS/OrchardiOSDevice.m
  */
 
 #import "UIDevice+TCHardware.h"
@@ -60,6 +61,8 @@ static NSString *s_device_names[kTCDeviceCount] = {
     [kTCDevice11] = @"iPhone 11",
     [kTCDevice11Pro] = @"iPhone 11 Pro",
     [kTCDevice11ProMax] = @"iPhone 11 Pro MAX",
+    [kTCDeviceSE2iPhone] = @"iPhone SE 2",
+    
     
     [kTCDeviceUnknowniPhone] = @"Unknown iPhone",
     
@@ -78,8 +81,9 @@ static NSString *s_device_names[kTCDeviceCount] = {
     [kTCDevice2GiPad] = @"iPad 2",
     [kTCDevice3GiPad] = @"iPad 3",
     [kTCDevice4GiPad] = @"iPad 4",
-    [kTCDevice5GiPad] = @"iPad 2017",
-    [kTCDevice6GiPad] = @"iPad 2018",
+    [kTCDevice5GiPad] = @"iPad 5 2017",
+    [kTCDevice6GiPad] = @"iPad 6 2018",
+    [kTCDevice7GiPad] = @"iPad 7 2019",
     
     // iPad mini
     [kTCDevice1GiPadMini] = @"iPad Mini 1",
@@ -88,25 +92,28 @@ static NSString *s_device_names[kTCDeviceCount] = {
     [kTCDevice4GiPadMini] = @"iPad Mini 4",
     [kTCDevice5GiPadMini] = @"iPad Mini 5",
     
-    // ipad Air
+    // iPad Air
     [kTCDevice1GiPadAir] = @"iPad Air 1",
     [kTCDevice2GiPadAir] = @"iPad Air 2",
     [kTCDevice3GiPadAir] = @"iPad Air 3",
     [kTCDeviceUnknowniPad] = @"Unknown iPad",
     
-    // ipad pro
+    // iPad pro
     [kTCDevice1GiPadPro9_7] = @"iPad Pro 1 (9.7 inch)",
     [kTCDevice1GiPadPro12_9] = @"iPad Pro 1 (12.9 inch)",
     
     [kTCDevice1GiPadPro10_5] = @"iPad Pro 1 (10.5 inch)",
     [kTCDevice2GiPadPro12_9] = @"iPad Pro 2 (12.9 inch)",
 
-    [kTCDevice1GiPadPro11] = @"iPad Pro 3 (11 inch)",
-    [kTCDevice1GiPadPro11_1TB] = @"iPad Pro 3 (11 inch, 1TB)",
+    [kTCDevice1GiPadPro11] = @"iPad Pro 1 (11 inch)",
+    [kTCDevice1GiPadPro11_1TB] = @"iPad Pro 1 (11 inch, 1TB)",
     [kTCDevice3GiPadPro12_9] = @"iPad Pro 3 (12.9 inch)",
     [kTCDevice3GiPadPro12_9_1TB] = @"iPad Pro 3 (12.9 inch, 1TB)",
     
-    // apple TV
+    [kTCDevice2GiPadPro11] = @"iPad Pro 2 (11 inch)",
+    [kTCDevice4GiPadPro12_9] = @"iPad Pro 4 (12.9 inch)",
+    
+    // Apple TV
     [kTCDeviceAppleTV2] = @"Apple TV 2",
     [kTCDeviceAppleTV3] = @"Apple TV 3",
     [kTCDeviceAppleTV4] = @"Apple TV 4",
@@ -303,6 +310,9 @@ static NSString *s_device_names[kTCDeviceCount] = {
             case 5:
                 return kTCDevice11ProMax;
                 
+            case 8:
+                return kTCDeviceSE2iPhone;
+                
             default:
                 break;
         }
@@ -372,6 +382,8 @@ static NSString *s_device_names[kTCDeviceCount] = {
             return kTCDevice1GiPadPro10_5;
         } else if (subVersion <= 6) {
             return kTCDevice6GiPad;
+        } else if (subVersion >= 11 && subVersion <= 12) {
+            return kTCDevice7GiPad;
         }
     }
     else if ([platform hasPrefix:@"iPad8,"]) {
@@ -392,6 +404,14 @@ static NSString *s_device_names[kTCDeviceCount] = {
             case 6:
             case 8:
                 return kTCDevice3GiPadPro12_9_1TB;
+                
+            case 9:
+            case 10:
+                return kTCDevice2GiPadPro11;
+                
+            case 11:
+            case 12:
+                return kTCDevice4GiPadPro12_9;
                 
             default:
                 break;

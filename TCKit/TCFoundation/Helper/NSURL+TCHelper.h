@@ -31,6 +31,9 @@ extern NSString *_Nullable TCPercentEscapedStringFromFileName(NSString *string);
 
 - (BOOL)isHttpURL;
 
+- (nullable NSString *)hostport;
+
+
 /**
 @brief
 case CC_SHA1_DIGEST_LENGTH:

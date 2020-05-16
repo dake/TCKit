@@ -221,6 +221,51 @@ static uLong tc_file_crc(NSURL *url, uLong (*fun_init)(uLong crc, const Bytef *b
     }
 }
 
+- (nullable NSString *)hostport
+{
+    NSString *scheme = self.scheme.lowercaseString;
+    if (scheme.length < 1) {
+        return nil;
+    }
+    
+    NSString *host = self.host;
+    if (host.length < 1) {
+        return nil;
+    }
+    
+    NSMutableString *str = NSMutableString.string;
+    bool ipv6 = false;
+    if (tc_is_ip_addr(host.UTF8String, &ipv6) && ipv6) {
+        [str appendFormat:@"[%@]:", host];
+    } else {
+        [str appendFormat:@"%@:", host];
+    }
+    
+    int port = self.port.intValue;
+    if (port < 1) {
+        if ([scheme isEqualToString:@"https"] || [scheme isEqualToString:@"wss"]) {
+            port = 443;
+        } else if ([scheme isEqualToString:@"http"] || [scheme isEqualToString:@"ws"]) {
+            port = 80;
+        } else if ([scheme isEqualToString:@"ftp"]) {
+            port = 21;
+        } else if ([scheme isEqualToString:@"telnet"]) {
+            port = 23;
+        } else if ([scheme isEqualToString:@"smtp"]) {
+            port = 25;
+        } else if ([scheme isEqualToString:@"socks"]) {
+            port = 1080;
+        } else if ([scheme isEqualToString:@"ssh"] || [scheme isEqualToString:@"sftp"]) {
+            port = 22;
+        }
+    }
+    if (port > 0) {
+        [str appendFormat:@"%d", port];
+    }
+    
+    return str.copy;
+}
+
 - (NSURL *)safeURLByResolvingSymlinksInPath
 {
     NSURL *url = self.URLByResolvingSymlinksInPath;
