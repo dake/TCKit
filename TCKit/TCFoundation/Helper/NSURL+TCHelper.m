@@ -228,13 +228,21 @@ static uLong tc_file_crc(NSURL *url, uLong (*fun_init)(uLong crc, const Bytef *b
         return nil;
     }
     
-    NSURLComponents *com = [NSURLComponents componentsWithURL:self resolvingAgainstBaseURL:nil];
-    NSString *const host = com.percentEncodedHost ?: com.host;
+    NSString *host = self.host;
     if (host.length < 1) {
         return nil;
     }
+    NSURLComponents *com = [NSURLComponents componentsWithURL:self resolvingAgainstBaseURL:NO];
+    if (nil != com) {
+        host = com.percentEncodedHost ?: com.host;
+    } else {
+        bool ipv6 = false;
+        if (tc_is_ip_addr(host.UTF8String, &ipv6) && ipv6) {
+            host = [NSString stringWithFormat:@"[%@]", host];
+        }
+    }
         
-    int port = com.port.intValue;
+    int port = (com.port ?: self.port).intValue;
     if (port < 1) {
         if ([scheme isEqualToString:@"https"] || [scheme isEqualToString:@"wss"]) {
             port = 443;
@@ -252,7 +260,7 @@ static uLong tc_file_crc(NSURL *url, uLong (*fun_init)(uLong crc, const Bytef *b
             port = 22;
         }
     }
-    if (port < 0) {
+    if (port < 1) {
         return host;
     }
     
