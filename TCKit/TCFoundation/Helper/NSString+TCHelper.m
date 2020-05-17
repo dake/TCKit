@@ -487,6 +487,9 @@ bool tc_is_ip_addr(char const *host, bool *ipv6)
     if (0 == range.location) {
         text = [@"http" stringByAppendingString:text];
     } else if (NSNotFound == range.location) {
+        if (tc_is_ip_addr(text.UTF8String, ipv6)) {
+            return YES;
+        }
         text = [@"http://" stringByAppendingString:text];
     }
     

@@ -236,9 +236,9 @@ static uLong tc_file_crc(NSURL *url, uLong (*fun_init)(uLong crc, const Bytef *b
     NSMutableString *str = NSMutableString.string;
     bool ipv6 = false;
     if (tc_is_ip_addr(host.UTF8String, &ipv6) && ipv6) {
-        [str appendFormat:@"[%@]:", host];
+        [str appendFormat:@"[%@]", host];
     } else {
-        [str appendFormat:@"%@:", host];
+        [str appendFormat:@"%@", host];
     }
     
     int port = self.port.intValue;
@@ -260,7 +260,7 @@ static uLong tc_file_crc(NSURL *url, uLong (*fun_init)(uLong crc, const Bytef *b
         }
     }
     if (port > 0) {
-        [str appendFormat:@"%d", port];
+        [str appendFormat:@":%d", port];
     }
     
     return str.copy;
