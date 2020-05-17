@@ -464,10 +464,39 @@ bool tc_is_ip_addr(char const *host, bool *ipv6)
     return ret;
 }
 
-- (BOOL)isIPAddress
+- (BOOL)isIPAddress:(BOOL *_Nullable)ipv6
 {
-    return tc_is_ip_addr(self.UTF8String, NULL);
+    return tc_is_ip_addr(self.UTF8String, ipv6);
 }
+
+- (BOOL)isIPAddressInURLHost:(BOOL *_Nullable)ipv6
+{
+    NSString *text = self;
+    NSRange range = [text rangeOfString:@"://"];
+    NSRange begin = NSMakeRange(0, text.length);
+    if (NSNotFound != range.location) {
+        begin.location = range.location + range.length;
+        begin.length -= begin.location;
+    }
+    NSRange end = [text rangeOfString:@"/" options:kNilOptions range:begin];
+    if (NSNotFound != end.location) {
+        begin.length = end.location - begin.location;
+        text = [text substringWithRange:begin];
+    }
+
+    if (0 == range.location) {
+        text = [@"http" stringByAppendingString:text];
+    } else if (NSNotFound == range.location) {
+        text = [@"http://" stringByAppendingString:text];
+    }
+    
+    NSString *host = [NSURL URLWithString:text].host;
+    if (host.length < 1) {
+        return NO;
+    }
+    return tc_is_ip_addr(host.UTF8String, ipv6);
+}
+
 
 #pragma mark - 
 
