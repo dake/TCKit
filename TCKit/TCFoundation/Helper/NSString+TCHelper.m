@@ -466,7 +466,12 @@ bool tc_is_ip_addr(char const *host, bool *ipv6)
 
 - (BOOL)isIPAddress:(BOOL *_Nullable)ipv6
 {
-    return tc_is_ip_addr(self.UTF8String, ipv6);
+    bool v6 = false;
+    bool ret = tc_is_ip_addr(self.UTF8String, &v6);
+    if (NULL != ipv6) {
+        *ipv6 = v6;
+    }
+    return ret;
 }
 
 - (BOOL)isIPAddressInURLHost:(BOOL *_Nullable)ipv6
@@ -497,7 +502,13 @@ bool tc_is_ip_addr(char const *host, bool *ipv6)
     if (host.length < 1) {
         return NO;
     }
-    return tc_is_ip_addr(host.UTF8String, ipv6);
+    
+    bool v6 = false;
+    bool ret = tc_is_ip_addr(host.UTF8String, &v6);
+    if (NULL != ipv6) {
+        *ipv6 = v6;
+    }
+    return ret;
 }
 
 

@@ -223,25 +223,18 @@ static uLong tc_file_crc(NSURL *url, uLong (*fun_init)(uLong crc, const Bytef *b
 
 - (nullable NSString *)hostport
 {
-    NSString *scheme = self.scheme.lowercaseString;
+    NSString *const scheme = self.scheme.lowercaseString;
     if (scheme.length < 1) {
         return nil;
     }
     
-    NSString *host = self.host;
+    NSURLComponents *com = [NSURLComponents componentsWithURL:self resolvingAgainstBaseURL:nil];
+    NSString *const host = com.percentEncodedHost ?: com.host;
     if (host.length < 1) {
         return nil;
     }
-    
-    NSMutableString *str = NSMutableString.string;
-    bool ipv6 = false;
-    if (tc_is_ip_addr(host.UTF8String, &ipv6) && ipv6) {
-        [str appendFormat:@"[%@]", host];
-    } else {
-        [str appendFormat:@"%@", host];
-    }
-    
-    int port = self.port.intValue;
+        
+    int port = com.port.intValue;
     if (port < 1) {
         if ([scheme isEqualToString:@"https"] || [scheme isEqualToString:@"wss"]) {
             port = 443;
@@ -259,11 +252,11 @@ static uLong tc_file_crc(NSURL *url, uLong (*fun_init)(uLong crc, const Bytef *b
             port = 22;
         }
     }
-    if (port > 0) {
-        [str appendFormat:@":%d", port];
+    if (port < 0) {
+        return host;
     }
     
-    return str.copy;
+    return [host stringByAppendingFormat:@":%d", port];
 }
 
 - (NSURL *)safeURLByResolvingSymlinksInPath

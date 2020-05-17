@@ -31,6 +31,7 @@ extern NSString *_Nullable TCPercentEscapedStringFromFileName(NSString *string);
 
 - (BOOL)isHttpURL;
 
+// ipv6 无端口也带 []
 - (nullable NSString *)hostport;
 
 
