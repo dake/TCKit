@@ -53,29 +53,36 @@ static int adaptPunycodeDelta(int delta, int number, BOOL firstTime)
 }
 
 /* Minimal validity checking. This should be elaborated to include the full IDN stringprep profile. */
-static BOOL validIDNCodeValue(unsigned codepoint)
+NS_INLINE BOOL validIDNCodeValue(unsigned int codepoint, BOOL *needMore)
 {
     /* Valid Unicode, non-basic codepoint? (implied by rfc3492) */
-    if (codepoint < 0x9F || codepoint > 0x10FFFF)
+    if (codepoint < 0x9F || codepoint > 0x10FFFF) {
         return NO;
+    }
     
     /* Some prohibited values from rfc3454 referenced by rfc3491[5] */
     if (codepoint == 0x00A0 ||
         (codepoint >= 0x2000 && codepoint <= 0x200D) ||
         codepoint == 0x202F || codepoint == 0xFEFF ||
-        ( codepoint >= 0xFFF9 && codepoint <= 0xFFFF ))
+        ( codepoint >= 0xFFF9 && codepoint <= 0xFFFF )) {
         return NO; /* Miscellaneous whitespace & non-printing characters */
+    }
     
     unsigned plane = ( codepoint & ~(0xFFFFU) );
     
     if (plane == 0x0F0000 || plane == 0x100000 ||
-        (codepoint >= 0xE000 && codepoint <= 0xF8FF))
+        (codepoint >= 0xE000 && codepoint <= 0xF8FF)) {
         return NO;  /* Private use areas */
+    }
     
     if ((codepoint & 0xFFFE) == 0xFFFE ||
         (codepoint >= 0xD800 && codepoint <= 0xDFFF) ||
-        (codepoint >= 0xFDD0 && codepoint <= 0xFDEF))
+        (codepoint >= 0xFDD0 && codepoint <= 0xFDEF)) {
+        if (NULL != needMore) {
+            *needMore = YES;
+        }
         return NO; /* Various non-character code points */
+    }
     
     /* end of gauntlet */
     return YES;
@@ -83,29 +90,32 @@ static BOOL validIDNCodeValue(unsigned codepoint)
 
 + (NSString *)_punycodeEncode:(NSString *)aString;
 {
-    // setup buffers
-    char outputBuffer[MAX_HOSTNAME_LEN]; 
-    size_t stringLength = aString.length;
+    NSUInteger const stringLength = aString.length;
+    // check once for hostname too long here and just refuse to encode if it is (this handles it if all ASCII)
+    // there are additional checks for running over the buffer during the encoding loop
+    if (stringLength > MAX_HOSTNAME_LEN) {
+        return aString;
+    }
+    
+    char outputBuffer[MAX_HOSTNAME_LEN];
     unichar *inputBuffer = alloca(stringLength * sizeof(unichar));
     unichar *inputPtr, *inputEnd = inputBuffer + stringLength;
     char *outputEnd = outputBuffer + MAX_HOSTNAME_LEN;
     char *outputPtr = outputBuffer;
-    
-    // check once for hostname too long here and just refuse to encode if it is (this handles it if all ASCII)
-    // there are additional checks for running over the buffer during the encoding loop
-    if (stringLength > MAX_HOSTNAME_LEN)
-        return aString;
-    [aString getCharacters:inputBuffer];
+    // 🏀
+    [aString getCharacters:inputBuffer range:NSMakeRange(0, stringLength)];
     
     // handle ASCII characters
     for (inputPtr = inputBuffer; inputPtr < inputEnd; inputPtr++) {
-        if (*inputPtr < 0x80) 
+        if (*inputPtr < 0x80) {
             *outputPtr++ = (char)*inputPtr;
+        }
     }
     unsigned int handled = (unsigned int)(outputPtr - outputBuffer);
     
-    if (handled == stringLength)
+    if (handled == stringLength) {
         return aString;
+    }
     
     // add dash separator
     if (handled > 0 && outputPtr < outputEnd)
@@ -120,15 +130,16 @@ static BOOL validIDNCodeValue(unsigned codepoint)
     while (handled < stringLength) {
         unichar max = UINT16_MAX;
         for (inputPtr = inputBuffer; inputPtr < inputEnd; inputPtr++) {
-            if (*inputPtr >= n && *inputPtr < max)
+            if (*inputPtr >= n && *inputPtr < max) {
                 max = *inputPtr;
+            }
         }
         
         delta += (max - n) * (handled + 1);
         n = max;
         
         for (inputPtr = inputBuffer; inputPtr < inputEnd; inputPtr++) {
-            if (*inputPtr < n) 
+            if (*inputPtr < n)
                 delta++;
             else if (*inputPtr == n) {
                 int oldDelta = delta;
@@ -164,35 +175,36 @@ static BOOL validIDNCodeValue(unsigned codepoint)
         delta++;
         n++;
     }
-    if (outputPtr >= outputEnd)
+    if (outputPtr >= outputEnd) {
         return aString;
+    }
     *outputPtr = '\0';
     return [ACEPrefix stringByAppendingString:@(outputBuffer)];
 }
 
 + (NSString *)_punycodeDecode:(NSString *)aString;
 {
-    NSMutableString *decoded;
-    NSRange deltas;
-    unsigned int *delta;
-    unsigned deltaCount, deltaIndex;
-    NSUInteger labelLength;
-    const unsigned acePrefixLength = 4;
+    static const unsigned acePrefixLength = 4;
     
     /* Check that the string has the IDNA ACE prefix. Most strings won't. */
-    labelLength = [aString length];
+    NSUInteger const labelLength = aString.length;
     if (labelLength < acePrefixLength ||
-        ([aString compare:ACEPrefix options:NSCaseInsensitiveSearch range:(NSRange){0,acePrefixLength}] != NSOrderedSame))
+        ([aString compare:ACEPrefix options:NSCaseInsensitiveSearch range:(NSRange){0,acePrefixLength}] != NSOrderedSame)) {
         return aString;
+    }
     
     /* Also, any valid encoded string will be all-ASCII */
-    if (![aString canBeConvertedToEncoding:NSASCIIStringEncoding])
+    if (![aString canBeConvertedToEncoding:NSASCIIStringEncoding]) {
         return aString;
+    }
     
     /* Find the delimiter that marks the end of the basic-code-points section. */
     NSRange delimiter = [aString rangeOfString:@"-"
                                        options:NSBackwardsSearch
                                          range:(NSRange){acePrefixLength, labelLength-acePrefixLength}];
+    
+    NSRange deltas;
+    NSMutableString *decoded = nil;
     if (delimiter.length > 0) {
         decoded = [[aString substringWithRange:(NSRange){acePrefixLength, delimiter.location - acePrefixLength}] mutableCopy];
         deltas = (NSRange){NSMaxRange(delimiter), labelLength - NSMaxRange(delimiter)};
@@ -207,8 +219,9 @@ static BOOL validIDNCodeValue(unsigned codepoint)
         return aString;
     }
     
-    unsigned int decodedLabelLength = (unsigned)[decoded length];
-    
+    unsigned int deltaCount = 0;
+    unsigned int decodedLabelLength = (unsigned int)decoded.length;
+    unsigned int *delta = NULL;
     /* Convert the variable-length-integers in the deltas section into machine representation */
     {
         unichar *enc;
@@ -234,9 +247,9 @@ static BOOL validIDNCodeValue(unsigned codepoint)
                 reset = NO;
             }
             
-            if (enc[i] <= 0x7A)
+            if (enc[i] <= 0x7A) {
                 digit = punycodeDigitValue[enc[i]];
-            else {
+            } else {
                 free(enc);
                 free(delta);
                 return aString;
@@ -278,19 +291,19 @@ static BOOL validIDNCodeValue(unsigned codepoint)
     
     /* now use the decoded integers to insert characters into the decoded string */
     {
-        unsigned position, codeValue;
         unichar ch[1];
+        NSUInteger len = 0;
+        unsigned int position = 0;
+        unsigned int codeValue = 0x80;
         
-        position = 0;
-        codeValue = 0x80;
-        
-        for (deltaIndex = 0; deltaIndex < deltaCount; deltaIndex ++) {
+        for (unsigned int deltaIndex = 0; deltaIndex < deltaCount; deltaIndex ++) {
             position += delta[deltaIndex];
             
-            codeValue += ( position / (decodedLabelLength + 1) );
-            position = ( position % (decodedLabelLength + 1) );
+            codeValue += (position / (decodedLabelLength + 1));
+            position = (position % (decodedLabelLength + 1));
             
-            if (!validIDNCodeValue(codeValue)){
+            BOOL needMore = NO;
+            if (!validIDNCodeValue(codeValue, &needMore) && (!needMore || (0 == len && deltaIndex + 1 == deltaCount))) {
                 free(delta);
                 return aString;
             }
@@ -299,20 +312,22 @@ static BOOL validIDNCodeValue(unsigned codepoint)
             ch[0] = (unichar)codeValue;
             NSString *insertion = [NSString stringWithCharacters:ch length:1];
             [decoded replaceCharactersInRange:(NSRange){position, 0} withString:insertion];
-            
-            position ++;
-            decodedLabelLength ++;
+            if (!needMore || len > 0) {
+                len = 0;
+            } else {
+                len = (len + 1) % 2;
+            }
+            position++;
+            decodedLabelLength++;
         }
     }
     
-    if ([decoded length] != decodedLabelLength) {
-        free(delta);
+    free(delta);
+    if (decoded.length != decodedLabelLength) {
         return aString;
     }
     
-    free(delta);
-    
-    NSString *normalized = [decoded precomposedStringWithCompatibilityMapping];  // Applies normalization KC
+    NSString *normalized = decoded.precomposedStringWithCompatibilityMapping;  // Applies normalization KC
     if ([normalized compare:decoded options:NSLiteralSearch] != NSOrderedSame) {
         // Decoded string was not normalized, therefore could not have been the result of decoding a correctly encoded IDN.
         return aString;
@@ -326,20 +341,29 @@ static BOOL validIDNCodeValue(unsigned codepoint)
     if (aHostname.length < 1 || [aHostname canBeConvertedToEncoding:NSASCIIStringEncoding]) {
         return aHostname;
     }
-    
-    NSMutableArray *encodedParts = NSMutableArray.array;
+
+    NSMutableArray<NSString *> *encodedParts = NSMutableArray.array;
     NSArray *parts = [aHostname componentsSeparatedByString:@"."];
     for (NSString *tmp in parts) {
-        NSMutableString *part = NSMutableString.string;
-        [tmp enumerateSubstringsInRange:NSMakeRange(0, tmp.length) options:NSStringEnumerationByComposedCharacterSequences usingBlock:^(NSString * _Nullable substring, NSRange substringRange, NSRange enclosingRange, BOOL * _Nonnull stop) {
-            if (substring.length > 1) {
-                [part appendString:[substring substringToIndex:1]];
-            } else {
-                [part appendString:substring];
-            }
-        }];
+//        NSMutableString *part = NSMutableString.string;
+//        [tmp enumerateSubstringsInRange:NSMakeRange(0, tmp.length) options:NSStringEnumerationByComposedCharacterSequences usingBlock:^(NSString * _Nullable substring, NSRange substringRange, NSRange enclosingRange, BOOL * _Nonnull stop) {
+//            if (substring.length == 2) {
+////                [part appendString:[substring substringToIndex:1]];
+//
+//                /*
+//                 "💩" === "\u{1F4A9}". Unfortunately, this is also true: "💩" === "\uD83D\uDCA9".
+//                 H = Math.floor((C - 0x10000) / 0x400) + 0xD800
+//                 L = (C - 0x10000) % 0x400 + 0xDC00`
+//                 */
+//
+//                [part appendString:substring];
+//            } else {
+//                [part appendString:substring];
+//            }
+//        }];
         
-        NSString *str = [self _punycodeEncode:part].precomposedStringWithCompatibilityMapping ?: tmp;
+//        NSString *str = [self _punycodeEncode:part].precomposedStringWithCompatibilityMapping ?: tmp;
+        NSString *str = [self _punycodeEncode:tmp].precomposedStringWithCompatibilityMapping ?: tmp;
         [encodedParts addObject:str];
     }
     return [encodedParts componentsJoinedByString:@"."];
@@ -348,9 +372,8 @@ static BOOL validIDNCodeValue(unsigned codepoint)
 + (NSString *)IDNDecodedHostname:(NSString *)anIDNHostname;
 {
     BOOL wasEncoded = NO;
-    NSMutableArray *decodedLabels = NSMutableArray.array;
-    NSArray *labels = [anIDNHostname componentsSeparatedByString:@"."];
-    for (NSString *label in labels) {
+    NSMutableArray<NSString *> *decodedLabels = NSMutableArray.array;
+    for (NSString *label in [anIDNHostname componentsSeparatedByString:@"."]) {
         NSString *decodedLabel = [self _punycodeDecode:label] ?: label;
         if (!wasEncoded && ![label isEqualToString:decodedLabel]) {
             wasEncoded = YES;
