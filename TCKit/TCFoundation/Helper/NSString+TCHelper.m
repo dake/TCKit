@@ -511,6 +511,31 @@ bool tc_is_ip_addr(char const *host, bool *ipv6)
     return ret;
 }
 
+- (BOOL)isLocalLAN
+{
+    NSString *const host = self;
+    if ([host isEqualToString:@"localhost"] || [host hasSuffix:@".local"]) {
+        return YES;
+    }
+
+    BOOL ipv6 = NO;
+    if (![host isIPAddress:&ipv6]) {
+        return NO;
+    }
+    
+    if (ipv6) {
+        return [host isEqualToString:@"::1"]
+        || [host hasInCasePrefix:@"fe80:"];
+    }
+    
+    return [host hasPrefix:@"127."]
+    || [host hasPrefix:@"192.168"]
+    || [host hasPrefix:@"10."]
+    // host >= 172.16 && host < 172.32
+    || ([host hasPrefix:@"172."] && [host compare:@"172.16" options:NSNumericSearch] != NSOrderedAscending && [host compare:@"172.32" options:NSNumericSearch] == NSOrderedAscending)
+    || [host hasPrefix:@"169.254"];
+}
+
 
 #pragma mark - 
 
@@ -577,7 +602,10 @@ bool tc_is_ip_addr(char const *host, bool *ipv6)
             kCFStringEncodingShiftJIS,
             
             kCFStringEncodingHZ_GB_2312,
+            kCFStringEncodingGBK_95,
+            kCFStringEncodingGB_2312_80,
             kCFStringEncodingGB_18030_2000,
+            
         };
         
         for (NSUInteger i = 0; i < sizeof(kEds)/sizeof(kEds[0]); ++i) {
@@ -623,20 +651,23 @@ bool tc_is_ip_addr(char const *host, bool *ipv6)
         return ([text isKindOfClass:self] && ![self isSubclassOfClass:NSMutableString.class]) ? text : [self stringWithString:text];
     }
     
-    if (!force && !fast) {
-        for (NSNumber *value in s_tryEncodings) {
-            @autoreleasepool {
-                NSStringEncoding detectedEnc = value.unsignedIntegerValue;
-                // !!!: 兼容 NSMutableString
-                __kindof NSString *text = [[self alloc] initWithData:data encoding:detectedEnc];
-                if (nil != text) {
-                    if (NULL != enc) {
-                        *enc = detectedEnc;
+    if (!force) {
+        if (!fast) {
+            for (NSNumber *value in s_tryEncodings) {
+                @autoreleasepool {
+                    NSStringEncoding detectedEnc = value.unsignedIntegerValue;
+                    // !!!: 兼容 NSMutableString
+                    __kindof NSString *text = [[self alloc] initWithData:data encoding:detectedEnc];
+                    if (nil != text) {
+                        if (NULL != enc) {
+                            *enc = detectedEnc;
+                        }
+                        return text;
                     }
-                    return text;
                 }
             }
         }
+        
         return nil;
     }
     
@@ -656,7 +687,7 @@ bool tc_is_ip_addr(char const *host, bool *ipv6)
         if (NULL != enc) {
             *enc = detectedEnc;
         }
-    } else {
+    } else if (!fast) {
         for (NSNumber *value in s_tryEncodings) {
             @autoreleasepool {
                 NSStringEncoding detectedEnc = value.unsignedIntegerValue;

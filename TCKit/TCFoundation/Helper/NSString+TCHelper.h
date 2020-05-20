@@ -39,6 +39,7 @@ extern bool tc_is_ip_addr(char const *host, bool *_Nullable ipv6);
 - (BOOL)isValidIDCardNumberOfChina;
 - (BOOL)isIPAddress:(BOOL *_Nullable)ipv6; // 纯 ip ，不能有端口，路径等
 - (BOOL)isIPAddressInURLHost:(BOOL *_Nullable)ipv6; // [::1]:44/xx.cgi?a=b
+- (BOOL)isLocalLAN;
 
 /**
  @brief	convert IANA charset name encoding

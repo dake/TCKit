@@ -824,7 +824,7 @@ static uint8_t nibbleFromChar(unichar c) {
         return NSMakeRange(NSNotFound, 0);
     }
     
-    if (0 == encoding) {
+    if (0 == encoding || kCFStringEncodingInvalidId == encoding) {
         encoding = NSASCIIStringEncoding;
     }
     
