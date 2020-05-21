@@ -73,7 +73,7 @@
         }
     }
     
-    self.tc_touchesShouldCancelInContentViewBlock = ^BOOL(UIView * view, BOOL (^originalBlock)(UIView *view)){
+    self.tc_touchesShouldCancelInContentViewBlock = ^BOOL (UIView * view, BOOL (^originalBlock)(UIView *view)){
         if ([view isKindOfClass:UIButton.class]) {
             return YES;
         }
