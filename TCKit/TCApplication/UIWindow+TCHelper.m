@@ -20,6 +20,19 @@
 // code from: http://stackoverflow.com/questions/11637709/get-the-current-displaying-uiviewcontroller-on-the-screen-in-appdelegate-m
 - (UIViewController *)topMostViewController
 {
+    UIViewController *ctrler = self._topMostViewController;
+    if (nil == ctrler) {
+        return nil;
+    }
+    
+    if (ctrler.childViewControllers.count > 0) {
+        return [self topViewController:ctrler.childViewControllers.firstObject];
+    }
+    return ctrler;
+}
+
+- (UIViewController *)_topMostViewController
+{
     if (nil != self.rootViewController) {
         return [self topViewController:self.rootViewController];
     }
