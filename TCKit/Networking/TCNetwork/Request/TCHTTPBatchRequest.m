@@ -78,7 +78,7 @@
         request.observer = self;
         request.delegate = self;
         if (!request.hasIdentifier) {
-            request.identifier = [NSString stringWithFormat:@"%p", (void *)request];
+            request.identifier = [NSString stringWithFormat:@"%p", request];
         }
         
         // ignore expired cache
