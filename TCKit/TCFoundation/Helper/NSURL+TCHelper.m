@@ -691,6 +691,130 @@ static int tc_CCHmacUpdate(void *c, const void *data, CC_LONG len)
     return suc;
 }
 
+@end
 
+
+#import <CoreServices/UTCoreTypes.h>
+
+
+@implementation UIPasteboard (TCKit)
+
+- (BOOL)setFile:(NSURL *)fileURL suggestedName:(NSString *_Nullable)suggestedName uti:(NSString *_Nullable  *_Nullable)uti
+{
+    NSCParameterAssert(fileURL.isFileURL);
+    if (nil == fileURL) {
+        return NO;
+    }
+    
+    NSString *const utiMust =  (NULL == uti || (*uti).length < 1) ? (NSString *)kUTTypeData : *uti;
+    if (NULL != uti && (*uti).length < 1) {
+        *uti = utiMust;
+    }
+    if (@available(iOS 11, *)) {
+        NSItemProvider *fileProvider = [[NSItemProvider alloc] initWithItem:fileURL typeIdentifier:utiMust];
+        fileProvider.suggestedName = TCPercentEscapedStringFromFileName(suggestedName) ?: fileURL.lastPathComponent;
+        [self setItemProviders:@[fileProvider] localOnly:YES expirationDate:[NSDate dateWithMinutesFromNow:20]];
+    } else {
+        NSData *data = [NSData dataWithContentsOfAlwaysMappedURL:fileURL error:NULL];
+        if (nil == data) {
+            return NO;
+        }
+        [self setData:data forPasteboardType:utiMust];
+    }
+    return YES;
+}
+
+- (nullable NSURL *)fileForName:(NSString *_Nullable)suggestedName uti:(NSString *_Nullable)uti
+{
+    // TODO: 取出以后的 item 从 pasteboard 清空
+    if (@available(iOS 11, *)) {
+        NSMutableArray<NSItemProvider *> *items = [NSMutableArray arrayWithArray:self.itemProviders ?: @[]];
+        NSItemProvider *fileProvider = items.pullObject;
+        if (nil == fileProvider) {
+            return nil;
+        }
+        if (nil == fileProvider.suggestedName && nil != suggestedName) {
+            fileProvider.suggestedName = TCPercentEscapedStringFromFileName(suggestedName);
+        }
+    
+        __block NSURL *fileURL = nil;
+        dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+        tc_dispatch_global_async_bg(^{
+            @autoreleasepool {
+                [fileProvider loadFileRepresentationForTypeIdentifier:uti.length > 0 ? uti : fileProvider.registeredTypeIdentifiers.firstObject completionHandler:^(NSURL * _Nullable item, NSError * _Nullable error) {
+                    if (nil != item && [NSFileManager.defaultManager isReadableFileAtPath:item.path]) {
+                        NSURL *dirURL = [NSObject defaultTmpDirectoryInDomain:@"thr_pasteboard_shared" create:YES];
+                        if (nil != dirURL) {
+                            NSString *fileName = item.lastPathComponent;
+                            NSString *ext = nil;
+                            NSString *rawName = [fileName stringByDeletingFixedPathExtension:&ext];
+                            NSURL *tmpURL = [dirURL URLByAppendingPathComponent:fileName];
+                            int i = 2;
+                            while (nil != tmpURL && [NSFileManager.defaultManager fileExistsAtPath:tmpURL.path]) {
+                                if (ext.length > 0) {
+                                    tmpURL = [dirURL URLByAppendingPathComponent:[rawName stringByAppendingFormat:@" %d.%@", i++, ext]];
+                                } else {
+                                    tmpURL = [dirURL URLByAppendingPathComponent:[rawName stringByAppendingFormat:@" %d", i++]];
+                                }
+                            }
+                            if (nil != tmpURL && [NSFileManager.defaultManager linkCopyItemAtURL:item toURL:tmpURL error:NULL]) {
+                                fileURL = tmpURL;
+                            }
+                        }
+                    }
+                    dispatch_semaphore_signal(semaphore);
+                }];
+            }
+        });
+        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+        if (nil != fileURL) {
+            // 必须取完数据后才能置空，且置空后，取出的文件被销毁
+            self.itemProviders = items;
+            return fileURL;
+        }
+    }
+    
+    NSString *utiStr = uti.length > 0 ? uti : self.pasteboardTypes.firstObject;
+    NSData *data = [self dataForPasteboardType:utiStr];
+    if (nil == data) {
+        return nil;
+    }
+    
+    NSMutableArray<NSDictionary<NSString *, id> *> *items = [NSMutableArray arrayWithArray:self.items ?: @[]];
+    NSDictionary<NSString *, id> *item = nil;
+    for (NSDictionary<NSString *, id> *tmp in items) {
+        if (nil != tmp[utiStr]) {
+            item = tmp;
+            break;
+        }
+    }
+    NSCParameterAssert(item);
+    if (nil != item) {
+        [items removeObjectIdenticalTo:item];
+    }
+    self.items = items;
+
+    NSURL *dirURL = [NSObject defaultTmpDirectoryInDomain:@"thr_pasteboard_shared" create:YES];
+    if (nil == dirURL) {
+        return nil;
+    }
+    
+    NSString *fileName = suggestedName ?: NSUUID.UUID.UUIDString;
+    NSString *ext = nil;
+    NSString *rawName = [fileName stringByDeletingFixedPathExtension:&ext];
+    NSURL *tmpURL = [dirURL URLByAppendingPathComponent:fileName];
+    int i = 2;
+    while (nil != tmpURL && [NSFileManager.defaultManager fileExistsAtPath:tmpURL.path]) {
+        if (ext.length > 0) {
+            tmpURL = [dirURL URLByAppendingPathComponent:[rawName stringByAppendingFormat:@" %d.%@", i++, ext]];
+        } else {
+            tmpURL = [dirURL URLByAppendingPathComponent:[rawName stringByAppendingFormat:@" %d", i++]];
+        }
+    }
+    if (nil != tmpURL && [data writeToURL:tmpURL atomically:YES]) {
+        return tmpURL;
+    }
+    return nil;
+}
 
 @end

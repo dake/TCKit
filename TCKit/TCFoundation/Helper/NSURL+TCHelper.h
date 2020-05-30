@@ -75,4 +75,13 @@ case CC_SHA512_DIGEST_LENGTH:
 
 @end
 
+@interface UIPasteboard (TCHelper)
+
+- (BOOL)setFile:(NSURL *)fileURL suggestedName:(NSString *_Nullable)suggestedName uti:(NSString *_Nullable  *_Nullable)uti;
+
+- (nullable NSURL *)fileForName:(NSString *_Nullable)suggestedName uti:(NSString *_Nullable)uti;
+
+@end
+
+
 NS_ASSUME_NONNULL_END
