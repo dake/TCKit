@@ -33,7 +33,7 @@ extern NSString *const kTCUIApplicationDelegateChangedNotification;
 
 @interface NSString (UIApplication)
 
-- (void)phoneCall:(void(^)(BOOL success))complete;
+- (void)phoneCall:(void (^)(BOOL success))complete;
 
 @end
 

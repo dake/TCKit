@@ -74,7 +74,7 @@
 
 #pragma mark -
 
-- (void)cachedResponseByForce:(BOOL)force result:(void(^)(id response, TCCachedRespState state))result
+- (void)cachedResponseByForce:(BOOL)force result:(void (^)(id response, TCCachedRespState state))result
 {
     NSCParameterAssert(result);
     

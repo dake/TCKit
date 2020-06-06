@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)cachePathForResponse;
 
 - (void)storeCachedResponse:(id)response forCachePolicy:(TCHTTPCachePolicy *)cachePolicy finish:(dispatch_block_t)block;
-- (void)cachedResponseForRequest:(id<TCHTTPRequest>)request result:(void(^)(id _Nullable response))result;
+- (void)cachedResponseForRequest:(id<TCHTTPRequest>)request result:(void (^)(id _Nullable response))result;
 
 - (id<TCHTTPRespValidator>)responseValidatorForRequest:(id<TCHTTPRequest>)request;
 

@@ -73,14 +73,14 @@ extern NSNumberFormatter *tc_mapping_number_fmter(void);
 
 #pragma mark - async
 
-+ (void)tc_asyncMappingWithArray:(NSArray *)arry finish:(void(^)(NSMutableArray * __nullable dataList))finish;
-+ (void)tc_asyncMappingWithDictionary:(NSDictionary<NSString *, id> *)dic finish:(void(^)(__kindof NSObject * __nullable data))finish;
++ (void)tc_asyncMappingWithArray:(NSArray *)arry finish:(void (^)(NSMutableArray * __nullable dataList))finish;
++ (void)tc_asyncMappingWithDictionary:(NSDictionary<NSString *, id> *)dic finish:(void (^)(__kindof NSObject * __nullable data))finish;
 
-+ (void)tc_asyncMappingWithArray:(NSArray *)arry inQueue:(dispatch_queue_t __nullable)queue finish:(void(^)(NSMutableArray * __nullable dataList))finish;
-+ (void)tc_asyncMappingWithDictionary:(NSDictionary<NSString *, id> *)dic inQueue:(dispatch_queue_t)queue finish:(void(^)(__kindof NSObject * __nullable data))finish;
++ (void)tc_asyncMappingWithArray:(NSArray *)arry inQueue:(dispatch_queue_t __nullable)queue finish:(void (^)(NSMutableArray * __nullable dataList))finish;
++ (void)tc_asyncMappingWithDictionary:(NSDictionary<NSString *, id> *)dic inQueue:(dispatch_queue_t)queue finish:(void (^)(__kindof NSObject * __nullable data))finish;
 
-+ (void)tc_asyncMappingWithArray:(NSArray *)arry context:(id<TCMappingPersistentContext> __nullable)context inQueue:(dispatch_queue_t __nullable)queue finish:(void(^)(NSMutableArray *dataList))finish;
-+ (void)tc_asyncMappingWithDictionary:(NSDictionary<NSString *, id> *)dic context:(id<TCMappingPersistentContext> __nullable)context inQueue:(dispatch_queue_t __nullable)queue finish:(void(^)(__kindof NSObject * __nullable data))finish;
++ (void)tc_asyncMappingWithArray:(NSArray *)arry context:(id<TCMappingPersistentContext> __nullable)context inQueue:(dispatch_queue_t __nullable)queue finish:(void (^)(NSMutableArray *dataList))finish;
++ (void)tc_asyncMappingWithDictionary:(NSDictionary<NSString *, id> *)dic context:(id<TCMappingPersistentContext> __nullable)context inQueue:(dispatch_queue_t __nullable)queue finish:(void (^)(__kindof NSObject * __nullable data))finish;
 
 
 @end

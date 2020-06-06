@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface TCHTTPRequestCenter (Private)
 
-- (void)loadResumeData:(void(^)(NSData *data))finish forPolicy:(TCHTTPStreamPolicy *)policy;
+- (void)loadResumeData:(void (^)(NSData *data))finish forPolicy:(TCHTTPStreamPolicy *)policy;
 - (void)clearCachedResumeDataForRequest:(id<TCHTTPReqAgentDelegate>)request;
 
 

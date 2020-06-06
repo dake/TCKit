@@ -51,7 +51,7 @@ NS_CLASS_AVAILABLE_IOS(7_0) @interface TCHTTPRequestCenter : NSObject <TCHTTPReq
 #pragma mark - Cache 
 
 - (void)storeCachedResponse:(id)response forCachePolicy:(TCHTTPCachePolicy *)cachePolicy finish:(dispatch_block_t)block;
-- (void)cachedResponseForRequest:(id<TCHTTPRequest>)request result:(void(^)(id response))result;
+- (void)cachedResponseForRequest:(id<TCHTTPRequest>)request result:(void (^)(id response))result;
 
 
 #pragma mark - Custom value in HTTP Head

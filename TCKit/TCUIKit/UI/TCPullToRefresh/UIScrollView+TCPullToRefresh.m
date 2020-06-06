@@ -412,7 +412,7 @@ static char const kHeaderClassKey;
     self.loadingMore = NO;
 }
 
-- (void)loadingDismissWithBlock:(void(^)(void))block
+- (void)loadingDismissWithBlock:(void (^)(void))block
 {
     if (kTCRefreshPages == self.loadType) {
         if (nil != block) {

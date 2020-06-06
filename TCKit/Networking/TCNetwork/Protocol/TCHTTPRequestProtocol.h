@@ -136,7 +136,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (BOOL)forceStart:(NSError * _Nullable __strong * _Nullable)error;
 
-- (void)cachedResponseByForce:(BOOL)force result:(void(^)(id _Nullable response, TCCachedRespState state))result;
+- (void)cachedResponseByForce:(BOOL)force result:(void (^)(id _Nullable response, TCCachedRespState state))result;
 
 
 #pragma mark - Batch

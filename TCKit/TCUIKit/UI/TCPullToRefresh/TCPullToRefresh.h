@@ -71,7 +71,7 @@ typedef NS_ENUM(NSInteger, TCPullRefreshState) {
 - (void)loadMoreViewDataSource;
 - (void)doneLoadMoreViewData;
 
-- (void)loadingDismissWithBlock:(void(^)(void))block;
+- (void)loadingDismissWithBlock:(void (^)(void))block;
 
 @end
 

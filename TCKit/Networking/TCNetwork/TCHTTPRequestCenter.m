@@ -790,7 +790,7 @@
     });
 }
 
-- (void)cachedResponseForRequest:(id<TCHTTPRequest>)request result:(void(^)(id response))result
+- (void)cachedResponseForRequest:(id<TCHTTPRequest>)request result:(void (^)(id response))result
 {
     NSCParameterAssert(result);
     

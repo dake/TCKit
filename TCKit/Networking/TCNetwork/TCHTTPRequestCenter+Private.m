@@ -13,7 +13,7 @@
 
 @implementation TCHTTPRequestCenter (Private)
 
-- (void)loadResumeData:(void(^)(NSData *data))finish forPolicy:(TCHTTPStreamPolicy *)policy
+- (void)loadResumeData:(void (^)(NSData *data))finish forPolicy:(TCHTTPStreamPolicy *)policy
 {
     if (nil == finish) {
         return;

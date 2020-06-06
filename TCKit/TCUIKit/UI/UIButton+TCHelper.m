@@ -305,12 +305,12 @@ static char const kBtnExtraKey;
     self.btnExtra.paddingBetweenTitleAndImage = paddingBetweenTitleAndImage;
 }
 
-- (void(^)(__kindof UIButton *sender, CGSize layoutSize))layoutSizeNeedChangeBlock
+- (void (^)(__kindof UIButton *sender, CGSize layoutSize))layoutSizeNeedChangeBlock
 {
-    return (void(^)(__kindof UIButton *sender, CGSize layoutSize))objc_getAssociatedObject(self, @selector(setLayoutSizeNeedChange:));
+    return (void (^)(__kindof UIButton *sender, CGSize layoutSize))objc_getAssociatedObject(self, @selector(setLayoutSizeNeedChange:));
 }
 
-- (void)setLayoutSizeNeedChange:(void(^)(__kindof UIButton *sender, CGSize layoutSize))block
+- (void)setLayoutSizeNeedChange:(void (^)(__kindof UIButton *sender, CGSize layoutSize))block
 {
     objc_setAssociatedObject(self, _cmd, block, OBJC_ASSOCIATION_COPY_NONATOMIC);
 }

@@ -49,7 +49,7 @@ typedef NS_ENUM(NSInteger, TCButtonLayoutStyle) {
 - (void)resetImageAndTitleEdges;
 - (void)updateLayoutStyle;
 
-- (void)setLayoutSizeNeedChange:(void(^)(__kindof UIButton *sender, CGSize layoutSize))block;
+- (void)setLayoutSizeNeedChange:(void (^)(__kindof UIButton *sender, CGSize layoutSize))block;
 
 
 - (nullable UIColor *)backgroundColorForState:(UIControlState)state;

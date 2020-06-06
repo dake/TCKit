@@ -92,7 +92,7 @@ NSString *const kTCUIApplicationDelegateChangedNotification = @"TCUIApplicationD
 
 @implementation NSString (UIApplication)
 
-- (void)phoneCall:(void(^)(BOOL success))complete
+- (void)phoneCall:(void (^)(BOOL success))complete
 {
     if (self.length > 1) {
         NSURL *phoneNumber = [NSURL URLWithString:[NSString stringWithFormat:@"tel%s://%@", "prompt", self]];

@@ -627,28 +627,28 @@ NS_INLINE dispatch_queue_t tc_mappingQueue(void)
 }
 
 
-+ (void)tc_asyncMappingWithArray:(NSArray *)arry finish:(void(^)(NSMutableArray *dataList))finish
++ (void)tc_asyncMappingWithArray:(NSArray *)arry finish:(void (^)(NSMutableArray *dataList))finish
 {
     [self tc_asyncMappingWithArray:arry context:nil inQueue:nil finish:finish];
 }
 
-+ (void)tc_asyncMappingWithDictionary:(NSDictionary *)dic finish:(void(^)(__kindof NSObject * __nullable data))finish
++ (void)tc_asyncMappingWithDictionary:(NSDictionary *)dic finish:(void (^)(__kindof NSObject * __nullable data))finish
 {
     [self tc_asyncMappingWithDictionary:dic context:nil inQueue:nil finish:finish];
 }
 
-+ (void)tc_asyncMappingWithArray:(NSArray *)arry inQueue:(dispatch_queue_t)queue finish:(void(^)(NSMutableArray *dataList))finish
++ (void)tc_asyncMappingWithArray:(NSArray *)arry inQueue:(dispatch_queue_t)queue finish:(void (^)(NSMutableArray *dataList))finish
 {
     [self tc_asyncMappingWithArray:arry context:nil inQueue:queue finish:finish];
 }
 
-+ (void)tc_asyncMappingWithDictionary:(NSDictionary<NSString *, id> *)dic inQueue:(dispatch_queue_t)queue finish:(void(^)(__kindof NSObject * __nullable data))finish
++ (void)tc_asyncMappingWithDictionary:(NSDictionary<NSString *, id> *)dic inQueue:(dispatch_queue_t)queue finish:(void (^)(__kindof NSObject * __nullable data))finish
 {
     [self tc_asyncMappingWithDictionary:dic context:nil inQueue:queue finish:finish];
 }
 
 
-+ (void)tc_asyncMappingWithDictionary:(NSDictionary *)dic context:(id<TCMappingPersistentContext>)context inQueue:(dispatch_queue_t)queue finish:(void(^)(__kindof NSObject * __nullable data))finish
++ (void)tc_asyncMappingWithDictionary:(NSDictionary *)dic context:(id<TCMappingPersistentContext>)context inQueue:(dispatch_queue_t)queue finish:(void (^)(__kindof NSObject * __nullable data))finish
 {
     if (nil == finish) {
         return;
@@ -664,7 +664,7 @@ NS_INLINE dispatch_queue_t tc_mappingQueue(void)
     });
 }
 
-+ (void)tc_asyncMappingWithArray:(NSArray *)arry context:(id<TCMappingPersistentContext>)context inQueue:(dispatch_queue_t)queue finish:(void(^)(NSMutableArray *dataList))finish
++ (void)tc_asyncMappingWithArray:(NSArray *)arry context:(id<TCMappingPersistentContext>)context inQueue:(dispatch_queue_t)queue finish:(void (^)(NSMutableArray *dataList))finish
 {
     if (nil == finish) {
         return;
