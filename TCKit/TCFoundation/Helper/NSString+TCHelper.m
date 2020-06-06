@@ -466,6 +466,9 @@ bool tc_is_ip_addr(char const *host, bool *ipv6)
 
 - (BOOL)isIPAddress:(BOOL *_Nullable)ipv6
 {
+    if ([self hasPrefix:@"["]) {
+        return NO;
+    }
     bool v6 = false;
     bool ret = tc_is_ip_addr(self.UTF8String, &v6);
     if (NULL != ipv6) {
