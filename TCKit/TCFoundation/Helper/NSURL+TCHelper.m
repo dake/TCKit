@@ -665,26 +665,30 @@ static int tc_CCHmacUpdate(void *c, const void *data, CC_LONG len)
 - (BOOL)moveItemMustAtURL:(NSURL *)srcURL toURL:(NSURL *)dstURL error:(NSError **)error
 {
     NSError *err = nil;
-    if ([self moveItemAtURL:srcURL toURL:dstURL error:&err]) {
+    if ([self moveItemAtURL:srcURL toURL:dstURL error:&err] || 0 == rename(srcURL.fileSystemRepresentation, dstURL.fileSystemRepresentation)) {
         return YES;
     }
     
-    if (NULL != error) {
-        *error = err;
-    }
-    if (err.code == NSFileWriteFileExistsError && [err.domain isEqualToString:NSCocoaErrorDomain]) {
-        return NO;
+    if (nil != err) {
+        if (NULL != error) {
+            *error = err;
+        }
+        if (err.code == NSFileWriteFileExistsError && [err.domain isEqualToString:NSCocoaErrorDomain]) {
+            return NO;
+        }
     }
     
     BOOL suc = [self linkCopyItemAtURL:srcURL toURL:dstURL error:NULL];
     if (suc) {
-        if ([self removeItemAtURL:srcURL error:NULL]) {
+        if ([self removeItemAtURL:srcURL error:NULL] || 0 == remove(srcURL.fileSystemRepresentation)) {
             if (NULL != error) {
                 *error = nil;
             }
         } else {
             suc = NO;
-            [self removeItemAtURL:dstURL error:NULL];
+            if (![self removeItemAtURL:dstURL error:NULL]) {
+                remove(dstURL.fileSystemRepresentation);
+            }
         }
     }
     
