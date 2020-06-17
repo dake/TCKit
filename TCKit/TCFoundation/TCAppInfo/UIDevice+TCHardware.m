@@ -609,12 +609,24 @@ static NSString *s_device_names[kTCDeviceCount] = {
     return s_found;
 }
 
+
+/*
 #pragma mark - MAC addy
 // Return the local MAC addy
 // Courtesy of FreeBSD hackers email list
 // Accidentally munged during previous update. Fixed thanks to mlamb.
 + (NSString *)macaddress
 {
+    return [self macaddress:"en0"];
+}
+
++ (NSString *)macaddress:(const char *)ifname
+{
+    NSCParameterAssert(ifname);
+    if (NULL == ifname || strlen(ifname) < 1) {
+        return nil;
+    }
+    
     int mib[] = {
         CTL_NET,
         AF_ROUTE,
@@ -625,37 +637,41 @@ static NSString *s_device_names[kTCDeviceCount] = {
     };
     u_int size = sizeof(mib)/sizeof(mib[0]);
     
-    if ((mib[5] = (int)if_nametoindex("en0")) == 0) {
-        printf("Error: if_nametoindex error\n");
+    if ((mib[5] = (int)if_nametoindex(ifname)) == 0) {
+//        printf("Error: if_nametoindex error\n");
         return nil;
     }
     
     size_t len = 0;
     if (sysctl(mib, size, NULL, &len, NULL, 0) < 0) {
-        printf("Error: sysctl, take 1\n");
+//        printf("Error: sysctl, take 1\n");
         return nil;
     }
     
     char *buf = malloc(len);
     if (buf == NULL) {
-        printf("Error: Memory allocation error\n");
+//        printf("Error: Memory allocation error\n");
         return nil;
     }
     
     if (sysctl(mib, size, buf, &len, NULL, 0) < 0) {
-        printf("Error: sysctl, take 2\n");
+//        printf("Error: sysctl, take 2\n");
         free(buf); // Thanks, Remy "Psy" Demerest
         return nil;
     }
     
     struct if_msghdr *ifm = (struct if_msghdr *)buf;
     struct sockaddr_dl *sdl = (struct sockaddr_dl *)(ifm + 1);
-    unsigned char *ptr = (unsigned char *)LLADDR(sdl);
-    NSString *outstring = [NSString stringWithFormat:@"%02X:%02X:%02X:%02X:%02X:%02X", *ptr, *(ptr+1), *(ptr+2), *(ptr+3), *(ptr+4), *(ptr+5)];
+    NSMutableString *str = [NSMutableString stringWithCapacity:sdl->sdl_alen * 3 - 1];
+    char *const ptr = LLADDR(sdl);
+    for (int i = 0; i < sdl->sdl_alen; ++i) {
+        [str appendFormat:((i + 1 >= sdl->sdl_alen) ? @"%02x" : @"%02x:"), ptr[i]];
+    }
 
     free(buf);
-    return outstring;
+    return str.copy;
 }
+*/
 
 #pragma mark -
 

@@ -155,7 +155,10 @@ NS_ASSUME_NONNULL_BEGIN
 + (unsigned long long)appUsedMemory;
 + (unsigned long long)appFreeMemory;
 
+/*
 + (nullable NSString *)macaddress;
++ (nullable NSString *)macaddress:(const char *)ifname;
+ */
 
 + (nullable NSArray<NSString *> *)dnsAddresses;
 + (void)sysDNSServersIpv4:(NSArray<NSString *> * _Nullable __autoreleasing *_Nullable)ipv4 ipv6: (NSArray<NSString *> * _Nullable __autoreleasing *_Nullable)ipv6;
