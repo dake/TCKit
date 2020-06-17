@@ -747,7 +747,6 @@ static NSString *s_device_names[kTCDeviceCount] = {
 //            block(addr, &stop);
 //        }
         block(addr, &stop);
-        
         addr = addr->ifa_next;
     }
     
