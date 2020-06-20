@@ -351,7 +351,7 @@ static id valueForBaseTypeOfProperty(id value, TCMappingMeta *meta, TCMappingOpt
                     ret = [[klass alloc] initWithString:value];
                 }
                 
-                NSCAssert(nil != ret, @"property %@ type %@ doesn't match value type %@", meta->_propertyName, meta->_typeName, NSStringFromClass([value class]));
+                NSCAssert(nil != ret, @"property %@ type %@ doesn't match value type %@", meta->_propertyName, meta->_typeName, nil == value ? nil : NSStringFromClass([value class]));
                 break;
             }
                 
@@ -360,7 +360,7 @@ static id valueForBaseTypeOfProperty(id value, TCMappingMeta *meta, TCMappingOpt
                     ret = value;
                 }
                 
-                NSCAssert(nil != ret, @"property %@ type %@ doesn't match value type %@", meta->_propertyName, meta->_typeName, NSStringFromClass([value class]));
+                NSCAssert(nil != ret, @"property %@ type %@ doesn't match value type %@", meta->_propertyName, meta->_typeName, nil == value ? nil : NSStringFromClass([value class]));
                 break;
             }
                 
@@ -371,7 +371,7 @@ static id valueForBaseTypeOfProperty(id value, TCMappingMeta *meta, TCMappingOpt
                     ret = NSClassFromString(value);
                 }
                 
-                NSCAssert(nil != ret, @"property %@ type %@ doesn't match value type %@", meta->_propertyName, meta->_typeName, NSStringFromClass([value class]));
+                NSCAssert(nil != ret, @"property %@ type %@ doesn't match value type %@", meta->_propertyName, meta->_typeName, nil == value ? nil : NSStringFromClass([value class]));
                 break;
             }
                 
