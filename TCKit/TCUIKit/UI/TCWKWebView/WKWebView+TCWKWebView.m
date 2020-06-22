@@ -165,10 +165,19 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         [self tc_swizzle:@selector(loadRequest:)];
+        [self tc_swizzle:@selector(canPerformAction:withSender:)];
         
         // fix non-public api
         //    [self tc_swizzle:@selector(layoutSubviews)];
     });
+}
+
+- (BOOL)tc_canPerformAction:(SEL)action withSender:(id)sender
+{
+    if (action == @selector(selectAll:)) {
+        return YES;
+    }
+    return [self tc_canPerformAction:action withSender:sender];
 }
 
 - (nullable id)tc_loadHTMLString:(NSString *)string baseURL:(nullable NSURL *)baseURL
