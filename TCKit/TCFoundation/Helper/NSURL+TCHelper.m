@@ -701,7 +701,7 @@ static int tc_CCHmacUpdate(void *c, const void *data, CC_LONG len)
 #import <CoreServices/UTCoreTypes.h>
 
 
-@implementation UIPasteboard (TCKit)
+@implementation UIPasteboard (TCHelper)
 
 - (BOOL)setFile:(NSURL *)fileURL suggestedName:(NSString *_Nullable)suggestedName uti:(NSString *_Nullable  *_Nullable)uti
 {
@@ -747,7 +747,7 @@ static int tc_CCHmacUpdate(void *c, const void *data, CC_LONG len)
             @autoreleasepool {
                 [fileProvider loadFileRepresentationForTypeIdentifier:uti.length > 0 ? uti : fileProvider.registeredTypeIdentifiers.firstObject completionHandler:^(NSURL * _Nullable item, NSError * _Nullable error) {
                     if (nil != item && [NSFileManager.defaultManager isReadableFileAtPath:item.path]) {
-                        NSURL *dirURL = [NSObject defaultTmpDirectoryInDomain:@"thr_pasteboard_shared" create:YES];
+                        NSURL *dirURL = [NSObject defaultTmpDirectoryInDomain:@"tc_pasteboard_shared" create:YES];
                         if (nil != dirURL) {
                             NSString *fileName = item.lastPathComponent;
                             NSString *ext = nil;
@@ -798,7 +798,7 @@ static int tc_CCHmacUpdate(void *c, const void *data, CC_LONG len)
     }
     self.items = items;
 
-    NSURL *dirURL = [NSObject defaultTmpDirectoryInDomain:@"thr_pasteboard_shared" create:YES];
+    NSURL *dirURL = [NSObject defaultTmpDirectoryInDomain:@"tc_pasteboard_shared" create:YES];
     if (nil == dirURL) {
         return nil;
     }
