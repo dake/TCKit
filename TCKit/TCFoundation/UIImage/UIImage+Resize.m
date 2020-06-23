@@ -11,7 +11,7 @@
 #import "UIImage+CGImage.h"
 
 #import <ImageIO/ImageIO.h>
-#import <AssetsLibrary/AssetsLibrary.h>
+//#import <AssetsLibrary/AssetsLibrary.h>
 #import <Accelerate/Accelerate.h>
 
 #if ! __has_feature(objc_arc)
