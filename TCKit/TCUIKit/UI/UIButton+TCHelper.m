@@ -609,39 +609,152 @@ static char const kBtnExtraKey;
 
 + (UIImage *)imageFromBarButtonSystemItem:(UIBarButtonSystemItem)item
 {
-    static const CGFloat defaultNBBtnHW  = 44.0;
+    switch (item) {
+        case UIBarButtonSystemItemDone:
+        case UIBarButtonSystemItemCancel:
+        case UIBarButtonSystemItemEdit:
+        case UIBarButtonSystemItemSave:
+        case UIBarButtonSystemItemFlexibleSpace:
+        case UIBarButtonSystemItemFixedSpace:
+        case UIBarButtonSystemItemPageCurl:
+            return nil;
+            
+        default:
+            break;
+    }
     
-    UIImage *barButtonSystemItemImage = nil;
-    @try {
-        UINavigationBar *tempNavigationBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, defaultNBBtnHW, defaultNBBtnHW)];
-        UINavigationItem *tempNavigationItem = [[UINavigationItem alloc] init];
-        UIBarButtonItem *tempBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:item target:nil action:NULL];
+    if (@available(iOS 13, *)) {
+        NSString *key = nil;
+        switch (item) {
+            case UIBarButtonSystemItemAdd:
+                key = @"plus";
+                break;
+           
+            case UIBarButtonSystemItemCompose:
+                key = @"square.and.pencil";
+                break;
+                
+            case UIBarButtonSystemItemReply:
+                key = @"arrowshape.turn.up.left";
+                break;
+                
+            case UIBarButtonSystemItemAction:
+                key = @"square.and.arrow.up";
+                break;
+                
+            case UIBarButtonSystemItemOrganize:
+                key = @"folder";
+                break;
+                
+            case UIBarButtonSystemItemBookmarks:
+                key = @"book";
+                break;
+                
+            case UIBarButtonSystemItemSearch:
+                key = @"magnifyingglass";
+                break;
+                
+            case UIBarButtonSystemItemRefresh:
+                key = @"arrow.clockwise";
+                break;
+                
+            case UIBarButtonSystemItemStop:
+                key = @"xmark";
+                break;
+                
+            case UIBarButtonSystemItemCamera:
+                key = @"camera.fill";
+                break;
+                
+            case UIBarButtonSystemItemTrash:
+                key = @"trash";
+                break;
+                
+            case UIBarButtonSystemItemPlay:
+                key = @"play.fill";
+                break;
+                
+            case UIBarButtonSystemItemPause:
+                key = @"pause.fill";
+                break;
+                
+            case UIBarButtonSystemItemRewind:
+                key = @"backward.fill";
+                break;
+                
+            case UIBarButtonSystemItemFastForward:
+                key = @"forward.fill";
+                break;
+                
+            case UIBarButtonSystemItemUndo:
+                key = @"arrow.uturn.left";
+                break;
+                
+            case UIBarButtonSystemItemRedo:
+                key = @"arrow.uturn.right";
+                break;
+                
+                // toolbar only
+            case UIBarButtonSystemItemPageCurl:
+                break;
+                
+            case UIBarButtonSystemItemClose:
+//                key = @"xmark.circle";
+                break;
+                
+            default:
+                break;
+        }
         
-        tempNavigationBar.items = @[tempNavigationItem];
-        tempNavigationItem.rightBarButtonItems = @[tempBarButtonItem];
-        [tempNavigationBar snapshotViewAfterScreenUpdates:YES];
-        [tempNavigationBar layoutIfNeeded];
-        UIView *barButtonItemView = [tempBarButtonItem valueForKey:@"view"];
+        if (nil != key) {
+            return [UIImage systemImageNamed:key];
+        }
+    }
+    
+    
+    static const CGFloat defaultNBBtnHW = 44.0;
+    
+    UIImage *img = nil;
+    @try {
+        BOOL isToolBar = UIBarButtonSystemItemPageCurl == item;
+        UIView *bar = isToolBar ? [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, defaultNBBtnHW, defaultNBBtnHW)] : [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, defaultNBBtnHW, defaultNBBtnHW)];
+        UIBarButtonItem *barItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:item target:nil action:NULL];
+        if (isToolBar) {
+            ((UIToolbar *)bar).items = @[barItem];
+        } else {
+            UINavigationItem *naviItem = [[UINavigationItem alloc] init];
+            naviItem.rightBarButtonItems = @[barItem];
+            ((UINavigationBar *)bar).items = @[naviItem];
+        }
+        [bar snapshotViewAfterScreenUpdates:YES];
+        [bar layoutIfNeeded];
+        UIView *barButtonItemView = [barItem respondsToSelector:@selector(view)] ? [barItem valueForKey:NSStringFromSelector(@selector(view))] : nil;
         if ([barButtonItemView isKindOfClass:UIButton.class]) {
-            barButtonSystemItemImage = [(UIButton *)barButtonItemView imageForState:UIControlStateNormal];
+            img = [(UIButton *)barButtonItemView imageForState:UIControlStateNormal];
         } else {
             for (UIView *subview in barButtonItemView.subviews) {
                 if ([subview isKindOfClass:UIButton.class]) {
-                    barButtonSystemItemImage = [(UIButton *)subview imageForState:UIControlStateNormal];
-                } else if ([subview isKindOfClass:UIImageView.class]) {
-                    barButtonSystemItemImage = ((UIImageView *)subview).image;
+                    img = [(UIButton *)subview imageForState:UIControlStateNormal];
+                    if (nil != img) {
+                        break;
+                    }
                 }
-                
-                if (nil != barButtonSystemItemImage) {
-                    break;
+            }
+            if (nil == img) {
+                for (UIView *subview in barButtonItemView.subviews) {
+                    if ([subview isKindOfClass:UIImageView.class]) {
+                        img = ((UIImageView *)subview).image;
+                        if (nil != img) {
+                            break;
+                        }
+                    }
                 }
             }
         }
     } @catch (NSException *exp) {
-        NSLog(@"%s: Exception while retrieving image from UIBarButtonItem!", __PRETTY_FUNCTION__);
         
     } @finally {
-        return barButtonSystemItemImage;
+        return img;
     }
 }
 
