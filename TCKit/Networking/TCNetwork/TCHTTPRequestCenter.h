@@ -42,7 +42,7 @@ NS_CLASS_AVAILABLE_IOS(7_0) @interface TCHTTPRequestCenter : NSObject <TCHTTPReq
 - (void)removeAllRequests;
 
 - (NSString *)cachePathForResponse;
-- (NSString *)cacheDomainForResponse;
+- (nullable NSString *)cacheDomainForResponse;
 - (void)removeAllCachedResponses;
 
 - (void)registerResponseValidatorClass:(Class)validatorClass;
