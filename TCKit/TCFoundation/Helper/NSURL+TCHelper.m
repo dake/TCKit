@@ -717,7 +717,7 @@ static int tc_CCHmacUpdate(void *c, const void *data, CC_LONG len)
     if (@available(iOS 11, *)) {
         NSItemProvider *fileProvider = [[NSItemProvider alloc] initWithItem:fileURL typeIdentifier:utiMust];
         fileProvider.suggestedName = TCPercentEscapedStringFromFileName(suggestedName) ?: fileURL.lastPathComponent;
-        [self setItemProviders:@[fileProvider] localOnly:YES expirationDate:[NSDate dateWithMinutesFromNow:20]];
+        [self setItemProviders:@[fileProvider] localOnly:YES expirationDate:[NSDate dateWithMinutesFromNow:10]];
     } else {
         NSData *data = [NSData dataWithContentsOfAlwaysMappedURL:fileURL error:NULL];
         if (nil == data) {
