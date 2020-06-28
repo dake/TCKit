@@ -777,10 +777,19 @@
     
     dispatch_async(self.responseQueue, ^{
         @autoreleasepool {
-            if (nil != path && ![NSKeyedArchiver archiveRootObject:response toFile:path]) {
-                NSCAssert(false, @"write response failed.");
+            if (nil != path) {
+                if (@available(iOS 11, *)) {
+                    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:response requiringSecureCoding:NO error:NULL];
+                    if (nil == data || ![data writeToFile:path atomically:YES]) {
+                        NSCAssert(false, @"write response failed.");
+                    }
+                } else {
+                    if (![NSKeyedArchiver archiveRootObject:response toFile:path]) {
+                        NSCAssert(false, @"write response failed.");
+                    }
+                }
             }
-            
+
             if (nil != block) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     block();
@@ -831,10 +840,25 @@
         }
         
         dispatch_async(self.responseQueue, ^{
+            static NSSet<Class> *klasses = nil;
+            static dispatch_once_t onceToken;
+            dispatch_once(&onceToken, ^{
+                klasses = [NSSet setWithObjects:NSDictionary.class, NSArray.class, NSString.class, NSURL.class,
+                           NSNumber.class, NSData.class, NSDate.class, NSError.class, NSNull.class, nil];
+            });
+            
             @autoreleasepool {
                 id cachedResponse = nil;
                 @try {
-                    cachedResponse = [NSKeyedUnarchiver unarchiveObjectWithFile:path];
+                    if (@available(iOS 11, *)) {
+                        NSData *data = [NSData dataWithContentsOfFile:path options:NSDataReadingMappedAlways|NSDataReadingUncached error:NULL];
+                        if (data.length > 0) {
+                            cachedResponse = [NSKeyedUnarchiver unarchivedObjectOfClasses:klasses fromData:data error:NULL];
+                        }
+                        
+                    } else {
+                        cachedResponse = [NSKeyedUnarchiver unarchiveObjectWithFile:path];
+                    }
                 }
                 @catch (NSException *exception) {
                     cachedResponse = nil;
