@@ -854,6 +854,7 @@
                         NSData *data = [NSData dataWithContentsOfFile:path options:NSDataReadingMappedAlways|NSDataReadingUncached error:NULL];
                         if (data.length > 0) {
                             cachedResponse = [NSKeyedUnarchiver unarchivedObjectOfClasses:klasses fromData:data error:NULL];
+                            NSCParameterAssert(cachedResponse);
                         }
                         
                     } else {
