@@ -828,7 +828,7 @@ static uint8_t nibbleFromChar(unichar c) {
         encoding = NSASCIIStringEncoding;
     }
     
-    NSUInteger len = self.length;
+    NSUInteger const len = self.length;
     NSData *keyData = [strToFind dataUsingEncoding:encoding];
     if (nil == keyData || len < keyData.length) {
         return NSMakeRange(NSNotFound, 0);
@@ -839,9 +839,15 @@ static uint8_t nibbleFromChar(unichar c) {
         if (searchRange->location == NSNotFound) {
             searchRange->location = 0;
         }
-        
-        if (searchRange->length < 1 || searchRange->length > len) {
+        if (searchRange->length < 1) {
             searchRange->length = len;
+        }
+        
+        if (NSMaxRange(*searchRange) > len) {
+            searchRange->length = len - searchRange->location;
+        }
+        if (searchRange->length < 1) {
+            return NSMakeRange(NSNotFound, 0);
         }
         
         range = *searchRange;
