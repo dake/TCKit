@@ -1234,6 +1234,62 @@ static int EscapeMapCompare(const void *ucharVoid, const void *mapVoid) {
     return finalString;
 }
 
+
+- (nullable NSString *)stringByBlackEscaping
+{
+    NSString *outputText = self;
+    @autoreleasepool {
+        outputText = [outputText stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
+    }
+    @autoreleasepool {
+        outputText = [outputText stringByReplacingOccurrencesOfString:@"\n" withString:@"\\n"];
+    }
+    @autoreleasepool {
+        outputText = [outputText stringByReplacingOccurrencesOfString:@"\r" withString:@"\\r"];
+    }
+    @autoreleasepool {
+        outputText = [outputText stringByReplacingOccurrencesOfString:@"\t" withString:@"\\t"];
+    }
+    @autoreleasepool {
+        outputText = [outputText stringByReplacingOccurrencesOfString:@"\v" withString:@"\\v"];
+    }
+    
+    return outputText;
+}
+
+- (NSString *)stringByBlackUnescaping
+{
+    if (self.length < 3) {
+        return self;
+    }
+    
+    NSString *outputText = self;
+    @autoreleasepool {
+        outputText = [outputText stringByReplacingOccurrencesOfString:@"\\\\" withString:@"\\"];
+    }
+    @autoreleasepool {
+        outputText = [outputText stringByReplacingOccurrencesOfString:@"\\\"" withString:@"\""];
+    }
+    @autoreleasepool {
+        outputText = [outputText stringByReplacingOccurrencesOfString:@"\\n" withString:@"\n"];
+    }
+    @autoreleasepool {
+        outputText = [outputText stringByReplacingOccurrencesOfString:@"\\r" withString:@"\r"];
+    }
+    @autoreleasepool {
+        outputText = [outputText stringByReplacingOccurrencesOfString:@"\\t" withString:@"\t"];
+    }
+    @autoreleasepool {
+        outputText = [outputText stringByReplacingOccurrencesOfString:@"\\v" withString:@"\v"];
+    }
+    @autoreleasepool {
+        outputText = [outputText stringByReplacingOccurrencesOfString:@"\\/" withString:@"/"];
+    }
+    
+    return outputText;
+}
+
+
 @end
 
 

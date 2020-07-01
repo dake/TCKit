@@ -60,6 +60,9 @@ extern bool tc_is_ip_addr(char const *host, bool *_Nullable ipv6);
 
 - (NSString *)replaceUnicode;
 
+- (nullable NSString *)stringByBlackEscaping;
+- (NSString *)stringByBlackUnescaping;
+
 @end
 
 NS_ASSUME_NONNULL_END
