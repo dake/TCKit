@@ -165,6 +165,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 //- (NSString *)gatewayIPAddress;
 + (void)HTTPProxy:(NSString *_Nullable __autoreleasing * _Nullable)host port:(NSNumber *_Nullable __autoreleasing * _Nullable)port;
++ (void)HTTPSProxy:(NSString *_Nullable __autoreleasing * _Nullable)host port:(NSNumber *_Nullable __autoreleasing * _Nullable)port;
 
 + (void)fetchMemoryStatistics:(void (^)(size_t total, size_t wired, size_t active, size_t inactive, size_t free))block;
 + (nullable NSDate *)systemUpTime;
@@ -197,7 +198,7 @@ typedef NS_ENUM(NSInteger, TCNetworkInterfaceType) {
     kTCNetworkInterfaceTypeUSB, // en2, iOS 11 iPod: en3
     kTCNetworkInterfaceTypeBluetooth, // en3, iOS 11 iPod: en2
     
-    kTCNetworkInterfaceTypeNEVPN, // utun1
+    kTCNetworkInterfaceTypeNEVPN, // utun1, ios13: utun5, ios14: utun2
     kTCNetworkInterfaceTypePersonalVPN, // ipsec0
     
     kTCNetworkInterfaceTypeCount,

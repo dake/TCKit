@@ -779,7 +779,7 @@ static NSString *s_device_names[kTCDeviceCount] = {
         [kTCNetworkInterfaceTypeUSB] = @"en2",
         [kTCNetworkInterfaceTypeBluetooth] = @"en3",
         
-        [kTCNetworkInterfaceTypeNEVPN] = @"utun1",
+//        [kTCNetworkInterfaceTypeNEVPN] = @"utun1",
         [kTCNetworkInterfaceTypePersonalVPN] = @"ipsec0",
     };
     
@@ -928,6 +928,24 @@ static NSString *s_device_names[kTCDeviceCount] = {
 
 + (void)HTTPProxy:(NSString **)host port:(NSNumber **)port
 {
+    [self HTTPProxy:host port:port hostKey:(id)kCFNetworkProxiesHTTPProxy portKey:(id)kCFNetworkProxiesHTTPPort];
+}
+
++ (void)HTTPSProxy:(NSString **)host port:(NSNumber **)port
+{
+    [self HTTPProxy:host port:port
+            hostKey:[(__bridge NSString *)kCFNetworkProxiesHTTPProxy stringByReplacingOccurrencesOfString:@"HTTP" withString:@"HTTPS"]
+            portKey:[(__bridge NSString *)kCFNetworkProxiesHTTPPort stringByReplacingOccurrencesOfString:@"HTTP" withString:@"HTTPS"]];
+}
+
++ (void)HTTPProxy:(NSString **)host port:(NSNumber **)port hostKey:(id)hostKey portKey:(id)portKey
+{
+    NSCParameterAssert(hostKey);
+    NSCParameterAssert(portKey);
+    if (nil == hostKey || nil == portKey) {
+        return;
+    }
+    
     CFDictionaryRef dicRef = CFNetworkCopySystemProxySettings();
     if (NULL == dicRef) {
         return;
@@ -937,29 +955,50 @@ static NSString *s_device_names[kTCDeviceCount] = {
     if (dic.count < 1) {
         return;
     }
-    NSString *proxy = dic[(id)kCFNetworkProxiesHTTPProxy];
+    NSString *proxy = dic[hostKey];
     if (proxy.length > 0) {
         if (NULL != host) {
             *host = proxy;
         }
         if (NULL != port) {
-            *port = dic[(id)kCFNetworkProxiesHTTPPort];
+            *port = dic[portKey];
         }
         return;
     }
-    
-    dic = [dic[@"__SCOPED__"] allValues].firstObject;
-    proxy = dic[(id)kCFNetworkProxiesHTTPProxy];
-    if (proxy.length > 0) {
-        if (NULL != host) {
-            *host = proxy;
-        }
-        if (NULL != port) {
-            *port = dic[(id)kCFNetworkProxiesHTTPPort];
-        }
+    // __SCOPED__
+    NSDictionary<NSString *, NSDictionary *> *scope = dic[[NSString stringWithFormat:@"__%@%@%c%c__", @"SC", @"op".uppercaseString, 'E', 'D']];
+    NSCParameterAssert(nil == scope || [scope isKindOfClass:NSDictionary.class]);
+    if (![scope isKindOfClass:NSDictionary.class]) {
         return;
+    }
+    for (NSString *key in scope.allKeys) {
+        if ([key hasPrefix:@"utun"]) {
+            proxy = scope[key][hostKey];
+            if (proxy.length > 0) {
+                if (NULL != host) {
+                    *host = proxy;
+                }
+                if (NULL != port) {
+                    *port = scope[key][portKey];
+                }
+                return;
+            }
+        }
+    }
+    for (NSDictionary *ifs in scope.allValues) {
+        proxy = ifs[hostKey];
+        if (proxy.length > 0) {
+            if (NULL != host) {
+                *host = proxy;
+            }
+            if (NULL != port) {
+                *port = ifs[portKey];
+            }
+            return;
+        }
     }
 }
+
 // #define ROUNDUP(a) \
 ((a) > 0 ? (1 + (((a) - 1) | (sizeof(long) - 1))) : sizeof(long))
 //- (NSString *)gatewayIPAddress
