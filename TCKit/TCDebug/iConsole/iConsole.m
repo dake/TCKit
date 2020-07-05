@@ -116,10 +116,10 @@ static void exceptionHandler(NSException *exception)
 - (void)setConsoleText
 {
     NSString *text = _infoString;
-    NSUInteger touches = (TARGET_IPHONE_SIMULATOR ? _simulatorTouchesToShow: _deviceTouchesToShow);
+    NSUInteger touches = (TARGET_OS_SIMULATOR ? _simulatorTouchesToShow: _deviceTouchesToShow);
     if (touches > 0 && touches < 11) {
         text = [text stringByAppendingFormat:@"\nSwipe down with %lu finger%@ to hide console", (unsigned long)touches, (touches != 1)? @"s": @""];
-    } else if (TARGET_IPHONE_SIMULATOR ? _simulatorShakeToShow : _deviceShakeToShow) {
+    } else if (TARGET_OS_SIMULATOR ? _simulatorShakeToShow : _deviceShakeToShow) {
         text = [text stringByAppendingString:@"\nShake device to hide console"];
     }
     text = [text stringByAppendingString:@"\n--------------------------------------\n"];
@@ -709,7 +709,7 @@ static void exceptionHandler(NSException *exception)
     
     if ([iConsole sharedConsole].enabled && event.type == UIEventTypeTouches) {
         NSSet *touches = [event allTouches];
-        if ([touches count] == (TARGET_IPHONE_SIMULATOR ? [iConsole sharedConsole].simulatorTouchesToShow: [iConsole sharedConsole].deviceTouchesToShow)) {
+        if ([touches count] == (TARGET_OS_SIMULATOR ? [iConsole sharedConsole].simulatorTouchesToShow: [iConsole sharedConsole].deviceTouchesToShow)) {
             BOOL allUp = YES;
             BOOL allDown = YES;
             BOOL allLeft = YES;
@@ -781,7 +781,7 @@ static void exceptionHandler(NSException *exception)
     [super motionEnded:motion withEvent:event];
     
     if ([iConsole sharedConsole].enabled &&
-        (TARGET_IPHONE_SIMULATOR ? [iConsole sharedConsole].simulatorShakeToShow: [iConsole sharedConsole].deviceShakeToShow)) {
+        (TARGET_OS_SIMULATOR ? [iConsole sharedConsole].simulatorShakeToShow: [iConsole sharedConsole].deviceShakeToShow)) {
         if (event.type == UIEventTypeMotion && event.subtype == UIEventSubtypeMotionShake) {
             if ([iConsole sharedConsole].view.superview == nil) {
                 [iConsole show];

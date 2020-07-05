@@ -6,7 +6,7 @@
 //  Copyright © 2016年 dake. All rights reserved.
 //
 
-#if !TARGET_IPHONE_SIMULATOR && \
+#if !TARGET_OS_SIMULATOR && \
 (defined(__TCKit__) && !defined(TC_IOS_PUBLISH)) || (!defined(__TCKit__) && defined(DEBUG))
 
 #import <Foundation/Foundation.h>

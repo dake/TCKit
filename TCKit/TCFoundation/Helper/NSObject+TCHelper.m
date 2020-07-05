@@ -18,7 +18,7 @@ static NSString const *kDefaultDomain = @"TCKit";
 + (NSURL *)defaultPersistentDirectoryInDomain:(NSString *)domain create:(BOOL)create
 {
     NSString *dir = [NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES).firstObject stringByAppendingPathComponent:domain?:kDefaultDomain];
-    //#if TARGET_IPHONE_SIMULATOR
+    //#if TARGET_OS_SIMULATOR
     //    path = [path stringByAppendingPathComponent:[[NSBundle mainBundle] bundleIdentifier]];
     //#endif
     
