@@ -204,7 +204,8 @@ typedef NS_ENUM(NSInteger, TCNetworkInterfaceType) {
     kTCNetworkInterfaceTypeCount,
 };
 
-+ (nullable NSString *)ipFromInterface:(TCNetworkInterfaceType)type;
++ (nullable NSString *)ipFromInterface:(TCNetworkInterfaceType)type ipv6:(BOOL *_Nullable)ipv6;
++ (nullable NSString *)ipFromInterface:(TCNetworkInterfaceType)type destination:(BOOL)destination ipv6:(BOOL *_Nullable)ipv6;
 
 @end
 

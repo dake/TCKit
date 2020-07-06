@@ -62,6 +62,7 @@ extern NSString *const kTCApplicationDidReceiveDiskSpaceWarning;
 + (void)applicationUpdateBlock:(nullable dispatch_block_t)updateBlock type:(TCMigrationVersionType)type domain:(nullable NSString *)domain;
 + (void)updateResetDomain:(nullable NSString *)domain type:(TCMigrationVersionType)type;
 + (BOOL)updatedVersion:(TCMigrationVersionType)type domain:(nullable NSString *)domain;
++ (void)systemUpdateBlock:(dispatch_block_t)block domain:(nullable NSString *)domain;
 
 @end
 

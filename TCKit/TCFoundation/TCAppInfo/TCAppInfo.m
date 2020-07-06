@@ -20,6 +20,7 @@ static NSString *const kTCMigrationLastBuildKey = @"lastMigrationBuild.TCMigrati
 
 static NSString *const kTCMigrationLastAppVersionKey = @"lastAppVersion.TCMigration.TCKit";
 static NSString *const kTCMigrationLastAppBuildKey = @"lastAppBuild.TCMigration.TCKit";
+static NSString *const kTCMigrationLastSysBuildKey = @"lastSysBuild.TCMigration.TCKit";
 
 NSString *const kTCApplicationDidReceiveDiskSpaceWarning = @"TCApplicationDidReceiveDiskSpaceWarning.TCKit";
 
@@ -158,6 +159,21 @@ NSString *const kTCApplicationDidReceiveDiskSpaceWarning = @"TCApplicationDidRec
     return ver.length < 1 ? NO : [ver isEqualToString:[self appVersion:type]];
 }
 
++ (void)systemUpdateBlock:(dispatch_block_t)block domain:(NSString *)domain
+{
+    if (nil == domain) {
+        domain = @"default";
+    }
+    
+    NSString *version = UIDevice.currentDevice.systemVersion;
+    if (![[self lastSysVersionForDomain:domain] isEqualToString:version]) {
+        if (nil != block) {
+            block();
+        }
+        [self setLastSysVersion:version domain:domain];
+    }
+}
+
 
 // migrate version
 
@@ -206,7 +222,7 @@ NSString *const kTCApplicationDidReceiveDiskSpaceWarning = @"TCApplicationDidRec
 
 + (NSString *)lastUpdateVersionForType:(TCMigrationVersionType)type domain:(NSString *)domain
 {
-    NSString *res = [[NSUserDefaults standardUserDefaults] valueForKey:[self versionUpdateKeyForType:type domain:domain]];
+    NSString *res = [NSUserDefaults.standardUserDefaults valueForKey:[self versionUpdateKeyForType:type domain:domain]];
     return res ?: @"";
 }
 
@@ -216,6 +232,16 @@ NSString *const kTCApplicationDidReceiveDiskSpaceWarning = @"TCApplicationDidRec
     [NSUserDefaults.standardUserDefaults synchronize];
 }
 
++ (NSString *)lastSysVersionForDomain:(NSString *)domain
+{
+    NSString *res = [NSUserDefaults.standardUserDefaults valueForKey:[domain stringByAppendingFormat:@".%@", kTCMigrationLastSysBuildKey]];
+    return res ?: @"";
+}
 
++ (void)setLastSysVersion:(NSString *)version domain:(NSString *)domain
+{
+    [NSUserDefaults.standardUserDefaults setValue:version forKey:[domain stringByAppendingFormat:@".%@", kTCMigrationLastSysBuildKey]];
+    [NSUserDefaults.standardUserDefaults synchronize];
+}
 
 @end

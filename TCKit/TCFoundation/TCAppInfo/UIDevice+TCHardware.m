@@ -769,18 +769,23 @@ static NSString *s_device_names[kTCDeviceCount] = {
     freeifaddrs(interfaces);
 }
 
-+ (NSString *)ipFromInterface:(TCNetworkInterfaceType)type
++ (NSString *)ipFromInterface:(TCNetworkInterfaceType)type ipv6:(BOOL *)ipv6
 {
-    static NSString *kMap[] = {
-        [kTCNetworkInterfaceTypeLoopback] = @"lo0",
-        [kTCNetworkInterfaceTypeCellular] = @"pdp_ip0",
-        [kTCNetworkInterfaceTypeWiFi] = @"en0",
-        [kTCNetworkInterfaceTypeHotspot] = @"bridge100",
-        [kTCNetworkInterfaceTypeUSB] = @"en2",
-        [kTCNetworkInterfaceTypeBluetooth] = @"en3",
+    return [self ipFromInterface:type destination:NO ipv6:ipv6];
+}
+
++ (NSString *)ipFromInterface:(TCNetworkInterfaceType)type destination:(BOOL)destination ipv6:(BOOL *)ipv6
+{
+    static const char *kMap[] = {
+        [kTCNetworkInterfaceTypeLoopback] = "lo0",
+        [kTCNetworkInterfaceTypeCellular] = "pdp_ip0",
+        [kTCNetworkInterfaceTypeWiFi] = "en0",
+        [kTCNetworkInterfaceTypeHotspot] = "bridge100",
+        [kTCNetworkInterfaceTypeUSB] = "en2",
+        [kTCNetworkInterfaceTypeBluetooth] = "en3",
         
 //        [kTCNetworkInterfaceTypeNEVPN] = @"utun1",
-        [kTCNetworkInterfaceTypePersonalVPN] = @"ipsec0",
+        [kTCNetworkInterfaceTypePersonalVPN] = "ipsec0",
     };
     
     if (type < 0 || type >= kTCNetworkInterfaceTypeCount) {
@@ -798,7 +803,8 @@ static NSString *s_device_names[kTCDeviceCount] = {
         }
     }
     
-    NSString *ifType = kMap[type];
+    __block BOOL v6 = NO;
+    const char *ifType = kMap[type];
     __block NSString *ip = nil;
     [self enumerateNetworkInterfaces:^(struct ifaddrs * _Nonnull addr, BOOL * _Nonnull stop) {
         unsigned int flags = addr->ifa_flags;
@@ -806,16 +812,42 @@ static NSString *s_device_names[kTCDeviceCount] = {
             return;
         }
         
-        if (NULL != addr->ifa_netmask && NULL != addr->ifa_addr && NULL != addr->ifa_name && [@(addr->ifa_name) isEqualToString:ifType]) {
-            NSString *tmp = [self stringFromSockAddr:addr->ifa_addr includeService:NO];
-            if (nil != tmp) {
-                ip = tmp;
-                if (addr->ifa_addr->sa_family == AF_INET) {
-                    *stop = YES;
+        if (NULL == addr->ifa_netmask || NULL == addr->ifa_name || 0 != strcmp(addr->ifa_name, ifType)) {
+            return;
+        }
+        
+        if (destination) {
+            if (NULL != addr->ifa_dstaddr) {
+                NSString *tmp = [self stringFromSockAddr:addr->ifa_dstaddr includeService:NO];
+                if (nil != tmp) {
+                    ip = tmp;
+                    if (addr->ifa_dstaddr->sa_family == AF_INET) {
+                        v6 = NO;
+                        *stop = YES;
+                        return;
+                    }
+                    v6 = addr->ifa_dstaddr->sa_family == AF_INET6;
+                }
+            }
+        } else {
+            if (NULL != addr->ifa_addr) {
+                NSString *tmp = [self stringFromSockAddr:addr->ifa_addr includeService:NO];
+                if (nil != tmp) {
+                    ip = tmp;
+                    if (addr->ifa_addr->sa_family == AF_INET) {
+                        v6 = NO;
+                        *stop = YES;
+                        return;
+                    }
+                    v6 = addr->ifa_addr->sa_family == AF_INET6;
                 }
             }
         }
     }];
+    
+    if (NULL != ipv6) {
+        *ipv6 = v6;
+    }
     return ip;
 }
 
@@ -999,6 +1031,8 @@ static NSString *s_device_names[kTCDeviceCount] = {
     }
 }
 
+// https://stackoverflow.com/questions/4872196/how-to-get-the-wifi-gateway-address-on-the-iphone/29440193#29440193
+// https://opensource.apple.com/source/xnu/xnu-1456.1.26/bsd/net/route.h
 // #define ROUNDUP(a) \
 ((a) > 0 ? (1 + (((a) - 1) | (sizeof(long) - 1))) : sizeof(long))
 //- (NSString *)gatewayIPAddress
