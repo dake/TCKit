@@ -926,10 +926,10 @@ static NSString *s_device_names[kTCDeviceCount] = {
 
 + (NSArray<NSString *> *)dnsAddresses
 {
-    NSArray *ipv4Dns = nil;
-    NSArray *ipv6Dns = nil;
+    NSArray<NSString *> *ipv4Dns = nil;
+    NSArray<NSString *> *ipv6Dns = nil;
     [self sysDNSServersIpv4:&ipv4Dns ipv6:&ipv6Dns];
-    NSMutableArray *dnsServers = NSMutableArray.array;
+    NSMutableArray<NSString *> *dnsServers = NSMutableArray.array;
     [dnsServers addObjectsFromArray:ipv4Dns];
     [dnsServers addObjectsFromArray:ipv6Dns];
     
