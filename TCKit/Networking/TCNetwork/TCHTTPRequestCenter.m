@@ -843,8 +843,8 @@
             static NSSet<Class> *klasses = nil;
             static dispatch_once_t onceToken;
             dispatch_once(&onceToken, ^{
-                klasses = [NSSet setWithObjects:NSDictionary.class, NSArray.class, NSString.class, NSURL.class,
-                           NSNumber.class, NSData.class, NSDate.class, NSError.class, NSNull.class, nil];
+                klasses = [NSSet setWithObjects:NSDictionary.class, NSArray.class, NSOrderedSet.class, NSSet.class, NSString.class, NSURL.class,
+                           NSNumber.class, NSData.class, NSDate.class, NSUUID.class, NSError.class, NSNull.class, nil];
             });
             
             @autoreleasepool {
