@@ -767,7 +767,7 @@ static NSString *_defaultService;
 - (NSArray UIC_KEY_TYPE *)allKeys
 {
     NSArray *items = [self.class prettify:[self itemClassObject] items:[self items]];
-    NSMutableArray *keys = [[NSMutableArray alloc] init];
+    NSMutableArray *keys = NSMutableArray.array;
     for (NSDictionary *item in items) {
         NSString *key = item[@"key"];
         if (key) {
@@ -786,7 +786,7 @@ static NSString *_defaultService;
         itemClassObject = kSecClassInternetPassword;
     }
     
-    NSMutableDictionary *query = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *query = NSMutableDictionary.dictionary;
     query[(__bridge __strong id)kSecClass] = (__bridge id)itemClassObject;
     query[(__bridge __strong id)kSecMatchLimit] = (__bridge id)kSecMatchLimitAll;
     query[(__bridge __strong id)kSecReturnAttributes] = (__bridge id)kCFBooleanTrue;
@@ -798,7 +798,7 @@ static NSString *_defaultService;
     
     if (status == errSecSuccess) {
         NSArray *items = [self prettify:itemClassObject items:(__bridge NSArray *)result];
-        NSMutableArray *keys = [[NSMutableArray alloc] init];
+        NSMutableArray *keys = NSMutableArray.array;
         for (NSDictionary *item in items) {
             if (itemClassObject == kSecClassGenericPassword) {
                 [keys addObject:@{@"service": item[@"service"] ?: @"", @"key": item[@"key"] ?: @""}];
@@ -823,7 +823,7 @@ static NSString *_defaultService;
         itemClassObject = kSecClassInternetPassword;
     }
     
-    NSMutableDictionary *query = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *query = NSMutableDictionary.dictionary;
     query[(__bridge __strong id)kSecClass] = (__bridge id)itemClassObject;
     query[(__bridge __strong id)kSecMatchLimit] = (__bridge id)kSecMatchLimitAll;
     query[(__bridge __strong id)kSecReturnAttributes] = (__bridge id)kCFBooleanTrue;
@@ -873,10 +873,10 @@ static NSString *_defaultService;
 
 + (NSArray *)prettify:(CFTypeRef)itemClass items:(NSArray *)items
 {
-    NSMutableArray *prettified = [[NSMutableArray alloc] init];
+    NSMutableArray *prettified = NSMutableArray.array;
     
     for (NSDictionary *attributes in items) {
-        NSMutableDictionary *item = [[NSMutableDictionary alloc] init];
+        NSMutableDictionary *item = NSMutableDictionary.dictionary;
         if (itemClass == kSecClassGenericPassword) {
             item[@"class"] = @"GenericPassword";
             id service = attributes[(__bridge id)kSecAttrService];
@@ -1042,9 +1042,9 @@ static NSString *_defaultService;
             }
         }
         
-        NSMutableArray *sharedCredentials = [[NSMutableArray alloc] init];
+        NSMutableArray *sharedCredentials = NSMutableArray.array;
         for (NSDictionary *credential in (__bridge NSArray *)credentials) {
-            NSMutableDictionary *sharedCredential = [[NSMutableDictionary alloc] init];
+            NSMutableDictionary *sharedCredential = NSMutableDictionary.dictionary;
             NSString *server = credential[(__bridge __strong id)kSecAttrServer];
             if (server) {
                 sharedCredential[@"server"] = server;
@@ -1098,7 +1098,7 @@ static NSString *_defaultService;
 
 - (NSMutableDictionary *)query
 {
-    NSMutableDictionary *query = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *query = NSMutableDictionary.dictionary;
     
     CFTypeRef itemClass = [self itemClassObject];
     query[(__bridge __strong id)kSecClass] =(__bridge id)itemClass;
@@ -1165,7 +1165,7 @@ static NSString *_defaultService;
         attributes = [self query];
         attributes[(__bridge __strong id)kSecAttrAccount] = key;
     } else {
-        attributes = [[NSMutableDictionary alloc] init];
+        attributes = NSMutableDictionary.dictionary;
     }
     
     attributes[(__bridge __strong id)kSecValueData] = value;

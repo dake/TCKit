@@ -316,10 +316,10 @@
 }
 
 - (instancetype)initWithCoder:(NSCoder *)decoder {
-    NSURL *baseURL = [decoder decodeObjectOfClass:[NSURL class] forKey:NSStringFromSelector(@selector(baseURL))];
-    NSURLSessionConfiguration *configuration = [decoder decodeObjectOfClass:[NSURLSessionConfiguration class] forKey:@"sessionConfiguration"];
+    NSURL *baseURL = [decoder decodeObjectOfClass:NSURL.class forKey:NSStringFromSelector(@selector(baseURL))];
+    NSURLSessionConfiguration *configuration = [decoder decodeObjectOfClass:NSURLSessionConfiguration.class forKey:@"sessionConfiguration"];
     if (!configuration) {
-        NSString *configurationIdentifier = [decoder decodeObjectOfClass:[NSString class] forKey:@"identifier"];
+        NSString *configurationIdentifier = [decoder decodeObjectOfClass:NSString.class forKey:@"identifier"];
         if (configurationIdentifier) {
 #if (defined(__IPHONE_OS_VERSION_MIN_REQUIRED) && __IPHONE_OS_VERSION_MIN_REQUIRED >= 80000) || (defined(__MAC_OS_X_VERSION_MIN_REQUIRED) && __MAC_OS_X_VERSION_MIN_REQUIRED >= 1100)
             configuration = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:configurationIdentifier];
@@ -334,9 +334,9 @@
         return nil;
     }
 
-    self.requestSerializer = [decoder decodeObjectOfClass:[AFHTTPRequestSerializer class] forKey:NSStringFromSelector(@selector(requestSerializer))];
-    self.responseSerializer = [decoder decodeObjectOfClass:[AFHTTPResponseSerializer class] forKey:NSStringFromSelector(@selector(responseSerializer))];
-    AFSecurityPolicy *decodedPolicy = [decoder decodeObjectOfClass:[AFSecurityPolicy class] forKey:NSStringFromSelector(@selector(securityPolicy))];
+    self.requestSerializer = [decoder decodeObjectOfClass:AFHTTPRequestSerializer.class forKey:NSStringFromSelector(@selector(requestSerializer))];
+    self.responseSerializer = [decoder decodeObjectOfClass:AFHTTPResponseSerializer.class forKey:NSStringFromSelector(@selector(responseSerializer))];
+    AFSecurityPolicy *decodedPolicy = [decoder decodeObjectOfClass:AFSecurityPolicy.class forKey:NSStringFromSelector(@selector(securityPolicy))];
     if (decodedPolicy) {
         self.securityPolicy = decodedPolicy;
     }

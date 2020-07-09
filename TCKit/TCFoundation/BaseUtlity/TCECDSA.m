@@ -27,7 +27,7 @@
 + (SecKeyRef)getPrivateKeyRefrenceFromData:(NSData*)p12Data password:(NSString*)password
 {
     SecKeyRef privateKeyRef = NULL;
-    NSMutableDictionary * options = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary * options = NSMutableDictionary.dictionary;
     [options setObject: password forKey:(__bridge id)kSecImportExportPassphrase];
     CFArrayRef items = CFArrayCreate(NULL, 0, 0, NULL);
     OSStatus securityError = SecPKCS12Import((__bridge CFDataRef) p12Data, (__bridge CFDictionaryRef)options, &items);

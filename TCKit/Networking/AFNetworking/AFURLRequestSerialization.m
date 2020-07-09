@@ -136,7 +136,7 @@ NSArray * AFQueryStringPairsFromKeyAndValue(NSString *key, id value) {
 
     NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"description" ascending:YES selector:@selector(compare:)];
 
-    if ([value isKindOfClass:[NSDictionary class]]) {
+    if ([value isKindOfClass:NSDictionary.class]) {
         NSDictionary *dictionary = value;
         // Sort dictionary keys to ensure consistent ordering in query string, which is important when deserializing potentially ambiguous sequences, such as an array of dictionaries
         for (id nestedKey in [dictionary.allKeys sortedArrayUsingDescriptors:@[ sortDescriptor ]]) {
@@ -145,12 +145,12 @@ NSArray * AFQueryStringPairsFromKeyAndValue(NSString *key, id value) {
                 [mutableQueryStringComponents addObjectsFromArray:AFQueryStringPairsFromKeyAndValue((key ? [NSString stringWithFormat:@"%@[%@]", key, nestedKey] : nestedKey), nestedValue)];
             }
         }
-    } else if ([value isKindOfClass:[NSArray class]]) {
+    } else if ([value isKindOfClass:NSArray.class]) {
         NSArray *array = value;
         for (id nestedValue in array) {
             [mutableQueryStringComponents addObjectsFromArray:AFQueryStringPairsFromKeyAndValue([NSString stringWithFormat:@"%@[]", key], nestedValue)];
         }
-    } else if ([value isKindOfClass:[NSSet class]]) {
+    } else if ([value isKindOfClass:NSSet.class]) {
         NSSet *set = value;
         for (id obj in [set sortedArrayUsingDescriptors:@[ sortDescriptor ]]) {
             [mutableQueryStringComponents addObjectsFromArray:AFQueryStringPairsFromKeyAndValue(key, obj)];
@@ -398,7 +398,7 @@ forHTTPHeaderField:(NSString *)field
     if (parameters) {
         for (AFQueryStringPair *pair in AFQueryStringPairsFromDictionary(parameters)) {
             NSData *data = nil;
-            if ([pair.value isKindOfClass:[NSData class]]) {
+            if ([pair.value isKindOfClass:NSData.class]) {
                 data = pair.value;
             } else if ([pair.value isEqual:[NSNull null]]) {
                 data = NSData.data;
@@ -565,8 +565,8 @@ forHTTPHeaderField:(NSString *)field
         return nil;
     }
 
-    self.mutableHTTPRequestHeaders = [[decoder decodeObjectOfClass:[NSDictionary class] forKey:NSStringFromSelector(@selector(mutableHTTPRequestHeaders))] mutableCopy];
-    self.queryStringSerializationStyle = (AFHTTPRequestQueryStringSerializationStyle)[[decoder decodeObjectOfClass:[NSNumber class] forKey:NSStringFromSelector(@selector(queryStringSerializationStyle))] unsignedIntegerValue];
+    self.mutableHTTPRequestHeaders = [[decoder decodeObjectOfClass:NSDictionary.class forKey:NSStringFromSelector(@selector(mutableHTTPRequestHeaders))] mutableCopy];
+    self.queryStringSerializationStyle = (AFHTTPRequestQueryStringSerializationStyle)[[decoder decodeObjectOfClass:NSNumber.class forKey:NSStringFromSelector(@selector(queryStringSerializationStyle))] unsignedIntegerValue];
 
     return self;
 }
@@ -1060,11 +1060,11 @@ typedef enum {
 
 - (NSInputStream *)inputStream {
     if (!_inputStream) {
-        if ([self.body isKindOfClass:[NSData class]]) {
+        if ([self.body isKindOfClass:NSData.class]) {
             _inputStream = [NSInputStream inputStreamWithData:self.body];
-        } else if ([self.body isKindOfClass:[NSURL class]]) {
+        } else if ([self.body isKindOfClass:NSURL.class]) {
             _inputStream = [NSInputStream inputStreamWithURL:self.body];
-        } else if ([self.body isKindOfClass:[NSInputStream class]]) {
+        } else if ([self.body isKindOfClass:NSInputStream.class]) {
             _inputStream = self.body;
         } else {
             _inputStream = [NSInputStream inputStreamWithData:NSData.data];
@@ -1292,7 +1292,7 @@ typedef enum {
         return nil;
     }
 
-    self.writingOptions = [[decoder decodeObjectOfClass:[NSNumber class] forKey:NSStringFromSelector(@selector(writingOptions))] unsignedIntegerValue];
+    self.writingOptions = [[decoder decodeObjectOfClass:NSNumber.class forKey:NSStringFromSelector(@selector(writingOptions))] unsignedIntegerValue];
 
     return self;
 }
@@ -1377,8 +1377,8 @@ typedef enum {
         return nil;
     }
 
-    self.format = (NSPropertyListFormat)[[decoder decodeObjectOfClass:[NSNumber class] forKey:NSStringFromSelector(@selector(format))] unsignedIntegerValue];
-    self.writeOptions = [[decoder decodeObjectOfClass:[NSNumber class] forKey:NSStringFromSelector(@selector(writeOptions))] unsignedIntegerValue];
+    self.format = (NSPropertyListFormat)[[decoder decodeObjectOfClass:NSNumber.class forKey:NSStringFromSelector(@selector(format))] unsignedIntegerValue];
+    self.writeOptions = [[decoder decodeObjectOfClass:NSNumber.class forKey:NSStringFromSelector(@selector(writeOptions))] unsignedIntegerValue];
 
     return self;
 }

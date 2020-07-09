@@ -516,7 +516,7 @@ static NSString * const AFNSURLSessionTaskDidSuspendNotification = @"com.alamofi
     self.reachabilityManager = [AFNetworkReachabilityManager sharedManager];
 #endif
 
-    self.mutableTaskDelegatesKeyedByTaskIdentifier = [[NSMutableDictionary alloc] init];
+    self.mutableTaskDelegatesKeyedByTaskIdentifier = NSMutableDictionary.dictionary;
 
     self.lock = [[NSLock alloc] init];
     self.lock.name = AFURLSessionManagerLockName;
@@ -1222,7 +1222,7 @@ expectedTotalBytes:(int64_t)expectedTotalBytes
 }
 
 - (instancetype)initWithCoder:(NSCoder *)decoder {
-    NSURLSessionConfiguration *configuration = [decoder decodeObjectOfClass:[NSURLSessionConfiguration class] forKey:@"sessionConfiguration"];
+    NSURLSessionConfiguration *configuration = [decoder decodeObjectOfClass:NSURLSessionConfiguration.class forKey:@"sessionConfiguration"];
 
     self = [self initWithSessionConfiguration:configuration];
     if (!self) {

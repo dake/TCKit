@@ -119,7 +119,7 @@ NSString *const _uuidsOfUserDevicesToggleKey = @"fc_uuidsOfUserDevicesToggle";
 -(NSString *)uuidForKey:(id<NSCopying>)key
 {
     if( _uuidForKey == nil ){
-        _uuidForKey = [[NSMutableDictionary alloc] init];
+        _uuidForKey = NSMutableDictionary.dictionary;
     }
     
     NSString *uuidValue = _uuidForKey[key];

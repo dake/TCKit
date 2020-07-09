@@ -61,20 +61,20 @@ static BOOL AFErrorOrUnderlyingErrorHasCodeInDomain(NSError *error, NSInteger co
 }
 
 static id AFJSONObjectByRemovingKeysWithNullValues(id JSONObject, NSJSONReadingOptions readingOptions) {
-    if ([JSONObject isKindOfClass:[NSArray class]]) {
+    if ([JSONObject isKindOfClass:NSArray.class]) {
         NSMutableArray *mutableArray = [NSMutableArray arrayWithCapacity:[(NSArray *)JSONObject count]];
         for (id value in (NSArray *)JSONObject) {
             [mutableArray addObject:AFJSONObjectByRemovingKeysWithNullValues(value, readingOptions)];
         }
 
         return (readingOptions & NSJSONReadingMutableContainers) ? mutableArray : [NSArray arrayWithArray:mutableArray];
-    } else if ([JSONObject isKindOfClass:[NSDictionary class]]) {
+    } else if ([JSONObject isKindOfClass:NSDictionary.class]) {
         NSMutableDictionary *mutableDictionary = [NSMutableDictionary dictionaryWithDictionary:JSONObject];
         for (id <NSCopying> key in [(NSDictionary *)JSONObject allKeys]) {
             id value = (NSDictionary *)JSONObject[key];
             if (!value || [value isEqual:[NSNull null]]) {
                 [mutableDictionary removeObjectForKey:key];
-            } else if ([value isKindOfClass:[NSArray class]] || [value isKindOfClass:[NSDictionary class]]) {
+            } else if ([value isKindOfClass:NSArray.class] || [value isKindOfClass:NSDictionary.class]) {
                 mutableDictionary[key] = AFJSONObjectByRemovingKeysWithNullValues(value, readingOptions);
             }
         }
@@ -179,8 +179,8 @@ static id AFJSONObjectByRemovingKeysWithNullValues(id JSONObject, NSJSONReadingO
         return nil;
     }
 
-    self.acceptableStatusCodes = [decoder decodeObjectOfClass:[NSIndexSet class] forKey:NSStringFromSelector(@selector(acceptableStatusCodes))];
-    self.acceptableContentTypes = [decoder decodeObjectOfClass:[NSIndexSet class] forKey:NSStringFromSelector(@selector(acceptableContentTypes))];
+    self.acceptableStatusCodes = [decoder decodeObjectOfClass:NSIndexSet.class forKey:NSStringFromSelector(@selector(acceptableStatusCodes))];
+    self.acceptableContentTypes = [decoder decodeObjectOfClass:NSIndexSet.class forKey:NSStringFromSelector(@selector(acceptableContentTypes))];
 
     return self;
 }
@@ -273,8 +273,8 @@ static id AFJSONObjectByRemovingKeysWithNullValues(id JSONObject, NSJSONReadingO
         return nil;
     }
 
-    self.readingOptions = [[decoder decodeObjectOfClass:[NSNumber class] forKey:NSStringFromSelector(@selector(readingOptions))] unsignedIntegerValue];
-    self.removesKeysWithNullValues = [[decoder decodeObjectOfClass:[NSNumber class] forKey:NSStringFromSelector(@selector(removesKeysWithNullValues))] boolValue];
+    self.readingOptions = [[decoder decodeObjectOfClass:NSNumber.class forKey:NSStringFromSelector(@selector(readingOptions))] unsignedIntegerValue];
+    self.removesKeysWithNullValues = [[decoder decodeObjectOfClass:NSNumber.class forKey:NSStringFromSelector(@selector(removesKeysWithNullValues))] boolValue];
 
     return self;
 }
@@ -398,7 +398,7 @@ static id AFJSONObjectByRemovingKeysWithNullValues(id JSONObject, NSJSONReadingO
         return nil;
     }
 
-    self.options = [[decoder decodeObjectOfClass:[NSNumber class] forKey:NSStringFromSelector(@selector(options))] unsignedIntegerValue];
+    self.options = [[decoder decodeObjectOfClass:NSNumber.class forKey:NSStringFromSelector(@selector(options))] unsignedIntegerValue];
 
     return self;
 }
@@ -490,8 +490,8 @@ static id AFJSONObjectByRemovingKeysWithNullValues(id JSONObject, NSJSONReadingO
         return nil;
     }
 
-    self.format = (NSPropertyListFormat)[[decoder decodeObjectOfClass:[NSNumber class] forKey:NSStringFromSelector(@selector(format))] unsignedIntegerValue];
-    self.readOptions = [[decoder decodeObjectOfClass:[NSNumber class] forKey:NSStringFromSelector(@selector(readOptions))] unsignedIntegerValue];
+    self.format = (NSPropertyListFormat)[[decoder decodeObjectOfClass:NSNumber.class forKey:NSStringFromSelector(@selector(format))] unsignedIntegerValue];
+    self.readOptions = [[decoder decodeObjectOfClass:NSNumber.class forKey:NSStringFromSelector(@selector(readOptions))] unsignedIntegerValue];
 
     return self;
 }
@@ -707,7 +707,7 @@ static UIImage * AFInflatedImageFromResponseWithDataAtScale(NSHTTPURLResponse *r
     }
 
 #if TARGET_OS_IOS  || TARGET_OS_TV || TARGET_OS_WATCH
-    NSNumber *imageScale = [decoder decodeObjectOfClass:[NSNumber class] forKey:NSStringFromSelector(@selector(imageScale))];
+    NSNumber *imageScale = [decoder decodeObjectOfClass:NSNumber.class forKey:NSStringFromSelector(@selector(imageScale))];
 #if CGFLOAT_IS_DOUBLE
     self.imageScale = [imageScale doubleValue];
 #else
@@ -766,7 +766,7 @@ static UIImage * AFInflatedImageFromResponseWithDataAtScale(NSHTTPURLResponse *r
                           error:(NSError *__autoreleasing *)error
 {
     for (id <AFURLResponseSerialization> serializer in self.responseSerializers) {
-        if (![serializer isKindOfClass:[AFHTTPResponseSerializer class]]) {
+        if (![serializer isKindOfClass:AFHTTPResponseSerializer.class]) {
             continue;
         }
 
@@ -792,7 +792,7 @@ static UIImage * AFInflatedImageFromResponseWithDataAtScale(NSHTTPURLResponse *r
         return nil;
     }
 
-    self.responseSerializers = [decoder decodeObjectOfClass:[NSArray class] forKey:NSStringFromSelector(@selector(responseSerializers))];
+    self.responseSerializers = [decoder decodeObjectOfClass:NSArray.class forKey:NSStringFromSelector(@selector(responseSerializers))];
 
     return self;
 }
