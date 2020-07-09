@@ -25,7 +25,7 @@
 
 @implementation _LocalURLFixer
 {
-    @private
+@private
     NSURL *_tmpPath;
 }
 

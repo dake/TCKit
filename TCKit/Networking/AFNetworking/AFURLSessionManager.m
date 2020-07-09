@@ -192,7 +192,7 @@ typedef void (^AFURLSessionTaskCompletionHandler)(NSURLResponse *response, id re
 didCompleteWithError:(NSError *)error
 {
     __strong AFURLSessionManager *manager = self.manager;
-    __block NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+    __block NSMutableDictionary *userInfo = NSMutableDictionary.dictionary;
     userInfo[AFNetworkingTaskDidCompleteResponseSerializerKey] = manager.responseSerializer;
 
     //Performance Improvement from #2672
@@ -225,7 +225,7 @@ didCompleteWithError:(NSError *)error
             }
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingTaskDidCompleteNotification object:task userInfo:userInfo];
+                [NSNotificationCenter.defaultCenter postNotificationName:AFNetworkingTaskDidCompleteNotification object:task userInfo:userInfo];
             });
         });
     } else {
@@ -251,7 +251,7 @@ didCompleteWithError:(NSError *)error
                 }
 
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingTaskDidCompleteNotification object:task userInfo:userInfo];
+                    [NSNotificationCenter.defaultCenter postNotificationName:AFNetworkingTaskDidCompleteNotification object:task userInfo:userInfo];
                 });
             });
         });
@@ -323,8 +323,8 @@ didFinishDownloadingToURL:(NSURL *)location
         if (self.downloadFileURL) {
             NSError *fileManagerError = nil;
 
-            if (![[NSFileManager defaultManager] moveItemAtURL:location toURL:self.downloadFileURL error:&fileManagerError]) {
-                [[NSNotificationCenter defaultCenter] postNotificationName:AFURLSessionDownloadTaskDidFailToMoveFileNotification object:downloadTask userInfo:fileManagerError.userInfo];
+            if (![NSFileManager.defaultManager moveItemAtURL:location toURL:self.downloadFileURL error:&fileManagerError]) {
+                [NSNotificationCenter.defaultCenter postNotificationName:AFURLSessionDownloadTaskDidFailToMoveFileNotification object:downloadTask userInfo:fileManagerError.userInfo];
             }
         }
     }
@@ -444,7 +444,7 @@ static NSString * const AFNSURLSessionTaskDidSuspendNotification = @"com.alamofi
     [self af_resume];
     
     if (state != NSURLSessionTaskStateRunning) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:AFNSURLSessionTaskDidResumeNotification object:self];
+        [NSNotificationCenter.defaultCenter postNotificationName:AFNSURLSessionTaskDidResumeNotification object:self];
     }
 }
 
@@ -454,7 +454,7 @@ static NSString * const AFNSURLSessionTaskDidSuspendNotification = @"com.alamofi
     [self af_suspend];
     
     if (state != NSURLSessionTaskStateSuspended) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:AFNSURLSessionTaskDidSuspendNotification object:self];
+        [NSNotificationCenter.defaultCenter postNotificationName:AFNSURLSessionTaskDidSuspendNotification object:self];
     }
 }
 @end
@@ -539,7 +539,7 @@ static NSString * const AFNSURLSessionTaskDidSuspendNotification = @"com.alamofi
 }
 
 - (void)dealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 #pragma mark -
@@ -553,7 +553,7 @@ static NSString * const AFNSURLSessionTaskDidSuspendNotification = @"com.alamofi
     if ([task respondsToSelector:@selector(taskDescription)]) {
         if ([task.taskDescription isEqualToString:self.taskDescriptionForSessionTasks]) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingTaskDidResumeNotification object:task];
+                [NSNotificationCenter.defaultCenter postNotificationName:AFNetworkingTaskDidResumeNotification object:task];
             });
         }
     }
@@ -564,7 +564,7 @@ static NSString * const AFNSURLSessionTaskDidSuspendNotification = @"com.alamofi
     if ([task respondsToSelector:@selector(taskDescription)]) {
         if ([task.taskDescription isEqualToString:self.taskDescriptionForSessionTasks]) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingTaskDidSuspendNotification object:task];
+                [NSNotificationCenter.defaultCenter postNotificationName:AFNetworkingTaskDidSuspendNotification object:task];
             });
         }
     }
@@ -717,13 +717,13 @@ static NSString * const AFNSURLSessionTaskDidSuspendNotification = @"com.alamofi
 
 #pragma mark -
 - (void)addNotificationObserverForTask:(NSURLSessionTask *)task {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(taskDidResume:) name:AFNSURLSessionTaskDidResumeNotification object:task];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(taskDidSuspend:) name:AFNSURLSessionTaskDidSuspendNotification object:task];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(taskDidResume:) name:AFNSURLSessionTaskDidResumeNotification object:task];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(taskDidSuspend:) name:AFNSURLSessionTaskDidSuspendNotification object:task];
 }
 
 - (void)removeNotificationObserverForTask:(NSURLSessionTask *)task {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:AFNSURLSessionTaskDidSuspendNotification object:task];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:AFNSURLSessionTaskDidResumeNotification object:task];
+    [NSNotificationCenter.defaultCenter removeObserver:self name:AFNSURLSessionTaskDidSuspendNotification object:task];
+    [NSNotificationCenter.defaultCenter removeObserver:self name:AFNSURLSessionTaskDidResumeNotification object:task];
 }
 
 #pragma mark -
@@ -944,7 +944,7 @@ didBecomeInvalidWithError:(NSError *)error
         self.sessionDidBecomeInvalid(session, error);
     }
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:AFURLSessionDidInvalidateNotification object:session];
+    [NSNotificationCenter.defaultCenter postNotificationName:AFURLSessionDidInvalidateNotification object:session];
 }
 
 - (void)URLSession:(NSURLSession *)session
@@ -1167,8 +1167,8 @@ didFinishDownloadingToURL:(NSURL *)location
             delegate.downloadFileURL = fileURL;
             NSError *error = nil;
             
-            if (![[NSFileManager defaultManager] moveItemAtURL:location toURL:fileURL error:&error]) {
-                [[NSNotificationCenter defaultCenter] postNotificationName:AFURLSessionDownloadTaskDidFailToMoveFileNotification object:downloadTask userInfo:error.userInfo];
+            if (![NSFileManager.defaultManager moveItemAtURL:location toURL:fileURL error:&error]) {
+                [NSNotificationCenter.defaultCenter postNotificationName:AFURLSessionDownloadTaskDidFailToMoveFileNotification object:downloadTask userInfo:error.userInfo];
             }
 
             return;

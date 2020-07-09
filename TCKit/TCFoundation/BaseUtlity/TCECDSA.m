@@ -19,7 +19,6 @@
 
 @implementation TCECDSA
 {
-    @private
 @private
     SecKeyRef _publicKey;
     SecKeyRef _privateKey;

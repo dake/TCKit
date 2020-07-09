@@ -515,7 +515,7 @@ static CGImageRef TC_CGImageCreateOrientationUp(UIImage *img, CGBitmapInfo destB
     
     if (data.length > 0) {
         CGImageSourceRef sourceRef = CGImageSourceCreateWithData((__bridge CFDataRef)data, nil);
-        NSMutableDictionary *options = [NSMutableDictionary dictionary];
+        NSMutableDictionary *options = NSMutableDictionary.dictionary;
         options[(NSString *)kCGImageSourceShouldAllowFloat] = (NSNumber *)kCFBooleanTrue;
         options[(NSString *)kCGImageSourceCreateThumbnailFromImageAlways] = (NSNumber *)kCFBooleanTrue;
         options[(NSString *)kCGImageSourceThumbnailMaxPixelSize] = @(size);

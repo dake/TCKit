@@ -77,7 +77,7 @@ NSString *const _uuidsOfUserDevicesToggleKey = @"fc_uuidsOfUserDevicesToggle";
     }
     
     if(!value && userDefaults ){
-        value = [[NSUserDefaults standardUserDefaults] stringForKey:key];
+        value = [NSUserDefaults.standardUserDefaults stringForKey:key];
     }
     
     return ![value isKindOfClass:NSString.class] ? nil : value;
@@ -87,8 +87,8 @@ NSString *const _uuidsOfUserDevicesToggleKey = @"fc_uuidsOfUserDevicesToggle";
 -(void)_setValue:(NSString *)value forKey:(NSString *)key userDefaults:(BOOL)userDefaults keychain:(BOOL)keychain service:(NSString *)service accessGroup:(NSString *)accessGroup synchronizable:(BOOL)synchronizable
 {
     if( value && userDefaults ){
-        [[NSUserDefaults standardUserDefaults] setObject:value forKey:key];
-        [[NSUserDefaults standardUserDefaults] synchronize];
+        [NSUserDefaults.standardUserDefaults setObject:value forKey:key];
+        [NSUserDefaults.standardUserDefaults synchronize];
     }
     
     if( value && keychain ){
@@ -122,8 +122,7 @@ NSString *const _uuidsOfUserDevicesToggleKey = @"fc_uuidsOfUserDevicesToggle";
         _uuidForKey = [[NSMutableDictionary alloc] init];
     }
     
-    NSString *uuidValue = [_uuidForKey objectForKey:key];
-    
+    NSString *uuidValue = _uuidForKey[key];
     if( uuidValue == nil ){
         uuidValue = [self uuid];
         
@@ -252,7 +251,7 @@ NSString *const _uuidsOfUserDevicesToggleKey = @"fc_uuidsOfUserDevicesToggle";
         {
             _uuidsOfUserDevices_iCloudAvailable = YES;
             
-            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(uuidsOfUserDevices_iCloudChange:) name:NSUbiquitousKeyValueStoreDidChangeExternallyNotification object:nil];
+            [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(uuidsOfUserDevices_iCloudChange:) name:NSUbiquitousKeyValueStoreDidChangeExternallyNotification object:nil];
             
             [self uuidsOfUserDevices_iCloudSync];
         }
@@ -329,7 +328,7 @@ NSString *const _uuidsOfUserDevicesToggleKey = @"fc_uuidsOfUserDevicesToggle";
             [self uuidsOfUserDevices_updateWithValue:[uuidsSet array]];
             
             NSDictionary *userInfo = [NSDictionary dictionaryWithObject:[self uuidsOfUserDevices] forKey:@"uuidsOfUserDevices"];
-            [[NSNotificationCenter defaultCenter] postNotificationName:FCUUIDsOfUserDevicesDidChangeNotification object:self userInfo:userInfo];
+            [NSNotificationCenter.defaultCenter postNotificationName:FCUUIDsOfUserDevicesDidChangeNotification object:self userInfo:userInfo];
         }
     }
 }

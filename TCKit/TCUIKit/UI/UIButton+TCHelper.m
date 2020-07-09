@@ -42,7 +42,7 @@
 
 @implementation _TCButtonExtra
 {
-    @private
+@private
     BOOL _isStateObserved;
 }
 
@@ -504,7 +504,7 @@ static char const kBtnExtraKey;
 {
     _TCButtonExtra *btnExtra = self.btnExtra;
     if (nil == btnExtra.innerBackgroundColorDic) {
-        btnExtra.innerBackgroundColorDic = [NSMutableDictionary dictionary];
+        btnExtra.innerBackgroundColorDic = NSMutableDictionary.dictionary;
         if (nil == btnExtra.borderColorDic) {
             [btnExtra addStateObserver:self];
         }
@@ -517,7 +517,7 @@ static char const kBtnExtraKey;
 {
     _TCButtonExtra *btnExtra = self.btnExtra;
     if (nil == btnExtra.borderColorDic) {
-        btnExtra.borderColorDic = [NSMutableDictionary dictionary];
+        btnExtra.borderColorDic = NSMutableDictionary.dictionary;
         if (nil == btnExtra.innerBackgroundColorDic) {
             [btnExtra addStateObserver:self];
         }

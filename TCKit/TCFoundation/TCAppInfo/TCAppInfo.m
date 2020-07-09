@@ -33,7 +33,7 @@ NSString *const kTCApplicationDidReceiveDiskSpaceWarning = @"TCApplicationDidRec
     dispatch_once(&onceToken, ^{
         void (^block)(NSNotification *note) = ^(NSNotification * _Nonnull note) {
             NSDictionary *fattributes = [NSFileManager.defaultManager attributesOfFileSystemForPath:NSHomeDirectory() error:NULL];
-            NSNumber *size = [fattributes objectForKey:NSFileSystemFreeSize];
+            NSNumber *size = fattributes[NSFileSystemFreeSize];
             if (nil != size && size.unsignedLongLongValue < 500e6) {
                 [NSNotificationCenter.defaultCenter postNotificationName:kTCApplicationDidReceiveDiskSpaceWarning object:size];
             }
@@ -193,7 +193,7 @@ NSString *const kTCApplicationDidReceiveDiskSpaceWarning = @"TCApplicationDidRec
 
 + (NSString *)lastMigrationVersion:(TCMigrationVersionType)type domain:(NSString *)domain
 {
-    NSString *res = [[NSUserDefaults standardUserDefaults] valueForKey:[self versionMigrationKeyForType:type domain:domain]];
+    NSString *res = [NSUserDefaults.standardUserDefaults valueForKey:[self versionMigrationKeyForType:type domain:domain]];
     return res ?: @"";
 }
 

@@ -105,7 +105,7 @@
 
 + (NSDictionary *)dictionaryWithMobileProvisioningString:(NSString *)rawMobileProvisionning
 {
-    NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
+    NSMutableDictionary *dictionary = NSMutableDictionary.dictionary;
     NSArray *lines = [rawMobileProvisionning componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
     
     for (NSUInteger i = 0; i < lines.count; ++i) {

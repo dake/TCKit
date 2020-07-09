@@ -28,7 +28,7 @@
 
 @implementation TCAlertController
 {
-    @private
+@private
     id<UIAlertViewAction> _alertView;
     __weak UIViewController *_parentCtrler;
 }

@@ -10,6 +10,7 @@
 		2913624A22C8E51B00F91317 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2913624922C8E51B00F91317 /* WebKit.framework */; };
 		2913624C22C8E54C00F91317 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2913624B22C8E54C00F91317 /* UIKit.framework */; };
 		2913624E22C8E55100F91317 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2913624D22C8E55100F91317 /* Foundation.framework */; };
+		29F86FAA24B6E4B700DCF538 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29F86FA924B6E4B700DCF538 /* CoreServices.framework */; };
 		B72A5FAE1F1F4093002D900D /* NSArray+TCUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = B72A5F671F1F4093002D900D /* NSArray+TCUtilities.m */; };
 		B72A5FAF1F1F4093002D900D /* NSDate+TCUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = B72A5F691F1F4093002D900D /* NSDate+TCUtilities.m */; };
 		B72A5FB01F1F4093002D900D /* NSObject+TCUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = B72A5F6B1F1F4093002D900D /* NSObject+TCUtilities.m */; };
@@ -175,8 +176,6 @@
 		B76D74F51F13198800CF77FA /* NSManagedObjectContext+TCMapping.m in Sources */ = {isa = PBXBuildFile; fileRef = B76D74B41F13198800CF77FA /* NSManagedObjectContext+TCMapping.m */; };
 		B76D74F61F13198800CF77FA /* NSObject+TCMappingExtra.h in Headers */ = {isa = PBXBuildFile; fileRef = B76D74B51F13198800CF77FA /* NSObject+TCMappingExtra.h */; };
 		B76D74F71F13198800CF77FA /* NSObject+TCMappingExtra.m in Sources */ = {isa = PBXBuildFile; fileRef = B76D74B61F13198800CF77FA /* NSObject+TCMappingExtra.m */; };
-		B76D74F81F13198800CF77FA /* AnimatedGIFImageSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = B76D74B91F13198800CF77FA /* AnimatedGIFImageSerialization.h */; };
-		B76D74F91F13198800CF77FA /* AnimatedGIFImageSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = B76D74BA1F13198800CF77FA /* AnimatedGIFImageSerialization.m */; };
 		B76D74FA1F13198800CF77FA /* UIImage+CGImage.h in Headers */ = {isa = PBXBuildFile; fileRef = B76D74BB1F13198800CF77FA /* UIImage+CGImage.h */; };
 		B76D74FB1F13198800CF77FA /* UIImage+CGImage.m in Sources */ = {isa = PBXBuildFile; fileRef = B76D74BC1F13198800CF77FA /* UIImage+CGImage.m */; };
 		B76D74FC1F13198800CF77FA /* UIImage+Resize.h in Headers */ = {isa = PBXBuildFile; fileRef = B76D74BD1F13198800CF77FA /* UIImage+Resize.h */; };
@@ -345,6 +344,7 @@
 		29177DEF22E388FD00F5F644 /* TCUIKit-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TCUIKit-Prefix.pch"; sourceTree = "<group>"; };
 		29177DF022E3897A00F5F644 /* TCFoundation-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TCFoundation-Prefix.pch"; sourceTree = "<group>"; };
 		29B818D422B4EDAE007988A7 /* TCNetwork-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TCNetwork-Prefix.pch"; sourceTree = "<group>"; };
+		29F86FA924B6E4B700DCF538 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.16.sdk/System/Library/Frameworks/CoreServices.framework; sourceTree = DEVELOPER_DIR; };
 		B72A5F571F1F4066002D900D /* libTCFoundationLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libTCFoundationLib.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		B72A5F661F1F4093002D900D /* NSArray+TCUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+TCUtilities.h"; sourceTree = "<group>"; };
 		B72A5F671F1F4093002D900D /* NSArray+TCUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+TCUtilities.m"; sourceTree = "<group>"; };
@@ -762,6 +762,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				29F86FAA24B6E4B700DCF538 /* CoreServices.framework in Frameworks */,
 				B73960C620E62556000D37A5 /* libresolv.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -994,6 +995,7 @@
 		B73960C420E62555000D37A5 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				29F86FA924B6E4B700DCF538 /* CoreServices.framework */,
 				2913624D22C8E55100F91317 /* Foundation.framework */,
 				2913624B22C8E54C00F91317 /* UIKit.framework */,
 				2913624922C8E51B00F91317 /* WebKit.framework */,
@@ -1932,7 +1934,6 @@
 				B76D74DD1F13198800CF77FA /* NSTimer+TCHelper.h in Headers */,
 				B76D74D11F13198800CF77FA /* TCRSA.h in Headers */,
 				B76D74DF1F13198800CF77FA /* NSURL+TCHelper.h in Headers */,
-				B76D74F81F13198800CF77FA /* AnimatedGIFImageSerialization.h in Headers */,
 				B76D74FA1F13198800CF77FA /* UIImage+CGImage.h in Headers */,
 				B76D74C91F13198800CF77FA /* NSData+TCCypher.h in Headers */,
 				B76D74D71F13198800CF77FA /* NSBundle+TCHelper.h in Headers */,
@@ -2356,7 +2357,6 @@
 				B76D74F11F13198800CF77FA /* TCMappingMeta.m in Sources */,
 				B76D74E61F13198800CF77FA /* TCMobileProvisioning.m in Sources */,
 				B76D74CA1F13198800CF77FA /* NSData+TCCypher.m in Sources */,
-				B76D74F91F13198800CF77FA /* AnimatedGIFImageSerialization.m in Sources */,
 				B76D74EB1F13198800CF77FA /* NSObject+TCCoding.m in Sources */,
 				B773EA6F1FE3A8E6009FAB14 /* NSOutputStream+TCHelper.m in Sources */,
 				B76D74E01F13198800CF77FA /* NSURL+TCHelper.m in Sources */,

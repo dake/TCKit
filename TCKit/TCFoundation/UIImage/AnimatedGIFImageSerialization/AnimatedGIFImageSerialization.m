@@ -38,7 +38,7 @@ __attribute__((overloadable)) UIImage * UIImageWithAnimatedGIFData(NSData *data,
 
 //    NSDictionary *userInfo = nil;
     {
-        NSMutableDictionary *mutableOptions = [NSMutableDictionary dictionary];
+        NSMutableDictionary *mutableOptions = NSMutableDictionary.dictionary;
         [mutableOptions setObject:@(YES) forKey:(NSString *)kCGImageSourceShouldCache];
         [mutableOptions setObject:(NSString *)kUTTypeGIF forKey:(NSString *)kCGImageSourceTypeIdentifierHint];
 

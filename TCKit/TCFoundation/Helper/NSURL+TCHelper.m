@@ -7,9 +7,12 @@
 //
 
 #import "NSURL+TCHelper.h"
-#import "NSString+TCHelper.h"
+#import <CoreServices/UTCoreTypes.h>
 #import <CommonCrypto/CommonCrypto.h>
 #import <sys/stat.h>
+
+#import "NSString+TCHelper.h"
+
 
 NSString *TCPercentEscapedStringFromString(NSString *string) {
     NSCharacterSet *allowedCharacterSet = NSCharacterSet.urlComponentAllowedCharacters;

@@ -17,7 +17,7 @@ NSInteger const kTCHTTPRequestCacheNeverExpired = -1;
 
 @implementation TCHTTPCachePolicy
 {
-    @private
+@private
     NSDictionary *_parametersForCachePathFilter;
     id _sensitiveDataForCachePathFilter;
     NSString *_cacheFileName;

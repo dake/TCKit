@@ -25,7 +25,7 @@ extern NSTimeInterval kTCHTTPTimerIntervalEnd;
  */
 @interface TCHTTPTimerPolicy : NSObject
 {
-    @protected
+@protected
     NSTimer *_timer;
 }
 

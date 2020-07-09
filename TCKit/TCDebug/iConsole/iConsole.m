@@ -138,7 +138,7 @@ static void exceptionHandler(NSException *exception)
 - (void)saveSettings
 {
     if (_saveLogToDisk) {
-        [[NSUserDefaults standardUserDefaults] synchronize];
+        [NSUserDefaults.standardUserDefaults synchronize];
     }
 }
 

@@ -23,11 +23,11 @@
 + (instancetype)launchImage
 {
     NSString *launchImage = nil;
-    NSArray *imagesDic = [NSBundle.mainBundle.infoDictionary valueForKey:@"UILaunchImages"];
+    NSArray<NSDictionary *> *imagesDic = [NSBundle.mainBundle.infoDictionary valueForKey:@"UILaunchImages"];
+    CGSize const size = UIScreen.mainScreen.bounds.size;
     for (NSDictionary *dic in imagesDic) {
         CGSize imageSize = CGSizeFromString(dic[@"UILaunchImageSize"]);
-        
-        if (CGSizeEqualToSize(imageSize, UIScreen.mainScreen.bounds.size)) {
+        if (CGSizeEqualToSize(imageSize, size)) {
             launchImage = dic[@"UILaunchImageName"];
             break;
         }

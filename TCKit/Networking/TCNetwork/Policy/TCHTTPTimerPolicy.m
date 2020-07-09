@@ -23,7 +23,7 @@ NSTimeInterval kTCHTTPTimerIntervalEnd = -1;
 
 @implementation TCHTTPTimerPolicy
 {
-    @private
+@private
     TCHTTPTimerType _timerType;
 }
 

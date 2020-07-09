@@ -236,7 +236,7 @@ static NSArray * AFPublicKeyTrustChainForServerTrust(SecTrustRef serverTrust) {
         return NO;
     }
 
-    NSMutableArray *policies = [NSMutableArray array];
+    NSMutableArray *policies = NSMutableArray.array;
     if (self.validatesDomainName) {
         [policies addObject:(__bridge_transfer id)SecPolicyCreateSSL(true, (__bridge CFStringRef)domain)];
     } else {
@@ -256,7 +256,7 @@ static NSArray * AFPublicKeyTrustChainForServerTrust(SecTrustRef serverTrust) {
         default:
             return NO;
         case AFSSLPinningModeCertificate: {
-            NSMutableArray *pinnedCertificates = [NSMutableArray array];
+            NSMutableArray *pinnedCertificates = NSMutableArray.array;
             for (NSData *certificateData in self.pinnedCertificates) {
                 [pinnedCertificates addObject:(__bridge_transfer id)SecCertificateCreateWithData(NULL, (__bridge CFDataRef)certificateData)];
             }

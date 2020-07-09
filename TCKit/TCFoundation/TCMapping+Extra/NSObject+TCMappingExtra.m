@@ -8,7 +8,7 @@
 
 #import "NSObject+TCMappingExtra.h"
 #import "UIColor+TCUtilities.h"
-#import "AnimatedGIFImageSerialization.h"
+//#import "AnimatedGIFImageSerialization.h"
 #import "NSData+TCCypher.h"
 #import "UIImage+Resize.h"
 
@@ -62,9 +62,9 @@
 
 + (NSData *)tc_transformDataFromImage:(UIImage *)img
 {
-    if (img.images.count > 0) {
-        return [AnimatedGIFImageSerialization animatedGIFDataWithImage:img error:NULL];
-    }
+//    if (img.images.count > 0) {
+//        return [AnimatedGIFImageSerialization animatedGIFDataWithImage:img error:NULL];
+//    }
     
     CGImageAlphaInfo const alphaInfo = CGImageGetBitmapInfo(img.CGImage) & kCGBitmapAlphaInfoMask;
     BOOL noAlpha = kCGImageAlphaNone == alphaInfo ||
@@ -72,7 +72,7 @@
     kCGImageAlphaNoneSkipFirst == alphaInfo;
     
     if (noAlpha) {
-        return UIImageJPEGRepresentation(img.fixOrientationToUp, 0.8f);
+        return UIImageJPEGRepresentation(img.fixOrientationToUp, 0.6f);
     }
     return UIImagePNGRepresentation(img.fixOrientationToUp);
 }

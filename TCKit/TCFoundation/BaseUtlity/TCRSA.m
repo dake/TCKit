@@ -13,7 +13,7 @@
 
 @implementation TCRSA
 {
-    @private
+@private
     SecKeyRef _publicKey;
     SecKeyRef _privateKey;
     

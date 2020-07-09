@@ -547,7 +547,7 @@ static void tcPerformBlockAfterDelay(dispatch_block_t block, NSTimeInterval dela
 // Return a dictionary with class/selectors entries, all the way up to NSObject
 - (NSDictionary *)tc_selectors
 {
-	NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+	NSMutableDictionary *dict = NSMutableDictionary.dictionary;
 	[dict setObject:[self.class getSelectorListForClass] forKey:NSStringFromClass(self.class)];
     for (Class cl in self.superclasses) {
 		dict[NSStringFromClass(cl)] = [cl getSelectorListForClass];
@@ -571,7 +571,7 @@ static void tcPerformBlockAfterDelay(dispatch_block_t block, NSTimeInterval dela
 // Return a dictionary with class/selectors entries, all the way up to NSObject
 - (NSDictionary *)tc_properties
 {
-	NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+	NSMutableDictionary *dict = NSMutableDictionary.dictionary;
 	[dict setObject:[self.class getPropertyListForClass] forKey:NSStringFromClass(self.class)];
     for (Class cl in self.superclasses) {
 		dict[NSStringFromClass(cl)] = [cl getPropertyListForClass];
@@ -595,7 +595,7 @@ static void tcPerformBlockAfterDelay(dispatch_block_t block, NSTimeInterval dela
 // Return a dictionary with class/selectors entries, all the way up to NSObject
 - (NSDictionary *)tc_ivars
 {
-	NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+	NSMutableDictionary *dict = NSMutableDictionary.dictionary;
 	[dict setObject:[self.class getIvarListForClass] forKey:NSStringFromClass(self.class)];
     for (Class cl in self.superclasses) {
 		dict[NSStringFromClass(cl)] = [cl getIvarListForClass];
@@ -619,7 +619,7 @@ static void tcPerformBlockAfterDelay(dispatch_block_t block, NSTimeInterval dela
 // Return a dictionary with class/selectors entries, all the way up to NSObject
 - (NSDictionary *)tc_protocols
 {
-	NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+	NSMutableDictionary *dict = NSMutableDictionary.dictionary;
 	[dict setObject:[self.class getProtocolListForClass] forKey:NSStringFromClass(self.class)];
     for (Class cl in self.superclasses) {
 		dict[NSStringFromClass(cl)] = [cl getProtocolListForClass];

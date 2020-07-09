@@ -41,7 +41,7 @@
 }
 
 - (void)tc_dealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
     
     if (nil != objc_getAssociatedObject(self, @selector(placeholderLabel))) {
         @try {
@@ -257,7 +257,7 @@
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 - (void)textViewEditChanged:(NSNotification *)note
@@ -305,7 +305,7 @@
     TCTextViewTarget *target = objc_getAssociatedObject(self, @selector(setTc_maxTextLength:));
     if (nil == target) {
         target = [[TCTextViewTarget alloc] init];
-        [[NSNotificationCenter defaultCenter] addObserver:target selector:@selector(textViewEditChanged:) name:UITextViewTextDidChangeNotification object:self];
+        [NSNotificationCenter.defaultCenter addObserver:target selector:@selector(textViewEditChanged:) name:UITextViewTextDidChangeNotification object:self];
         objc_setAssociatedObject(self, @selector(setTc_maxTextLength:), target, OBJC_ASSOCIATION_RETAIN);
     }
 }
@@ -324,7 +324,7 @@
     TCTextViewTarget *target = objc_getAssociatedObject(self, _cmd);
     if (nil == target) {
         target = [[TCTextViewTarget alloc] init];
-        [[NSNotificationCenter defaultCenter] addObserver:target selector:@selector(textViewEditChanged:) name:UITextViewTextDidChangeNotification object:self];
+        [NSNotificationCenter.defaultCenter addObserver:target selector:@selector(textViewEditChanged:) name:UITextViewTextDidChangeNotification object:self];
         objc_setAssociatedObject(self, _cmd, target, OBJC_ASSOCIATION_RETAIN);
     }
 }

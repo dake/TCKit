@@ -1501,7 +1501,7 @@ static NSDictionary *s_kelvin = nil;
         return s_kelvin;
     }
     
-    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    NSMutableDictionary *dict = NSMutableDictionary.dictionary;
     
     for (NSInteger i = 1000; i <= 40000; i += 100) {
         UIColor *color = [UIColor colorWithKelvin:i];
