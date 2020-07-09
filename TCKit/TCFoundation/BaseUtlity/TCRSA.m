@@ -149,7 +149,7 @@
         return nil;
     }
     
-    NSMutableData *encryptedData = [NSMutableData data];
+    NSMutableData *encryptedData = NSMutableData.data;
     NSUInteger len = plainData.length;
     
     for (size_t i = 0; i < blockCount; i++) {

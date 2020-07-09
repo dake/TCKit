@@ -81,7 +81,7 @@
         profileString = [profileString stringByReplacingOccurrencesOfString:@" " withString:@""];
         
         // Convert hex values to readable characters
-        NSMutableString *profileText = [NSMutableString string];
+        NSMutableString *profileText = NSMutableString.string;
         for (NSUInteger i = 0; i < profileString.length; i += 2) {
             NSString *hexChar = [profileString substringWithRange:NSMakeRange(i, 2)];
             int value = 0;

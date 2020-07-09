@@ -132,7 +132,7 @@ typedef void (^AFURLSessionTaskCompletionHandler)(NSURLResponse *response, id re
         return nil;
     }
     
-    _mutableData = [NSMutableData data];
+    _mutableData = NSMutableData.data;
     _uploadProgress = [[NSProgress alloc] initWithParent:nil userInfo:nil];
     _downloadProgress = [[NSProgress alloc] initWithParent:nil userInfo:nil];
     

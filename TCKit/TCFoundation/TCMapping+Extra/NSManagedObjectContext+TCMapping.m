@@ -29,7 +29,7 @@
 
 - (NSManagedObject *)fetchDataFromDBWithPrimaryKey:(NSDictionary *)primaryKey class:(Class)klass
 {
-    NSMutableString *fmt = [NSMutableString string];
+    NSMutableString *fmt = NSMutableString.string;
     NSArray *allKeys = primaryKey.allKeys;
     NSUInteger count = allKeys.count;
     for (NSUInteger i = 0; i < count; ++i) {

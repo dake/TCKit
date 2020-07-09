@@ -144,7 +144,7 @@ BOOL tcSwizzleMethod(TCSwizzleInput input, id block, IMP *origIMP, NSError **err
 	
 	while (argcount < totalArgs) {
 		const char *argtype = [ms getArgumentTypeAtIndex:(NSUInteger)argcount];
-		// printf("[%s] %d of %d\n", [NSStringFromSelector(selector) UTF8String], argcount, totalArgs); // debug
+		// printf("[%s] %d of %d\n", NSStringFromSelector(selector).UTF8String, argcount, totalArgs); // debug
 		if (strcmp(argtype, @encode(id)) == 0) {
 			id argument = va_arg(arguments, id);
 			[inv setArgument:&argument atIndex:argcount++];
@@ -798,7 +798,7 @@ static void tcPerformBlockAfterDelay(dispatch_block_t block, NSTimeInterval dela
 
 + (NSString *)dump
 {
-    NSMutableString *dump = [NSMutableString string];
+    NSMutableString *dump = NSMutableString.string;
     
     [dump appendFormat:@"%@ ", [[self.superclasses valueForKey:@"description"] componentsJoinedByString:@" : "]];
     

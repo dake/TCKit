@@ -401,7 +401,7 @@ forHTTPHeaderField:(NSString *)field
             if ([pair.value isKindOfClass:[NSData class]]) {
                 data = pair.value;
             } else if ([pair.value isEqual:[NSNull null]]) {
-                data = [NSData data];
+                data = NSData.data;
             } else {
                 data = [[pair.value description] dataUsingEncoding:self.stringEncoding];
             }
@@ -1067,7 +1067,7 @@ typedef enum {
         } else if ([self.body isKindOfClass:[NSInputStream class]]) {
             _inputStream = self.body;
         } else {
-            _inputStream = [NSInputStream inputStreamWithData:[NSData data]];
+            _inputStream = [NSInputStream inputStreamWithData:NSData.data];
         }
     }
 
@@ -1075,7 +1075,7 @@ typedef enum {
 }
 
 - (NSString *)stringForHeaders {
-    NSMutableString *headerString = [NSMutableString string];
+    NSMutableString *headerString = NSMutableString.string;
     for (NSString *field in [self.headers allKeys]) {
         [headerString appendString:[NSString stringWithFormat:@"%@: %@%@", field, [self.headers valueForKey:field], kAFMultipartFormCRLF]];
     }
@@ -1095,7 +1095,7 @@ typedef enum {
 
     length += _bodyContentLength;
 
-    NSData *closingBoundaryData = ([self hasFinalBoundary] ? [AFMultipartFormFinalBoundary(self.boundary) dataUsingEncoding:self.stringEncoding] : [NSData data]);
+    NSData *closingBoundaryData = ([self hasFinalBoundary] ? [AFMultipartFormFinalBoundary(self.boundary) dataUsingEncoding:self.stringEncoding] : NSData.data);
     length += [closingBoundaryData length];
 
     return length;
@@ -1153,7 +1153,7 @@ typedef enum {
     }
 
     if (_phase == AFFinalBoundaryPhase) {
-        NSData *closingBoundaryData = ([self hasFinalBoundary] ? [AFMultipartFormFinalBoundary(self.boundary) dataUsingEncoding:self.stringEncoding] : [NSData data]);
+        NSData *closingBoundaryData = ([self hasFinalBoundary] ? [AFMultipartFormFinalBoundary(self.boundary) dataUsingEncoding:self.stringEncoding] : NSData.data);
         totalNumberOfBytesRead += [self readData:closingBoundaryData intoBuffer:&buffer[totalNumberOfBytesRead] maxLength:(length - (NSUInteger)totalNumberOfBytesRead)];
     }
 

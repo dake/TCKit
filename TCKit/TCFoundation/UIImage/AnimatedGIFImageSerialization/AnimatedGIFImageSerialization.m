@@ -98,7 +98,7 @@ __attribute__((overloadable)) NSData * UIImageAnimatedGIFRepresentation(UIImage 
                                                   }
                                           };
 
-        NSMutableData *mutableData = [NSMutableData data];
+        NSMutableData *mutableData = NSMutableData.data;
         CGImageDestinationRef destination = CGImageDestinationCreateWithData((__bridge CFMutableDataRef)mutableData, kUTTypeGIF, frameCount, NULL);
 
         NSDictionary *imageProperties = @{ (__bridge NSString *)kCGImagePropertyGIFDictionary: @{
@@ -108,7 +108,7 @@ __attribute__((overloadable)) NSData * UIImageAnimatedGIFRepresentation(UIImage 
         CGImageDestinationSetProperties(destination, (__bridge CFDictionaryRef)imageProperties);
 
         for (size_t idx = 0; idx < image.images.count; idx++) {
-            CGImageDestinationAddImage(destination, [[image.images objectAtIndex:idx] CGImage], (__bridge CFDictionaryRef)frameProperties);
+            CGImageDestinationAddImage(destination, image.images[idx].CGImage, (__bridge CFDictionaryRef)frameProperties);
         }
         
         bool success = CGImageDestinationFinalize(destination);
