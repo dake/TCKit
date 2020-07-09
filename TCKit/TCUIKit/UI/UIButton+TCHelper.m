@@ -26,8 +26,8 @@
 
 @property (nonatomic, assign) UIEdgeInsets alignmentRectInsets;
 @property (nonatomic, assign) CGFloat paddingBetweenTitleAndImage;
-@property (nonatomic, strong) NSMutableDictionary *innerBackgroundColorDic;
-@property (nonatomic, strong) NSMutableDictionary *borderColorDic;
+@property (nonatomic, strong) NSMutableDictionary<NSNumber *, UIColor *> *innerBackgroundColorDic;
+@property (nonatomic, strong) NSMutableDictionary<NSNumber *, UIColor *> *borderColorDic;
 @property (nonatomic, assign) TCButtonLayoutStyle layoutStyle;
 @property (nonatomic, assign) BOOL isFrameObserved;
 @property (nonatomic, assign) BOOL enableUnderline;
@@ -99,7 +99,7 @@
         if ([keyPath isEqualToString:@"highlighted"] || [keyPath isEqualToString:@"selected"] || [keyPath isEqualToString:@"enabled"]) {
             NSNumber *state = @(_target.state);
             _target.backgroundColor = _innerBackgroundColorDic[state];
-            _target.layer.borderColor = [(UIColor *)_borderColorDic[state] CGColor];
+            _target.layer.borderColor = _borderColorDic[state].CGColor;
             
         } else if ([keyPath isEqualToString:@"bounds"] || [keyPath isEqualToString:@"frame"]) {
             CGRect oldFrame = [(NSValue *)change[NSKeyValueChangeOldKey] CGRectValue];

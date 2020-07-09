@@ -306,7 +306,7 @@ NSString *const _uuidsOfUserDevicesToggleKey = @"fc_uuidsOfUserDevicesToggle";
             
             if([uuidKey rangeOfString:_uuidForDeviceKey].location == 0)
             {
-                if([obj isKindOfClass:[NSString class]])
+                if([obj isKindOfClass:NSString.class])
                 {
                     NSString *uuidValue = (NSString *)obj;
                     

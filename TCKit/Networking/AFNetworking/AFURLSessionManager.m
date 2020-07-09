@@ -401,7 +401,7 @@ static NSString * const AFNSURLSessionTaskDidSuspendNotification = @"com.alamofi
 #pragma GCC diagnostic ignored "-Wnonnull"
         NSURLSessionDataTask *localDataTask = [session dataTaskWithURL:nil];
 #pragma clang diagnostic pop
-        IMP originalAFResumeIMP = method_getImplementation(class_getInstanceMethod([self class], @selector(af_resume)));
+        IMP originalAFResumeIMP = method_getImplementation(class_getInstanceMethod(self.class, @selector(af_resume)));
         Class currentClass = [localDataTask class];
         
         while (class_getInstanceMethod(currentClass, @selector(resume))) {
@@ -918,7 +918,7 @@ static NSString * const AFNSURLSessionTaskDidSuspendNotification = @"com.alamofi
 #pragma mark - NSObject
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"<%@: %p, session: %@, operationQueue: %@>", NSStringFromClass([self class]), self, self.session, self.operationQueue];
+    return [NSString stringWithFormat:@"<%@: %p, session: %@, operationQueue: %@>", NSStringFromClass(self.class), self, self.session, self.operationQueue];
 }
 
 - (BOOL)respondsToSelector:(SEL)selector {
@@ -932,7 +932,7 @@ static NSString * const AFNSURLSessionTaskDidSuspendNotification = @"com.alamofi
         return self.didFinishEventsForBackgroundURLSession != nil;
     }
 
-    return [[self class] instancesRespondToSelector:selector];
+    return [self.class instancesRespondToSelector:selector];
 }
 
 #pragma mark - NSURLSessionDelegate
@@ -1239,7 +1239,7 @@ expectedTotalBytes:(int64_t)expectedTotalBytes
 #pragma mark - NSCopying
 
 - (instancetype)copyWithZone:(NSZone *)zone {
-    return [[[self class] allocWithZone:zone] initWithSessionConfiguration:self.session.configuration];
+    return [[self.class allocWithZone:zone] initWithSessionConfiguration:self.session.configuration];
 }
 
 @end
