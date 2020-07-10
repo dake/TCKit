@@ -21,7 +21,7 @@
     return _downloadIdentifier;
 }
 
-- (NSString *)downloadResumeCacheDirectory
+- (NSURL *)downloadResumeCacheDirectory
 {
     if (nil == _downloadResumeCacheDirectory) {
         NSString *dir = [NSTemporaryDirectory() stringByAppendingPathComponent:@"TCHTTPRequestResumeCache"];
@@ -33,7 +33,7 @@
             dir = nil;
         }
         
-        _downloadResumeCacheDirectory = dir;
+        _downloadResumeCacheDirectory = nil != dir ? [NSURL fileURLWithPath:dir] : nil;
     }
     
     return _downloadResumeCacheDirectory;

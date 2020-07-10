@@ -64,24 +64,27 @@ NSInteger const kTCHTTPRequestCacheNeverExpired = -1;
     return _cacheFileName;
 }
 
-- (NSString *)cacheFilePath
+- (NSURL *)cacheFilePath
 {
     if (_request.method == kTCHTTPMethodDownload) {
         return _request.streamPolicy.downloadDestinationPath;
     }
     
-    NSString *path = nil;
+    NSURL *url = nil;
     if (nil != _request.requestAgent && [_request.requestAgent respondsToSelector:@selector(cachePathForResponse)]) {
-        path = [_request.requestAgent cachePathForResponse];
+        url = _request.requestAgent.cachePathForResponse;
     }
     
-    NSCParameterAssert(path);
+    NSCParameterAssert(url);
     
-    if (nil == path) {
-        path = [NSTemporaryDirectory() stringByAppendingPathComponent:@"TCHTTPCache.TCNetwork.TCKit"];
+    if (nil == url) {
+        NSString *path = [NSTemporaryDirectory() stringByAppendingPathComponent:@"TCHTTPCache.TCNetwork.TCKit"];
+        if (nil != path) {
+            url = [NSURL fileURLWithPath:path];
+        }
     }
-    if ([self createDiretoryForCachePath:path]) {
-        return [path stringByAppendingPathComponent:self.cacheFileName];
+    if ([self createDiretoryForCachePath:url]) {
+        return [url URLByAppendingPathComponent:self.cacheFileName];
     }
     
     return nil;
@@ -102,6 +105,8 @@ NSInteger const kTCHTTPRequestCacheNeverExpired = -1;
             return [(NSArray *)responseObject count] > 0;
         } else if ([responseObject isKindOfClass:NSString.class]) {
             return [(NSString *)responseObject length] > 0;
+        } else if ([responseObject isKindOfClass:NSURL.class]) {
+            return YES;
         }
     }
     
@@ -118,19 +123,19 @@ NSInteger const kTCHTTPRequestCacheNeverExpired = -1;
 
 - (TCCachedRespState)cacheState
 {
-    NSString *path = self.cacheFilePath;
-    if (nil == path) {
+    NSURL *url = self.cacheFilePath;
+    if (nil == url) {
         return kTCCachedRespNone;
     }
     
     BOOL isDir = NO;
     NSFileManager *fileMngr = NSFileManager.defaultManager;
-    if (![fileMngr fileExistsAtPath:path isDirectory:&isDir] || isDir) {
+    if (![fileMngr fileExistsAtPath:url.path isDirectory:&isDir] || isDir) {
         return kTCCachedRespNone;
     }
     
     struct stat statbuf;
-    if (stat(path.fileSystemRepresentation, &statbuf) != 0) {
+    if (stat(url.fileSystemRepresentation, &statbuf) != 0) {
         return kTCCachedRespExpired;
     }
     NSDate *modificationDate = [NSDate dateWithTimeIntervalSince1970:statbuf.st_mtime];
@@ -140,10 +145,9 @@ NSInteger const kTCHTTPRequestCacheNeverExpired = -1;
     }
     
     NSTimeInterval cacheTimeoutInterval = self.cacheTimeoutInterval;
-    
     if (cacheTimeoutInterval < 0 || -timeIntervalSinceNow < cacheTimeoutInterval) {
         if (_request.method == kTCHTTPMethodDownload) {
-            if (![fileMngr fileExistsAtPath:path]) {
+            if (![fileMngr fileExistsAtPath:url.path]) {
                 return kTCCachedRespNone;
             }
         }
@@ -182,28 +186,28 @@ NSInteger const kTCHTTPRequestCacheNeverExpired = -1;
 
 #pragma mark -
 
-- (BOOL)createDiretoryForCachePath:(NSString *)path
+- (BOOL)createDiretoryForCachePath:(NSURL *)url
 {
-    if (nil == path) {
+    if (nil == url) {
         return NO;
     }
     
     NSFileManager *fileManager = NSFileManager.defaultManager;
     BOOL isDir = NO;
-    if ([fileManager fileExistsAtPath:path isDirectory:&isDir]) {
+    if ([fileManager fileExistsAtPath:url.path isDirectory:&isDir]) {
         if (isDir) {
             return YES;
         } else {
-            [fileManager removeItemAtPath:path error:NULL];
+            [fileManager removeItemAtURL:url error:NULL];
         }
     }
     
-    if ([fileManager createDirectoryAtPath:path
-               withIntermediateDirectories:YES
-                                attributes:nil
-                                     error:NULL]) {
+    if ([fileManager createDirectoryAtURL:url
+              withIntermediateDirectories:YES
+                               attributes:nil
+                                    error:NULL]) {
         
-        [[NSURL fileURLWithPath:path] setResourceValue:@YES forKey:NSURLIsExcludedFromBackupKey error:NULL];
+        [url setResourceValue:@YES forKey:NSURLIsExcludedFromBackupKey error:NULL];
         return YES;
     }
     

@@ -30,8 +30,8 @@ typedef void (^AFConstructingBlock)(id<AFMultipartFormData> formData);
 
 @property (nonatomic, assign) BOOL shouldResumeDownload; // default: NO
 @property (nonatomic, copy, nullable) NSString *downloadIdentifier; // such as hash string, but can not be file system path! if nil, apiUrl's md5 used.
-@property (nonatomic, copy, nullable) NSString *downloadResumeCacheDirectory; // if nil, `tmp` directory used.
-@property (nonatomic, copy) NSString *downloadDestinationPath;
+@property (nonatomic, strong, nullable) NSURL *downloadResumeCacheDirectory; // if nil, `tmp` directory used.
+@property (nonatomic, strong) NSURL *downloadDestinationPath;
 
 - (void)purgeResumeData;
 

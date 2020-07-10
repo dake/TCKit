@@ -84,12 +84,12 @@ static NSString *tc_md5_32(NSString *str)
     objc_setAssociatedObject(self, @selector(tc_resumeIdentifier), tc_resumeIdentifier, OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
 
-- (NSString *)tc_resumeCacheDirectory
+- (NSURL *)tc_resumeCacheDirectory
 {
     return objc_getAssociatedObject(self, _cmd);
 }
 
-- (void)setTc_resumeCacheDirectory:(NSString *)tc_resumeCacheDirectory
+- (void)setTc_resumeCacheDirectory:(NSURL *)tc_resumeCacheDirectory
 {
     objc_setAssociatedObject(self, @selector(tc_resumeCacheDirectory), tc_resumeCacheDirectory, OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
@@ -101,7 +101,7 @@ static NSString *tc_md5_32(NSString *str)
 
 - (void)tc_cancelByProducingResumeData:(void (^)(NSData * __nullable resumeData))completionHandler
 {
-    if (self.tc_resumeCacheDirectory.length < 1) {
+    if (nil == self.tc_resumeCacheDirectory) {
         [self tc_cancelByProducingResumeData:completionHandler];
         return;
     }
@@ -112,14 +112,14 @@ static NSString *tc_md5_32(NSString *str)
         dispatch_block_t block = ^{
             if (nil != resumeData) {
                 @autoreleasepool {
-                    if ([resumeData writeToFile:sSelf.tc_resumeCachePath atomically:YES] &&
+                    if ([resumeData writeToURL:sSelf.tc_resumeCachePath atomically:YES] &&
                         ![NSURLSessionTask tc_isTmpResumeCache:sSelf.tc_resumeCacheDirectory]) {
-                        NSString *tmpDownloadFile = [sSelf.class tc_resumeInfoTempFileNameFor:resumeData];
+                        NSURL *tmpDownloadFile = [sSelf.class tc_resumeInfoTempFileNameFor:resumeData];
                         if (nil != tmpDownloadFile) {
                             NSError *error = nil;
-                            NSString *cachePath = [sSelf.tc_resumeCacheDirectory stringByAppendingPathComponent:tmpDownloadFile.lastPathComponent];
-                            [NSFileManager.defaultManager removeItemAtPath:cachePath error:NULL];
-                            [NSFileManager.defaultManager moveItemAtPath:tmpDownloadFile toPath:cachePath error:&error];
+                            NSURL *cachePath = [sSelf.tc_resumeCacheDirectory URLByAppendingPathComponent:tmpDownloadFile.lastPathComponent];
+                            [NSFileManager.defaultManager removeItemAtURL:cachePath error:NULL];
+                            [NSFileManager.defaultManager moveItemAtURL:tmpDownloadFile toURL:cachePath error:&error];
                             NSCAssert(nil == error, @"%@", error);
                         }
                     }
@@ -142,39 +142,45 @@ static NSString *tc_md5_32(NSString *str)
 
 #pragma mark -
 
-+ (NSString *)tc_resumeInfoTempFileNameFor:(NSData *)data
++ (NSURL *)tc_resumeInfoTempFileNameFor:(NSData *)data
 {
     if (nil == data) {
         return nil;
     }
     
-    NSDictionary *dic = [NSPropertyListSerialization propertyListWithData:data options:NSPropertyListImmutable format:NULL error:NULL];
-    NSString *fileName = nil;
-    if (nil != dic) {
-        fileName = dic[kNSURLSessionResumeInfoTempFileName];
-        if (nil == fileName) {
-            fileName = [dic[kNSURLSessionResumeInfoLocalPath] lastPathComponent];
+    NSDictionary *dic = nil;
+    @try {
+        dic = [NSPropertyListSerialization propertyListWithData:data options:NSPropertyListImmutable format:NULL error:NULL];
+    } @catch (NSException *exception) {
+        
+    } @finally {
+        NSString *fileName = nil;
+        if (nil != dic) {
+            fileName = dic[kNSURLSessionResumeInfoTempFileName];
+            if (nil == fileName) {
+                fileName = [dic[kNSURLSessionResumeInfoLocalPath] lastPathComponent];
+            }
+            
+            if (nil != fileName) {
+                return [[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:fileName];
+            }
         }
         
-        if (nil != fileName) {
-            fileName = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
-        }
+        return nil;
     }
-    
-    return fileName;
 }
 
-+ (NSString *)tc_resumeCachePathWithDirectory:(NSString *)subpath identifier:(NSString *)indentifier
++ (NSURL *)tc_resumeCachePathWithDirectory:(NSURL *)subpath identifier:(NSString *)indentifier
 {
-    return [subpath stringByAppendingPathComponent:tc_md5_32(indentifier)];
+    return [subpath URLByAppendingPathComponent:tc_md5_32(indentifier)];
 }
 
-+ (BOOL)tc_isTmpResumeCache:(NSString *)resumeDirectory
++ (BOOL)tc_isTmpResumeCache:(NSURL *)resumeDirectory
 {
-    return [resumeDirectory.stringByStandardizingPath hasPrefix:NSTemporaryDirectory().stringByStandardizingPath];
+    return [resumeDirectory.path.stringByStandardizingPath hasPrefix:NSTemporaryDirectory().stringByStandardizingPath];
 }
 
-- (NSString *)tc_resumeCachePath
+- (NSURL *)tc_resumeCachePath
 {
     return [self.class tc_resumeCachePathWithDirectory:self.tc_resumeCacheDirectory identifier:self.tc_resumeIdentifier];
 }
@@ -225,12 +231,12 @@ static NSString *tc_md5_32(NSString *str)
     [super setTc_resumeIdentifier:tc_resumeIdentifier];
 }
 
-- (NSString *)tc_resumeCacheDirectory
+- (NSURL *)tc_resumeCacheDirectory
 {
     return [super tc_resumeCacheDirectory];
 }
 
-- (void)setTc_resumeCacheDirectory:(NSString *)tc_resumeCacheDirectory
+- (void)setTc_resumeCacheDirectory:(NSURL *)tc_resumeCacheDirectory
 {
     [super setTc_resumeCacheDirectory:tc_resumeCacheDirectory];
 }
@@ -238,21 +244,21 @@ static NSString *tc_md5_32(NSString *str)
 
 #pragma mark -
 
-+ (nullable NSData *)tc_resumeDataWithIdentifier:(NSString *)identifier inDirectory:(nullable NSString *)subpath
++ (nullable NSData *)tc_resumeDataWithIdentifier:(NSString *)identifier inDirectory:(nullable NSURL *)subpath
 {
-    NSData *data = [NSData dataWithContentsOfFile:[self tc_resumeCachePathWithDirectory:subpath identifier:identifier] options:NSDataReadingUncached|NSDataReadingMappedAlways error:NULL];
-    NSString *tmpDownloadFile = [self tc_resumeInfoTempFileNameFor:data];
+    NSData *data = [NSData dataWithContentsOfURL:[self tc_resumeCachePathWithDirectory:subpath identifier:identifier] options:NSDataReadingUncached|NSDataReadingMappedAlways error:NULL];
+    NSURL *tmpDownloadFile = [self tc_resumeInfoTempFileNameFor:data];
     if (nil != tmpDownloadFile) {
         if (![self tc_isTmpResumeCache:subpath]) {
             NSError *error = nil;
-            [NSFileManager.defaultManager removeItemAtPath:tmpDownloadFile error:NULL];
-            [NSFileManager.defaultManager copyItemAtPath:[subpath stringByAppendingPathComponent:tmpDownloadFile.lastPathComponent] toPath:tmpDownloadFile error:&error];
+            [NSFileManager.defaultManager removeItemAtURL:tmpDownloadFile error:NULL];
+            [NSFileManager.defaultManager copyItemAtURL:[subpath URLByAppendingPathComponent:tmpDownloadFile.lastPathComponent] toURL:tmpDownloadFile error:&error];
             NSCAssert(nil == error, @"%@", error);
         }
         
-        if (![NSFileManager.defaultManager fileExistsAtPath:tmpDownloadFile]) {
+        if (![NSFileManager.defaultManager fileExistsAtPath:tmpDownloadFile.path]) {
             if (nil != subpath) {
-                [NSFileManager.defaultManager removeItemAtPath:[subpath stringByAppendingPathComponent:tmpDownloadFile.lastPathComponent] error:NULL];
+                [NSFileManager.defaultManager removeItemAtURL:[subpath URLByAppendingPathComponent:tmpDownloadFile.lastPathComponent] error:NULL];
             }
             data = nil;
         }
@@ -261,26 +267,26 @@ static NSString *tc_md5_32(NSString *str)
     return data;
 }
 
-+ (void)tc_purgeResumeDataWithIdentifier:(NSString *)identifier inDirectory:(nullable NSString *)subpath
++ (void)tc_purgeResumeDataWithIdentifier:(NSString *)identifier inDirectory:(nullable NSURL *)subpath
 {
-    NSString *path = [self tc_resumeCachePathWithDirectory:subpath identifier:identifier];
+    NSURL *url = [self tc_resumeCachePathWithDirectory:subpath identifier:identifier];
     
-    if (![NSFileManager.defaultManager fileExistsAtPath:path]) {
+    if (![NSFileManager.defaultManager fileExistsAtPath:url.path]) {
         return;
     }
     
     // rm tmp files
-    NSData *data = [NSData dataWithContentsOfFile:path options:NSDataReadingUncached|NSDataReadingMappedAlways error:NULL];
-    NSString *tmpDownloadFile = [self tc_resumeInfoTempFileNameFor:data];
+    NSData *data = [NSData dataWithContentsOfURL:url options:NSDataReadingUncached|NSDataReadingMappedAlways error:NULL];
+    NSURL *tmpDownloadFile = [self tc_resumeInfoTempFileNameFor:data];
     if (nil != tmpDownloadFile) {
-        [NSFileManager.defaultManager removeItemAtPath:tmpDownloadFile error:NULL];
+        [NSFileManager.defaultManager removeItemAtURL:tmpDownloadFile error:NULL];
         
         if (nil != subpath) {
-            [NSFileManager.defaultManager removeItemAtPath:[subpath stringByAppendingPathComponent:tmpDownloadFile.lastPathComponent] error:NULL];
+            [NSFileManager.defaultManager removeItemAtURL:[subpath URLByAppendingPathComponent:tmpDownloadFile.lastPathComponent] error:NULL];
         }
     }
     
-    [NSFileManager.defaultManager removeItemAtPath:path error:NULL];
+    [NSFileManager.defaultManager removeItemAtURL:url error:NULL];
 }
 
 - (void)tc_purgeResumeData

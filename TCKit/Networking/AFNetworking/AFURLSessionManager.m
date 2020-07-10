@@ -191,16 +191,18 @@ typedef void (^AFURLSessionTaskCompletionHandler)(NSURLResponse *response, id re
               task:(NSURLSessionTask *)task
 didCompleteWithError:(NSError *)error
 {
-    __strong AFURLSessionManager *manager = self.manager;
+    __strong AFURLSessionManager *const manager = self.manager;
     __block NSMutableDictionary *userInfo = NSMutableDictionary.dictionary;
     userInfo[AFNetworkingTaskDidCompleteResponseSerializerKey] = manager.responseSerializer;
 
     //Performance Improvement from #2672
     NSData *data = nil;
-    if (self.mutableData) {
-        data = [self.mutableData copy];
-        //We no longer need the reference, so nil it out to gain back some memory.
-        self.mutableData = nil;
+    if (nil != self.mutableData) {
+        @autoreleasepool {
+            data = self.mutableData.copy;
+            //We no longer need the reference, so nil it out to gain back some memory.
+            self.mutableData = nil;
+        }
     }
 
     if (nil != self.downloadFileURL) {
@@ -318,12 +320,17 @@ didFinishDownloadingToURL:(NSURL *)location
 {
     self.downloadFileURL = nil;
 
-    if (self.downloadTaskDidFinishDownloading) {
+    if (nil != self.downloadTaskDidFinishDownloading) {
         self.downloadFileURL = self.downloadTaskDidFinishDownloading(session, downloadTask, location);
-        if (self.downloadFileURL) {
+        if (nil != self.downloadFileURL) {
             NSError *fileManagerError = nil;
-
-            if (![NSFileManager.defaultManager moveItemAtURL:location toURL:self.downloadFileURL error:&fileManagerError]) {
+            
+#ifdef __TCKit__
+            BOOL suc = [NSFileManager.defaultManager moveItemMustAtURL:location toURL:self.downloadFileURL error:&fileManagerError];
+#else
+            BOOL suc = [NSFileManager.defaultManager moveItemAtURL:location toURL:self.downloadFileURL error:&fileManagerError];
+#endif
+            if (!suc) {
                 [NSNotificationCenter.defaultCenter postNotificationName:AFURLSessionDownloadTaskDidFailToMoveFileNotification object:downloadTask userInfo:fileManagerError.userInfo];
             }
         }
@@ -1161,13 +1168,17 @@ didBecomeDownloadTask:(NSURLSessionDownloadTask *)downloadTask
 didFinishDownloadingToURL:(NSURL *)location
 {
     AFURLSessionManagerTaskDelegate *delegate = [self delegateForTask:downloadTask];
-    if (self.downloadTaskDidFinishDownloading) {
+    if (nil != self.downloadTaskDidFinishDownloading) {
         NSURL *fileURL = self.downloadTaskDidFinishDownloading(session, downloadTask, location);
-        if (fileURL) {
+        if (nil != fileURL) {
             delegate.downloadFileURL = fileURL;
             NSError *error = nil;
-            
-            if (![NSFileManager.defaultManager moveItemAtURL:location toURL:fileURL error:&error]) {
+#ifdef __TCKit__
+            BOOL suc = [NSFileManager.defaultManager moveItemMustAtURL:location toURL:fileURL error:&error];
+#else
+            BOOL suc = [NSFileManager.defaultManager moveItemAtURL:location toURL:fileURL error:&error];
+#endif
+            if (!suc) {
                 [NSNotificationCenter.defaultCenter postNotificationName:AFURLSessionDownloadTaskDidFailToMoveFileNotification object:downloadTask userInfo:error.userInfo];
             }
 
@@ -1175,7 +1186,7 @@ didFinishDownloadingToURL:(NSURL *)location
         }
     }
 
-    if (delegate) {
+    if (nil != delegate) {
         [delegate URLSession:session downloadTask:downloadTask didFinishDownloadingToURL:location];
     }
 }

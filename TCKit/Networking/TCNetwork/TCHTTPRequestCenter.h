@@ -12,6 +12,7 @@
 #import "TCHTTPCachePolicy.h"
 #import "TCHTTPStreamPolicy.h"
 
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class AFSecurityPolicy;
@@ -41,7 +42,7 @@ NS_CLASS_AVAILABLE_IOS(7_0) @interface TCHTTPRequestCenter : NSObject <TCHTTPReq
 - (void)removeRequestObserver:(__unsafe_unretained id)observer;
 - (void)removeAllRequests;
 
-- (NSString *)cachePathForResponse;
+- (NSURL *)cachePathForResponse;
 - (nullable NSString *)cacheDomainForResponse;
 - (void)removeAllCachedResponses;
 

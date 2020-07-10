@@ -25,7 +25,7 @@
     NSMapTable<id, NSMapTable<id<NSCoding>, id<TCHTTPRequest>> *> *_requestPool;
     NSRecursiveLock *_poolLock;
     
-    NSString *_cachePathForResp;
+    NSURL *_cachePathForResp;
     __unsafe_unretained Class _respValidorClass;
     
     NSURLSessionConfiguration *_sessionConfig;
@@ -119,14 +119,18 @@
     return _memCache;
 }
 
-- (NSString *)cachePathForResponse
+- (NSURL *)cachePathForResponse
 {
     if (nil == _cachePathForResp) {
         NSString *path = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) firstObject];
-        _cachePathForResp = [path stringByAppendingPathComponent:@"TCHTTPRequestCache"];
+        path = [path stringByAppendingPathComponent:@"TCHTTPRequestCache"];
         NSString *domain = self.cacheDomainForResponse;
         if (domain.length > 0) {
-            _cachePathForResp = [_cachePathForResp stringByAppendingPathComponent:domain];
+            path = [path stringByAppendingPathComponent:domain];
+        }
+        
+        if (nil != path) {
+            _cachePathForResp = [NSURL fileURLWithPath:path];
         }
     }
     
@@ -363,7 +367,7 @@
     __block NSURLSessionTask *task = nil;
     
     NSURL * (^destination)(NSURL *targetPath, NSURLResponse *response) = ^(NSURL * _Nonnull targetPath, NSURLResponse * _Nonnull response) {
-        return [NSURL fileURLWithPath:request.streamPolicy.downloadDestinationPath];
+        return request.streamPolicy.downloadDestinationPath;
     };
     
     __weak typeof(self) wSelf = self;
@@ -503,7 +507,7 @@
             NSURL *downloadURL = [url appendParamIfNeed:param orderKey:nil];
             NSCParameterAssert(downloadURL);
             
-            if (nil == downloadURL || request.streamPolicy.downloadDestinationPath.length < 1) {
+            if (nil == downloadURL || nil == request.streamPolicy.downloadDestinationPath) {
                 break; // !!!: break here, no return
             }
             
@@ -687,9 +691,9 @@
             [_memCache removeAllObjects];
         }
     }
-    NSString *path = self.cachePathForResponse;
+    NSURL *path = self.cachePathForResponse;
     if (nil != path) {
-        [NSFileManager.defaultManager removeItemAtPath:path error:NULL];
+        [NSFileManager.defaultManager removeItemAtURL:path error:NULL];
     }
 }
 
@@ -773,18 +777,18 @@
         [self.memCache setObject:response forKey:cachePolicy.cacheFileName];
     }
     
-    NSString *path = cachePolicy.cacheFilePath;
+    NSURL *url = cachePolicy.cacheFilePath;
     
     dispatch_async(self.responseQueue, ^{
         @autoreleasepool {
-            if (nil != path) {
+            if (nil != url) {
                 if (@available(iOS 11, *)) {
                     NSData *data = [NSKeyedArchiver archivedDataWithRootObject:response requiringSecureCoding:NO error:NULL];
-                    if (nil == data || ![data writeToFile:path atomically:YES]) {
+                    if (nil == data || ![data writeToURL:url atomically:YES]) {
                         NSCAssert(false, @"write response failed.");
                     }
                 } else {
-                    if (![NSKeyedArchiver archiveRootObject:response toFile:path]) {
+                    if (![NSKeyedArchiver archiveRootObject:response toFile:url.path]) {
                         NSCAssert(false, @"write response failed.");
                     }
                 }
@@ -814,21 +818,21 @@
         return;
     }
     
-    NSString *path = cachePolicy.cacheFilePath;
-    if (nil == path) {
+    NSURL *url = cachePolicy.cacheFilePath;
+    if (nil == url) {
         result(nil);
         return;
     }
     
     NSFileManager *fileMngr = NSFileManager.defaultManager;
     BOOL isDir = NO;
-    if (![fileMngr fileExistsAtPath:path isDirectory:&isDir] || isDir) {
+    if (![fileMngr fileExistsAtPath:url.path isDirectory:&isDir] || isDir) {
         result(nil);
         return;
     }
     
     if (request.method == kTCHTTPMethodDownload) {
-        cachePolicy.cachedResponse = path;
+        cachePolicy.cachedResponse = url;
         result(cachePolicy.cachedResponse);
     } else {
         @synchronized(self.memCache) {
@@ -851,14 +855,14 @@
                 id cachedResponse = nil;
                 @try {
                     if (@available(iOS 11, *)) {
-                        NSData *data = [NSData dataWithContentsOfFile:path options:NSDataReadingMappedAlways|NSDataReadingUncached error:NULL];
+                        NSData *data = [NSData dataWithContentsOfURL:url options:NSDataReadingMappedAlways|NSDataReadingUncached error:NULL];
                         if (data.length > 0) {
                             cachedResponse = [NSKeyedUnarchiver unarchivedObjectOfClasses:klasses fromData:data error:NULL];
                             NSCParameterAssert(cachedResponse);
                         }
                         
                     } else {
-                        cachedResponse = [NSKeyedUnarchiver unarchiveObjectWithFile:path];
+                        cachedResponse = [NSKeyedUnarchiver unarchiveObjectWithFile:url.path];
                     }
                 }
                 @catch (NSException *exception) {
