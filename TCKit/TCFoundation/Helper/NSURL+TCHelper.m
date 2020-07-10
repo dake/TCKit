@@ -713,7 +713,7 @@ static int tc_CCHmacUpdate(void *c, const void *data, CC_LONG len)
         return NO;
     }
     
-    NSString *const utiMust =  (NULL == uti || (*uti).length < 1) ? (NSString *)kUTTypeData : *uti;
+    NSString *const utiMust = (NULL == uti || (*uti).length < 1) ? (NSString *)kUTTypeData : *uti;
     if (NULL != uti && (*uti).length < 1) {
         *uti = utiMust;
     }
