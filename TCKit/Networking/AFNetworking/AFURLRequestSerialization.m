@@ -104,7 +104,7 @@ NSString * AFPercentEscapedStringFromString(NSString *string) {
 }
 
 - (NSString *)URLEncodedStringValue {
-    if (!self.value || [self.value isEqual:[NSNull null]]) {
+    if (!self.value || [self.value isEqual:NSNull.null]) {
         return AFPercentEscapedStringFromString([self.field description]);
     } else {
         return [NSString stringWithFormat:@"%@=%@", AFPercentEscapedStringFromString([self.field description]), AFPercentEscapedStringFromString([self.value description])];
@@ -400,7 +400,7 @@ forHTTPHeaderField:(NSString *)field
             NSData *data = nil;
             if ([pair.value isKindOfClass:NSData.class]) {
                 data = pair.value;
-            } else if ([pair.value isEqual:[NSNull null]]) {
+            } else if ([pair.value isEqual:NSNull.null]) {
                 data = NSData.data;
             } else {
                 data = [[pair.value description] dataUsingEncoding:self.stringEncoding];
@@ -545,7 +545,7 @@ forHTTPHeaderField:(NSString *)field
                        context:(void *)context
 {
     if (context == AFHTTPRequestSerializerObserverContext) {
-        if ([change[NSKeyValueChangeNewKey] isEqual:[NSNull null]]) {
+        if ([change[NSKeyValueChangeNewKey] isEqual:NSNull.null]) {
             [self.mutableObservedChangedKeyPaths removeObject:keyPath];
         } else {
             [self.mutableObservedChangedKeyPaths addObject:keyPath];

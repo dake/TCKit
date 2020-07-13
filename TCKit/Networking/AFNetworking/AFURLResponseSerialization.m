@@ -72,7 +72,7 @@ static id AFJSONObjectByRemovingKeysWithNullValues(id JSONObject, NSJSONReadingO
         NSMutableDictionary *mutableDictionary = [NSMutableDictionary dictionaryWithDictionary:JSONObject];
         for (id <NSCopying> key in [(NSDictionary *)JSONObject allKeys]) {
             id value = (NSDictionary *)JSONObject[key];
-            if (!value || [value isEqual:[NSNull null]]) {
+            if (!value || [value isEqual:NSNull.null]) {
                 [mutableDictionary removeObjectForKey:key];
             } else if ([value isKindOfClass:NSArray.class] || [value isKindOfClass:NSDictionary.class]) {
                 mutableDictionary[key] = AFJSONObjectByRemovingKeysWithNullValues(value, readingOptions);

@@ -284,6 +284,9 @@ static CGBitmapInfo const kTCSystemDefaultOrder = kCGBitmapByteOrderDefault | kC
 
 - (CGSize)pixelSize
 {
+    if (NULL == self.CGImage) {
+        return CGSizeZero;
+    }
     CGSize size = self.size;
     size.width *= self.scale;
     size.height *= self.scale;
