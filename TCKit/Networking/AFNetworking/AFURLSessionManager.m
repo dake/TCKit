@@ -374,8 +374,9 @@ static NSString * const AFNSURLSessionTaskDidSuspendNotification = @"com.alamofi
      WARNING: Trouble Ahead
      https://github.com/AFNetworking/AFNetworking/pull/2702
      */
-
-    if (NSClassFromString(@"NSURLSessionTask")) {
+    
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
         /**
          iOS 7 and iOS 8 differ in NSURLSessionTask implementation, which makes the next bit of code a bit tricky.
          Many Unit Tests have been built to validate as much of this behavior has possible.
@@ -424,7 +425,7 @@ static NSString * const AFNSURLSessionTaskDidSuspendNotification = @"com.alamofi
         
         [localDataTask cancel];
         [session finishTasksAndInvalidate];
-    }
+    });
 }
 
 + (void)swizzleResumeAndSuspendMethodForClass:(Class)theClass {
