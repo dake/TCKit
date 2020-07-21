@@ -44,7 +44,7 @@ static NSString const *kDefaultDomain = @"TCKit";
         NSCAssert(false, @"create directory failed.");
         dir = nil;
     }
-    return nil == dir ? nil : [NSURL fileURLWithPath:dir].standardizedURL;
+    return nil == dir ? nil : [NSURL fileURLWithPath:dir];
 }
 
 + (NSURL *)defaultTmpDirectoryInDomain:(NSString *)domain create:(BOOL)create;
@@ -58,7 +58,7 @@ static NSString const *kDefaultDomain = @"TCKit";
         dir = nil;
     }
     
-    return nil == dir ? nil : [NSURL fileURLWithPath:dir].standardizedURL;
+    return nil == dir ? nil : [NSURL fileURLWithPath:dir];
 }
 
 

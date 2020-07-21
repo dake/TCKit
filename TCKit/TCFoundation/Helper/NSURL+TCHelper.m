@@ -305,6 +305,21 @@ static uLong tc_file_crc(NSURL *url, uLong (*fun_init)(uLong crc, const Bytef *b
     return (self.hasDirectoryPath && self.path.length > 1) ? [self.path stringByAppendingString:@"/"] : self.path;
 }
 
+- (BOOL)isEqualToFile:(NSURL *)url
+{
+    if (url == self || [url isEqual:self]) {
+        return YES;
+    }
+    
+    NSURL *right = url.URLByStandardizingPath;
+    if ([self isEqual:right]) {
+        return YES;
+    }
+    
+    NSURL *left = self.URLByStandardizingPath;
+    return [left isEqual:url] || [left isEqual:right];
+}
+
 - (nullable NSMutableDictionary<NSString *, NSString *> *)parseQueryToDictionaryWithDecodeInf:(BOOL)decodeInf orderKey:(NSArray<NSString *> **)orderKey
 {
     NSString *query = [self.query stringByReplacingOccurrencesOfString:@"+" withString:@"%20"];
@@ -649,7 +664,7 @@ static int tc_CCHmacUpdate(void *c, const void *data, CC_LONG len)
     }
     
     // !!!: may create an empty directory
-    if (![srcURL.standardizedURL isEqual:dstURL.standardizedURL]) {
+    if (![srcURL isEqualToFile:dstURL]) {
         [self removeItemAtURL:dstURL error:NULL];
     }
     suc = [self copyItemAtURL:srcURL toURL:dstURL error:error];
