@@ -206,9 +206,9 @@ static inline void animated_gif_swizzleSelector(Class class, SEL originalSelecto
 #pragma mark -
 
 + (UIImage *)animated_gif_imageNamed:(NSString *)name __attribute__((objc_method_family(new))) {
-    NSString *path = [[NSBundle mainBundle] pathForResource:[name stringByDeletingPathExtension] ofType:[name pathExtension]];
+    NSString *path = [NSBundle.mainBundle pathForResource:[name stringByDeletingPathExtension] ofType:[name pathExtension]];
     if (!path) {
-        path = [[NSBundle mainBundle] pathForResource:[[name stringByDeletingPathExtension] stringByAppendingString:@"@2x"] ofType:[name pathExtension]];
+        path = [NSBundle.mainBundle pathForResource:[[name stringByDeletingPathExtension] stringByAppendingString:@"@2x"] ofType:[name pathExtension]];
     }
 
     if (path) {

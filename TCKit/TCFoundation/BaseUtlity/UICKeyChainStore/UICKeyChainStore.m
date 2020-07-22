@@ -20,7 +20,7 @@ static NSString *_defaultService;
 + (NSString *)defaultService
 {
     if (!_defaultService) {
-        _defaultService = [[NSBundle mainBundle] bundleIdentifier] ?: @"";
+        _defaultService = NSBundle.mainBundle.bundleIdentifier ?: @"";
     }
     
     return _defaultService;

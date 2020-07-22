@@ -65,7 +65,7 @@
 + (NSDictionary *)dictionaryWithDefaultMobileProvisioning
 {
     // There is no provisioning profile in AppStore Apps or simulator Apps
-    NSString *profilePath = [[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"];
+    NSString *profilePath = [NSBundle.mainBundle pathForResource:@"embedded" ofType:@"mobileprovision"];
     
     // Check provisioning profile existence
     if (nil != profilePath) {

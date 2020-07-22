@@ -19,7 +19,7 @@ static NSString const *kDefaultDomain = @"TCKit";
 {
     NSString *dir = [NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES).firstObject stringByAppendingPathComponent:domain?:kDefaultDomain];
     //#if TARGET_OS_SIMULATOR
-    //    path = [path stringByAppendingPathComponent:[[NSBundle mainBundle] bundleIdentifier]];
+    //    path = [path stringByAppendingPathComponent:NSBundle.mainBundle.bundleIdentifier];
     //#endif
     
     if (create && ![NSFileManager.defaultManager createDirectoryAtPath:dir
