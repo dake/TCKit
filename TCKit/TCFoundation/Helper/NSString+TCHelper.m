@@ -7,11 +7,10 @@
 //
 
 #import "NSString+TCHelper.h"
-
+#import <UIKit/UIKit.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#import <UIKit/UIKit.h>
 
 @interface NSAttributedString (HTML)
 
@@ -1265,10 +1264,24 @@ static int EscapeMapCompare(const void *ucharVoid, const void *mapVoid) {
     
     NSString *outputText = self;
     @autoreleasepool {
-        outputText = [outputText stringByReplacingOccurrencesOfString:@"\\\\" withString:@"\\"];
+        // \\\\" -> \\\" -> \\"   vs \\\\" -> \\" -> \"
+        // \\\" -> \\" -> \"      vs \\\" -> \\" -> \"
+        // \\" -> \"              vs \\" -> \" -> "
+        // \" -> "                vs \" -> __ -> "
+        
+        /*
+         \\\\ -> __ -> \\         vs \\\\ -> \\
+         \\ -> __ -> \            vs \\ -> \
+         
+         \\\\n -> __ -> \\n -> \LF   vs \\\\n -> \\n -> __ -> \LF
+         \\\n -> __ -> \\n -> \LF    vs \\\n -> \\n -> __ -> \LF
+         \\n -> __ -> \n -> LF       vs \\n -> \n -> __ -> LF
+         \n -> __ -> __ -> LF        vs \n -> __ -> __ -> LF
+         */
+        outputText = [outputText stringByReplacingOccurrencesOfString:@"\\\"" withString:@"\""];
     }
     @autoreleasepool {
-        outputText = [outputText stringByReplacingOccurrencesOfString:@"\\\"" withString:@"\""];
+        outputText = [outputText stringByReplacingOccurrencesOfString:@"\\\\" withString:@"\\"];
     }
     @autoreleasepool {
         outputText = [outputText stringByReplacingOccurrencesOfString:@"\\n" withString:@"\n"];
