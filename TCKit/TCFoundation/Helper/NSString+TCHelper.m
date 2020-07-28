@@ -1234,7 +1234,7 @@ static int EscapeMapCompare(const void *ucharVoid, const void *mapVoid) {
 }
 
 
-- (nullable NSString *)stringByBlackEscaping
+- (nullable NSString *)stringByBackEscaping
 {
     NSString *outputText = self;
     @autoreleasepool {
@@ -1256,7 +1256,7 @@ static int EscapeMapCompare(const void *ucharVoid, const void *mapVoid) {
     return outputText;
 }
 
-- (NSString *)stringByBlackUnescaping
+- (NSString *)stringByBackUnescaping
 {
     if (self.length < 3) {
         return self;
