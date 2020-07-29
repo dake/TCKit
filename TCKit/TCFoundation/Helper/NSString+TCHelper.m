@@ -1258,18 +1258,19 @@ static int EscapeMapCompare(const void *ucharVoid, const void *mapVoid) {
 
 - (NSString *)stringByBackUnescaping
 {
-    if (self.length < 3) {
+    NSUInteger const len = self.length;
+    if (len < 2U) {
         return self;
     }
     
     NSString *outputText = self;
     @autoreleasepool {
-        // \\\\" -> \\\" -> \\"   vs \\\\" -> \\" -> \"
-        // \\\" -> \\" -> \"      vs \\\" -> \\" -> \"
-        // \\" -> \"              vs \\" -> \" -> "
-        // \" -> "                vs \" -> __ -> "
-        
         /*
+         \\\\" -> \\\" -> \\"   vs \\\\" -> \\" -> \"
+         \\\" -> \\" -> \"      vs \\\" -> \\" -> \"
+         \\" -> \"              vs \\" -> \" -> "
+         \" -> "                vs \" -> __ -> "
+         
          \\\\ -> __ -> \\         vs \\\\ -> \\
          \\ -> __ -> \            vs \\ -> \
          
