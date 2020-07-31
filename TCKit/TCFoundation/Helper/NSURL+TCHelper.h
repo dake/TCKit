@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <CoreServices/UTCoreTypes.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -77,9 +78,11 @@ case CC_SHA512_DIGEST_LENGTH:
 
 @end
 
+
 @interface UIPasteboard (TCHelper)
 
-- (BOOL)setFile:(NSURL *)fileURL suggestedName:(NSString *_Nullable)suggestedName uti:(NSString *_Nullable  *_Nullable)uti;
+// NSURL, NSData
+- (BOOL)setFile:(id<NSSecureCoding>)item suggestedName:(NSString *_Nullable)suggestedName uti:(NSString *_Nullable  *_Nullable)uti;
 
 - (nullable NSURL *)fileForName:(NSString *_Nullable)suggestedName uti:(NSString *_Nullable)uti;
 

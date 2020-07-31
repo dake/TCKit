@@ -716,15 +716,13 @@ static int tc_CCHmacUpdate(void *c, const void *data, CC_LONG len)
 @end
 
 
-#import <CoreServices/UTCoreTypes.h>
-
 
 @implementation UIPasteboard (TCHelper)
 
-- (BOOL)setFile:(NSURL *)fileURL suggestedName:(NSString *_Nullable)suggestedName uti:(NSString *_Nullable  *_Nullable)uti
+- (BOOL)setFile:(id<NSSecureCoding>)item suggestedName:(NSString *_Nullable)suggestedName uti:(NSString *_Nullable  *_Nullable)uti
 {
-    NSCParameterAssert(fileURL.isFileURL);
-    if (nil == fileURL) {
+    NSCParameterAssert(item);
+    if (nil == item) {
         return NO;
     }
     
@@ -733,11 +731,17 @@ static int tc_CCHmacUpdate(void *c, const void *data, CC_LONG len)
         *uti = utiMust;
     }
     if (@available(iOS 11, *)) {
-        NSItemProvider *fileProvider = [[NSItemProvider alloc] initWithItem:fileURL typeIdentifier:utiMust];
-        fileProvider.suggestedName = TCPercentEscapedStringFromFileName(suggestedName) ?: fileURL.lastPathComponent;
+        NSItemProvider *fileProvider = [[NSItemProvider alloc] initWithItem:item typeIdentifier:utiMust];
+        fileProvider.suggestedName = TCPercentEscapedStringFromFileName(suggestedName) ?: ([(NSObject *)item isKindOfClass:NSURL.class] ? ((NSURL *)item).lastPathComponent : nil);
         [self setItemProviders:@[fileProvider] localOnly:YES expirationDate:[NSDate dateWithMinutesFromNow:10]];
     } else {
-        NSData *data = [NSData dataWithContentsOfAlwaysMappedURL:fileURL error:NULL];
+        NSData *data = nil;
+        if ([(NSObject *)item isKindOfClass:NSData.class]) {
+            data = (typeof(data))item;
+        } else if ([(NSObject *)item isKindOfClass:NSURL.class]) {
+            data = [NSData dataWithContentsOfAlwaysMappedURL:(NSURL *)item error:NULL];
+        }
+        
         if (nil == data) {
             return NO;
         }
