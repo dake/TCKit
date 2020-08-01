@@ -10,8 +10,8 @@
 
 
 typedef NS_ENUM(NSInteger, TCMigrationVersionType) {
-    kTCMigrationShortVersion, // e.g 2.1.0
-    kTCMigrationBuildVersion, // e.g 2.1.0.23
+    kTCMigrationShortVersion, // e.g. 2.1.0
+    kTCMigrationBuildVersion, // e.g. 2.1.0.23
 };
 
 
