@@ -111,6 +111,8 @@ extern void tcHSPtoRGB(CGFloat  H, CGFloat  S, CGFloat  P, CGFloat *R, CGFloat *
 
 + (UIColor *)colorWithCyan:(CGFloat)c magenta:(CGFloat)m yellow:(CGFloat)y black:(CGFloat)k;
 - (void)toC:(CGFloat *__nullable)cyan toM:(CGFloat *__nullable)magenta toY:(CGFloat *__nullable)yellow toK:(CGFloat *__nullable)black;
+- (void)toH:(CGFloat *__nullable)hue toW:(CGFloat *__nullable)white toB:(CGFloat *__nullable)black;
+
 @property (nonatomic, readonly) CGFloat cyanChannel;
 @property (nonatomic, readonly) CGFloat magentaChannel;
 @property (nonatomic, readonly) CGFloat yellowChannel;
@@ -128,7 +130,7 @@ extern void tcHSPtoRGB(CGFloat  H, CGFloat  S, CGFloat  P, CGFloat *R, CGFloat *
 @property (nonatomic, readonly) CGFloat white;
 @property (nonatomic, readonly) CGFloat luminance; // 0 ~ 1
 
-@property (nonatomic, readonly) CGFloat hue;
+@property (nonatomic, readonly) CGFloat hue; // [0, 360)
 @property (nonatomic, readonly) CGFloat saturation;
 @property (nonatomic, readonly) CGFloat brightness;
 

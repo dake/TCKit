@@ -196,6 +196,29 @@ UIColor *tcInterpolateColors(UIColor *c1, UIColor *c2, CGFloat amt)
     return [UIColor colorWithRed:r green:g blue:b alpha:1.0f];
 }
 
+- (void)toH:(CGFloat *)hue toW:(CGFloat *)white toB:(CGFloat *)black
+{
+    if (NULL != hue) {
+        *hue = self.hue;
+    }
+
+    CGFloat r = self.red;
+    CGFloat g = self.green;
+    CGFloat b = self.blue;
+    
+    CGFloat max = MAX(r, g);
+    max = MAX(max, b);
+    CGFloat min = MIN(r, g);
+    min = MIN(min, b);
+
+    if (NULL != white) {
+        *white = min;
+    }
+    if (NULL != black) {
+        *black = 1 - max;
+    }
+}
+
 - (void)toC:(CGFloat *)cyan toM:(CGFloat *)magenta toY:(CGFloat *)yellow toK:(CGFloat *)black
 {
     CGFloat r = self.red;
@@ -1301,10 +1324,10 @@ void tcHSPtoRGB(
     NSString *result = nil;
     switch (self.colorSpaceModel) {
         case kCGColorSpaceModelRGB:
-            result = [NSString stringWithFormat:@"%02X%02X%02X%02X", self.redByte, self.greenByte, self.blueByte, self.alphaByte];
+            result = [NSString stringWithFormat:@"%02x%02x%02x%02x", self.redByte, self.greenByte, self.blueByte, self.alphaByte];
             break;
         case kCGColorSpaceModelMonochrome:
-            result = [NSString stringWithFormat:@"%02X%02X%02X%02X", self.whiteByte, self.whiteByte, self.whiteByte, self.alphaByte];
+            result = [NSString stringWithFormat:@"%02x%02x%02x%02x", self.whiteByte, self.whiteByte, self.whiteByte, self.alphaByte];
             break;
         default:
             break;
@@ -1318,10 +1341,10 @@ void tcHSPtoRGB(
     NSString *result = nil;
     switch (self.colorSpaceModel) {
         case kCGColorSpaceModelRGB:
-            result = [NSString stringWithFormat:@"%02X%02X%02X", self.redByte, self.greenByte, self.blueByte];
+            result = [NSString stringWithFormat:@"%02x%02x%02x", self.redByte, self.greenByte, self.blueByte];
             break;
         case kCGColorSpaceModelMonochrome:
-            result = [NSString stringWithFormat:@"%02X%02X%02X", self.whiteByte, self.whiteByte, self.whiteByte];
+            result = [NSString stringWithFormat:@"%02x%02x%02x", self.whiteByte, self.whiteByte, self.whiteByte];
             break;
         default:
             break;
@@ -1335,10 +1358,10 @@ void tcHSPtoRGB(
     NSString *result = nil;
     switch (self.colorSpaceModel) {
         case kCGColorSpaceModelRGB:
-            result = [NSString stringWithFormat:@"%02X%02X%02X%02X", self.alphaByte, self.redByte, self.greenByte, self.blueByte];
+            result = [NSString stringWithFormat:@"%02x%02x%02x%02x", self.alphaByte, self.redByte, self.greenByte, self.blueByte];
             break;
         case kCGColorSpaceModelMonochrome:
-            result = [NSString stringWithFormat:@"%02X%02X%02X%02X", self.alphaByte, self.whiteByte, self.whiteByte, self.whiteByte];
+            result = [NSString stringWithFormat:@"%02x%02x%02x%02x", self.alphaByte, self.whiteByte, self.whiteByte, self.whiteByte];
             break;
         default:
             break;
