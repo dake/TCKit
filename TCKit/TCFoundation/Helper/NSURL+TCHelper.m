@@ -312,7 +312,7 @@ static uLong tc_file_crc(NSURL *url, uLong (*fun_init)(uLong crc, const Bytef *b
     }
     
     NSURL *right = url.URLByStandardizingPath;
-    if ([self isEqual:right]) {
+    if ([right isEqual:self]) {
         return YES;
     }
     
