@@ -1303,6 +1303,40 @@ static int EscapeMapCompare(const void *ucharVoid, const void *mapVoid) {
     return outputText;
 }
 
+- (NSString *)replaceTemplate
+{
+    NSString *value = self;
+    BOOL hasCapture = NO;
+    BOOL trim = NO;
+    BOOL trim2 = NO;
+    @autoreleasepool {
+        hasCapture = [value rangeOfString:@"\\$[1-9]" options:NSRegularExpressionSearch].location != NSNotFound;
+        if (hasCapture) {
+            trim2 = [value containsString:@"\\\\$"];
+        }
+        
+        // 这里的字符串去转义和下面的 template 加转义，意义不同，这里可以把 \n 正确处理为 LF
+        value = value.stringByBackUnescaping;
+        if (hasCapture) {
+            if (!trim2) {
+                trim = [value containsString:@"\\$"];
+                if (trim) {
+                    value = [value stringByReplacingOccurrencesOfString:@"\\$" withString:@"$"];
+                }
+            }
+        }
+        
+        value = [NSRegularExpression escapedTemplateForString:value];
+    }
+    if (hasCapture && (trim2 || !trim)) {
+        @autoreleasepool {
+            value = [value stringByReplacingOccurrencesOfString:@"\\$" withString:@"$"];
+        }
+    }
+    
+    return value;
+}
+
 
 @end
 
