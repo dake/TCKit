@@ -214,7 +214,7 @@ static char const kAlignmentRectInsetsKey;
 
 - (NSArray<UIAlertAction *> *)UIAlertActions
 {
-    if (self.hasNextLevelMenu) {
+    if (self.hasNextLevelMenu && nil != self.handler) {
         TCMenuElementAttributes attr = nil != self.attributesWithoutIcon ? self.attributesWithoutIcon.unsignedIntegerValue : self.attributes;
         UIAlertActionStyle style = 0 != (TCMenuOptionsDestructive & self.options) ? UIAlertActionStyleDestructive : (0 != (TCMenuElementAttributesCancel & attr) ? UIAlertActionStyleCancel : UIAlertActionStyleDefault);
         UIAlertAction *action = [UIAlertAction actionWithTitle:self.titleWithoutIcon ?: self.title style:style handler:^(UIAlertAction * _Nonnull action) {
