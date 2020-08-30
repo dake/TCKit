@@ -67,6 +67,8 @@ typedef void (^TCUIActionHandler)(__kindof TCUIAction *action);
 
 @interface TCUIAction : NSObject
 
+@property (nonatomic, assign) BOOL menuOnly;
+
 /// Short display title.
 @property (nullable, nonatomic, copy) NSString *title;
 
