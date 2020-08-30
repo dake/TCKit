@@ -100,6 +100,7 @@ typedef void (^TCUIActionHandler)(__kindof TCUIAction *action);
 
 - (__kindof UIMenuElement *)UIMenuElement API_AVAILABLE(ios(13.0));
 - (NSArray<UIAlertAction *> *)UIAlertActions;
+- (NSArray<UITableViewRowAction *> *)UITableViewRowActions;
 
 //- (UIAction *)UIAction:(UIActionHandler)handler API_AVAILABLE(ios(13.0));
 //- (UIContextualAction *)UIContextualAction:(UIContextualActionHandler)handler API_AVAILABLE(ios(11.0));

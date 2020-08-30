@@ -251,6 +251,42 @@ static char const kAlignmentRectInsetsKey;
     return items;
 }
 
+- (NSArray<UITableViewRowAction *> *)UITableViewRowActions
+{
+    if (self.menuOnly) {
+        return @[];
+    }
+    
+    if (self.hasNextLevelMenu && nil != self.handler) {
+        UITableViewRowActionStyle style = 0 != (TCMenuOptionsDestructive & self.options) ? UITableViewRowActionStyleDestructive : UITableViewRowActionStyleNormal;
+        UITableViewRowAction *action = [UITableViewRowAction rowActionWithStyle:style title:self.titleWithoutIcon ?: self.title handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+            // force retain
+            if (nil != self.handler) {
+                self.handler(self);
+            }
+        }];
+        return @[action];
+    }
+    
+    NSMutableArray<UITableViewRowAction *> *items = NSMutableArray.array;
+    if (self.title.length > 0 && (nil != self.handler || self.children.count < 1)) {
+        TCMenuElementAttributes attr = nil != self.attributesWithoutIcon ? self.attributesWithoutIcon.unsignedIntegerValue : self.attributes;
+        UITableViewRowActionStyle style = 0 != (TCMenuElementAttributesDestructive & attr) ? UITableViewRowActionStyleDestructive : UITableViewRowActionStyleNormal;
+        UITableViewRowAction *action = [UITableViewRowAction rowActionWithStyle:style title:self.titleWithoutIcon ?: self.title handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+            // force retain
+            if (nil != self.handler) {
+                self.handler(self);
+            }
+        }];
+        [items addObject:action];
+    }
+    for (TCUIAction *action in self.children) {
+        [items addObjectsFromArray:action.UITableViewRowActions];
+    }
+    
+    return items;
+}
+
 @end
 
 
