@@ -211,11 +211,13 @@
                 reqMngr.securityPolicy = policy;
             }
             
-            if (nil != self.acceptableContentTypes) {
-                NSMutableSet *set = reqMngr.responseSerializer.acceptableContentTypes.mutableCopy;
+            if (self.acceptableContentTypes.count > 0) {
+                NSMutableSet<NSString *> *set = reqMngr.responseSerializer.acceptableContentTypes.mutableCopy ?: NSMutableSet.set;
                 [set unionSet:self.acceptableContentTypes];
                 reqMngr.responseSerializer.acceptableContentTypes = set;
                 self.acceptableContentTypes = nil;
+            } else if (nil == self.acceptableContentTypes) {
+                reqMngr.responseSerializer.acceptableContentTypes = nil;
             }
             
             if ([reqMngr.responseSerializer isKindOfClass:AFJSONResponseSerializer.class]
