@@ -57,6 +57,7 @@ extern size_t TC_FixedWidth(size_t width);
  @return  原图小边 <= minSize 返回原图，否则返回比例缩放的结果图，同原图imageOrientaion一致
  */
 - (UIImage *)scaleToMinSize:(CGFloat)minSize;
+- (UIImage *)scaleToMinSize:(CGFloat)minSize pixelAlign:(BOOL)pixelAlign;
 
 
 /**
