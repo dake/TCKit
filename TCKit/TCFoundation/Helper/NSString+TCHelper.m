@@ -1258,10 +1258,22 @@ static int EscapeMapCompare(const void *ucharVoid, const void *mapVoid) {
 
 - (NSString *)stringByBackUnescaping
 {
+    
+    
     NSUInteger const len = self.length;
     if (len < 2U) {
         return self;
     }
+    
+//    if (@available(iOS 13, *)) {
+//        @autoreleasepool {
+//            NSData *data = [NSJSONSerialization dataWithJSONObject:@{@"k": self} options:NSJSONWritingWithoutEscapingSlashes error:NULL];
+//            if (nil != data) {
+//                NSDictionary<NSString *, NSString *> *dic = data.tc_JSONObject;
+//                return dic[@"k"].replaceUnicode;
+//            }
+//        }
+//    }
     
     NSString *outputText = self;
     @autoreleasepool {
@@ -1298,6 +1310,29 @@ static int EscapeMapCompare(const void *ucharVoid, const void *mapVoid) {
     }
     @autoreleasepool {
         outputText = [outputText stringByReplacingOccurrencesOfString:@"\\/" withString:@"/"];
+    }
+    
+    NSUInteger const len2 = outputText.length;
+    if (len2 >= 4U && NSNotFound != [outputText rangeOfString:@"\\x" options:NSCaseInsensitiveSearch range:NSMakeRange(0, len2)].location) { // \x30
+        NSString *str = nil;
+        @autoreleasepool {
+            // http://userguide.icu-project.org/transforms/general
+            str = [outputText stringByReplacingOccurrencesOfString:@"\\\\x([0-9a-f]{2})" withString:@"\\\\x{$1}" options:NSCaseInsensitiveSearch|NSRegularExpressionSearch range:NSMakeRange(0, len2)];
+        }
+        if (len2 != str.length) {
+            @autoreleasepool {
+                str = [str stringByApplyingTransform:@"Any-Hex/Perl" reverse:YES];
+                if (str.length > 0) {
+                    NSData *data = [str dataUsingEncoding:NSISOLatin1StringEncoding] ?: [str dataUsingEncoding:NSASCIIStringEncoding];
+                    if (nil != data) {
+                        str = [NSString stringWithData:data usedEncoding:NULL force:YES];
+                        if (str.length > 0) {
+                            outputText = str;
+                        }
+                    }
+                }
+            }
+        }
     }
     
     return outputText;
