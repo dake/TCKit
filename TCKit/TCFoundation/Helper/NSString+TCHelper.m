@@ -736,7 +736,8 @@ bool tc_is_ip_addr(char const *host, bool *ipv6)
     //        }
     //    }
     //    return [returnStr stringByReplacingOccurrencesOfString:@"\\r\\n" withString:@"\n"];
-    
+    // http://userguide.icu-project.org/transforms/general
+    // https://unicode-org.github.io/icu/
     return [self stringByApplyingTransform:@"Any-Hex/Java" reverse:YES] ?: self;
 }
 
@@ -1317,6 +1318,7 @@ static int EscapeMapCompare(const void *ucharVoid, const void *mapVoid) {
         NSString *str = nil;
         @autoreleasepool {
             // http://userguide.icu-project.org/transforms/general
+            // https://unicode-org.github.io/icu/
             str = [outputText stringByReplacingOccurrencesOfString:@"\\\\x([0-9a-f]{2})" withString:@"\\\\x{$1}" options:NSCaseInsensitiveSearch|NSRegularExpressionSearch range:NSMakeRange(0, len2)];
         }
         if (len2 != str.length) {
