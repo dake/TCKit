@@ -59,13 +59,17 @@
 
 - (NSString *)reversedString
 {
-    NSMutableString *reversedString = [NSMutableString stringWithCapacity:self.length];
+    NSUInteger const len = self.length;
+    if (len < 2) {
+        return self;
+    }
+    NSMutableString *reversedString = [NSMutableString stringWithCapacity:len];
     
-    [self enumerateSubstringsInRange:NSMakeRange(0,self.length)
+    [self enumerateSubstringsInRange:NSMakeRange(0, len)
                              options:(NSStringEnumerationReverse | NSStringEnumerationByComposedCharacterSequences)
                           usingBlock:^(NSString *substring, NSRange substringRange, NSRange enclosingRange, BOOL *stop) {
-                              [reversedString appendString:substring];
-                          }];
+        [reversedString appendString:substring];
+    }];
     return reversedString;
 }
 
