@@ -10,8 +10,10 @@
 
 extern NSString *const FCUUIDsOfUserDevicesDidChangeNotification;
 
+__attribute__((objc_subclassing_restricted))
 @interface FCUUID : NSObject
 {
+@private
     NSMutableDictionary *_uuidForKey;
     NSString *_uuidForSession;
     NSString *_uuidForInstallation;

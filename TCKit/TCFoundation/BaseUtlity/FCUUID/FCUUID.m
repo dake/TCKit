@@ -9,9 +9,6 @@
 #import "UICKeyChainStore.h"
 
 
-@implementation FCUUID
-
-
 NSString *const FCUUIDsOfUserDevicesDidChangeNotification = @"FCUUIDsOfUserDevicesDidChangeNotification";
 
 
@@ -19,6 +16,15 @@ NSString *const _uuidForInstallationKey = @"fc_uuidForInstallation";
 NSString *const _uuidForDeviceKey = @"fc_uuidForDevice";
 NSString *const _uuidsOfUserDevicesKey = @"fc_uuidsOfUserDevices";
 NSString *const _uuidsOfUserDevicesToggleKey = @"fc_uuidsOfUserDevicesToggle";
+
+@interface FCUUID ()
+
+-(void)uuidsOfUserDevices_iCloudChange:(NSNotification *)notification;
+
+@end
+
+__attribute__((objc_direct_members))
+@implementation FCUUID
 
 
 +(FCUUID *)sharedInstance

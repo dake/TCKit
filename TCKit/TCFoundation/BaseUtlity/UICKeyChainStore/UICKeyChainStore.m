@@ -33,29 +33,29 @@ static NSString *_defaultService;
 
 #pragma mark -
 
-+ (UICKeyChainStore *)keyChainStore
++ (instancetype)keyChainStore
 {
     return [[self alloc] initWithService:nil accessGroup:nil];
 }
 
-+ (UICKeyChainStore *)keyChainStoreWithService:(NSString *)service
++ (instancetype)keyChainStoreWithService:(NSString *)service
 {
     return [[self alloc] initWithService:service accessGroup:nil];
 }
 
-+ (UICKeyChainStore *)keyChainStoreWithService:(NSString *)service accessGroup:(NSString *)accessGroup
++ (instancetype)keyChainStoreWithService:(NSString *)service accessGroup:(NSString *)accessGroup
 {
     return [[self alloc] initWithService:service accessGroup:accessGroup];
 }
 
 #pragma mark -
 
-+ (UICKeyChainStore *)keyChainStoreWithServer:(NSURL *)server protocolType:(UICKeyChainStoreProtocolType)protocolType
++ (instancetype)keyChainStoreWithServer:(NSURL *)server protocolType:(UICKeyChainStoreProtocolType)protocolType
 {
     return [[self alloc] initWithServer:server protocolType:protocolType authenticationType:UICKeyChainStoreAuthenticationTypeDefault];
 }
 
-+ (UICKeyChainStore *)keyChainStoreWithServer:(NSURL *)server protocolType:(UICKeyChainStoreProtocolType)protocolType authenticationType:(UICKeyChainStoreAuthenticationType)authenticationType
++ (instancetype)keyChainStoreWithServer:(NSURL *)server protocolType:(UICKeyChainStoreProtocolType)protocolType authenticationType:(UICKeyChainStoreAuthenticationType)authenticationType
 {
     return [[self alloc] initWithServer:server protocolType:protocolType authenticationType:authenticationType];
 }

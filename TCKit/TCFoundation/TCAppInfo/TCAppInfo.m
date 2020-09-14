@@ -67,7 +67,7 @@ NSString *const kTCApplicationDidReceiveDiskSpaceWarning = @"TCApplicationDidRec
 
 + (NSString *)bundleIdentifier
 {
-    return DEFAULT_PLIST_FOR_KEY(kCFBundleIdentifierKey);
+    return NSBundle.mainBundle.bundleIdentifier;
 }
 
 + (NSString *)uuidForDevice

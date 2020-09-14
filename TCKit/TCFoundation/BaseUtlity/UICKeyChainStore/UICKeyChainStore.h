@@ -107,7 +107,39 @@ typedef NS_ENUM(unsigned long, UICKeyChainStoreAuthenticationPolicy) {
     UICKeyChainStoreAuthenticationPolicyApplicationPassword NS_ENUM_AVAILABLE(10_12_1, 9_0) = 1u << 31,
 }__OSX_AVAILABLE_STARTING(__MAC_10_10, __IPHONE_8_0);
 
+
 @interface UICKeyChainStore : NSObject
+
++ (NSString *)defaultService;
++ (void)setDefaultService:(NSString *)defaultService;
+
++ (instancetype)keyChainStore;
++ (instancetype)keyChainStoreWithService:(nullable NSString *)service;
++ (instancetype)keyChainStoreWithService:(nullable NSString *)service accessGroup:(nullable NSString *)accessGroup;
+
++ (instancetype)keyChainStoreWithServer:(NSURL *)server protocolType:(UICKeyChainStoreProtocolType)protocolType;
++ (instancetype)keyChainStoreWithServer:(NSURL *)server protocolType:(UICKeyChainStoreProtocolType)protocolType authenticationType:(UICKeyChainStoreAuthenticationType)authenticationType;
+
+//- (instancetype)init;
+- (instancetype)initWithService:(nullable NSString *)service;
+- (instancetype)initWithService:(nullable NSString *)service accessGroup:(nullable NSString *)accessGroup;
+
+- (instancetype)initWithServer:(NSURL *)server protocolType:(UICKeyChainStoreProtocolType)protocolType;
+- (instancetype)initWithServer:(NSURL *)server protocolType:(UICKeyChainStoreProtocolType)protocolType authenticationType:(UICKeyChainStoreAuthenticationType)authenticationType;
+
+
++ (void)requestSharedWebCredentialWithCompletion:(nullable void (^)(NSArray UIC_CREDENTIAL_TYPE *credentials, NSError * __nullable error))completion;
++ (void)requestSharedWebCredentialForDomain:(nullable NSString *)domain account:(nullable NSString *)account completion:(nullable void (^)(NSArray UIC_CREDENTIAL_TYPE *credentials, NSError * __nullable error))completion;
+
+
+- (BOOL)contains:(nullable NSString *)key;
+- (BOOL)setData:(nullable NSData *)data forKey:(NSString *)key;
+- (nullable NSData *)dataForKey:(NSString *)key;
+
+@end
+
+__attribute__((objc_direct_members))
+@interface UICKeyChainStore () //
 
 @property (nonatomic, readonly) UICKeyChainStoreItemClass itemClass;
 
@@ -131,22 +163,6 @@ __OSX_AVAILABLE_STARTING(__MAC_NA, __IPHONE_8_0);
 @property (nonatomic, readonly, nullable) NSArray UIC_KEY_TYPE *allKeys;
 @property (nonatomic, readonly, nullable) NSArray *allItems;
 
-+ (NSString *)defaultService;
-+ (void)setDefaultService:(NSString *)defaultService;
-
-+ (UICKeyChainStore *)keyChainStore;
-+ (UICKeyChainStore *)keyChainStoreWithService:(nullable NSString *)service;
-+ (UICKeyChainStore *)keyChainStoreWithService:(nullable NSString *)service accessGroup:(nullable NSString *)accessGroup;
-
-+ (UICKeyChainStore *)keyChainStoreWithServer:(NSURL *)server protocolType:(UICKeyChainStoreProtocolType)protocolType;
-+ (UICKeyChainStore *)keyChainStoreWithServer:(NSURL *)server protocolType:(UICKeyChainStoreProtocolType)protocolType authenticationType:(UICKeyChainStoreAuthenticationType)authenticationType;
-
-- (instancetype)init;
-- (instancetype)initWithService:(nullable NSString *)service;
-- (instancetype)initWithService:(nullable NSString *)service accessGroup:(nullable NSString *)accessGroup;
-
-- (instancetype)initWithServer:(NSURL *)server protocolType:(UICKeyChainStoreProtocolType)protocolType;
-- (instancetype)initWithServer:(NSURL *)server protocolType:(UICKeyChainStoreProtocolType)protocolType authenticationType:(UICKeyChainStoreAuthenticationType)authenticationType;
 
 + (nullable NSString *)stringForKey:(NSString *)key;
 + (nullable NSString *)stringForKey:(NSString *)key service:(nullable NSString *)service;
@@ -162,15 +178,15 @@ __OSX_AVAILABLE_STARTING(__MAC_NA, __IPHONE_8_0);
 + (BOOL)setData:(nullable NSData *)data forKey:(NSString *)key service:(nullable NSString *)service;
 + (BOOL)setData:(nullable NSData *)data forKey:(NSString *)key service:(nullable NSString *)service accessGroup:(nullable NSString *)accessGroup;
 
-- (BOOL)contains:(nullable NSString *)key;
+//- (BOOL)contains:(nullable NSString *)key;
 
 - (BOOL)setString:(nullable NSString *)string forKey:(nullable NSString *)key;
 - (BOOL)setString:(nullable NSString *)string forKey:(nullable NSString *)key label:(nullable NSString *)label comment:(nullable NSString *)comment;
 - (nullable NSString *)stringForKey:(NSString *)key;
 
-- (BOOL)setData:(nullable NSData *)data forKey:(NSString *)key;
+//- (BOOL)setData:(nullable NSData *)data forKey:(NSString *)key;
 - (BOOL)setData:(nullable NSData *)data forKey:(NSString *)key label:(nullable NSString *)label comment:(nullable NSString *)comment;
-- (nullable NSData *)dataForKey:(NSString *)key;
+//- (nullable NSData *)dataForKey:(NSString *)key;
 
 + (BOOL)removeItemForKey:(NSString *)key;
 + (BOOL)removeItemForKey:(NSString *)key service:(nullable NSString *)service;
@@ -188,10 +204,8 @@ __OSX_AVAILABLE_STARTING(__MAC_NA, __IPHONE_8_0);
 - (void)setObject:(nullable NSString *)obj forKeyedSubscript:(NSString<NSCopying> *)key;
 
 + (nullable NSArray UIC_KEY_TYPE *)allKeysWithItemClass:(UICKeyChainStoreItemClass)itemClass;
-- (nullable NSArray UIC_KEY_TYPE *)allKeys;
 
 + (nullable NSArray *)allItemsWithItemClass:(UICKeyChainStoreItemClass)itemClass;
-- (nullable NSArray *)allItems;
 
 - (void)setAccessibility:(UICKeyChainStoreAccessibility)accessibility authenticationPolicy:(UICKeyChainStoreAuthenticationPolicy)authenticationPolicy
 __OSX_AVAILABLE_STARTING(__MAC_10_10, __IPHONE_8_0);
@@ -203,15 +217,12 @@ __OSX_AVAILABLE_STARTING(__MAC_10_10, __IPHONE_8_0);
 - (void)setSharedPassword:(nullable NSString *)password forAccount:(NSString *)account completion:(nullable void (^)(NSError * __nullable error))completion;
 - (void)removeSharedPasswordForAccount:(NSString *)account completion:(nullable void (^)(NSError * __nullable error))completion;
 
-+ (void)requestSharedWebCredentialWithCompletion:(nullable void (^)(NSArray UIC_CREDENTIAL_TYPE *credentials, NSError * __nullable error))completion;
-+ (void)requestSharedWebCredentialForDomain:(nullable NSString *)domain account:(nullable NSString *)account completion:(nullable void (^)(NSArray UIC_CREDENTIAL_TYPE *credentials, NSError * __nullable error))completion;
 
 + (NSString *)generatePassword;
 #endif
 
-@end
 
-@interface UICKeyChainStore (ErrorHandling)
+// MARK: ErrorHandling
 
 + (nullable NSString *)stringForKey:(NSString *)key error:(NSError * __nullable __autoreleasing * __nullable)error;
 + (nullable NSString *)stringForKey:(NSString *)key service:(nullable NSString *)service error:(NSError * __nullable __autoreleasing * __nullable)error;
@@ -249,9 +260,13 @@ __OSX_AVAILABLE_STARTING(__MAC_10_10, __IPHONE_8_0);
 - (BOOL)removeItemForKey:(NSString *)key error:(NSError * __nullable __autoreleasing * __nullable)error;
 - (BOOL)removeAllItemsWithError:(NSError * __nullable __autoreleasing * __nullable)error;
 
-@end
+//@end
+//
+//__attribute__((objc_direct_members))
+//@interface UICKeyChainStore (ForwardCompatibility)
 
-@interface UICKeyChainStore (ForwardCompatibility)
+
+// MARK: ForwardCompatibility
 
 + (BOOL)setString:(nullable NSString *)value forKey:(NSString *)key genericAttribute:(nullable id)genericAttribute;
 + (BOOL)setString:(nullable NSString *)value forKey:(NSString *)key genericAttribute:(nullable id)genericAttribute error:(NSError * __nullable __autoreleasing * __nullable)error;

@@ -19,7 +19,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 extern NSString *const kTCApplicationDidReceiveDiskSpaceWarning;
 
-
 @interface TCAppInfo : NSObject
 
 + (NSString *)appVersion:(TCMigrationVersionType)type;

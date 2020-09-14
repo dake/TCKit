@@ -48,10 +48,10 @@
     return [self objectForInfoDictionaryKey:(id)kCFBundleNameKey];
 }
 
-- (nullable NSString *)bundleIdentifier
-{
-    return [self objectForInfoDictionaryKey:(id)kCFBundleIdentifierKey];
-}
+//- (nullable NSString *)bundleIdentifier
+//{
+//    return [self objectForInfoDictionaryKey:(id)kCFBundleIdentifierKey];
+//}
 
 - (nullable NSString *)displayName
 {

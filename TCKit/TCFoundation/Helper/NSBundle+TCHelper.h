@@ -10,6 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+
 @interface NSBundle (TCHelper)
 
 + (instancetype)hostMainBundle;
@@ -18,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable NSString *)bundleVersion;
 - (nullable NSString *)bundleShortVersion;
 - (nullable NSString *)bundleName;
-- (nullable NSString *)bundleIdentifier;
+//- (nullable NSString *)bundleIdentifier;
 - (nullable NSString *)displayName;
 
 
