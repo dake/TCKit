@@ -46,8 +46,24 @@ __strong void(^block)(void) __attribute__((cleanup(_tc_blockCleanUp), unused)) =
 
 NS_INLINE BOOL IS_IPAD(void)
 {
+    /*
+     When you do need to know the device type, use higher-level APIs whenever possible.
+     On macOS, the UITraitCollection and UIDevice classes report the following iOS idiom types instead of UIUserInterfaceIdiom.mac
+     */
     return UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad;
 }
+
+//NS_INLINE BOOL IS_MAC(void)
+//{
+//    if (@available(macOS 11, iOS 1024, *)) {
+//        return YES;
+//    }
+//    
+//    if (@available(iOS 14, *)) {
+//        return UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomMac;
+//    }
+//    return NO;
+//}
 
 NS_INLINE NSComparisonResult COMPARE_SYSTEM_VERSION(NSString *v)
 {

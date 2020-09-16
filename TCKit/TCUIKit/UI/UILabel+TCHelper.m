@@ -105,12 +105,12 @@
     return [self bk_associatedValueForKey:_cmd];
 }
 
-- (void)setLongPressGestureRecognizer:(UILongPressGestureRecognizer *)recognizer
+- (void)setLongPressGestureRecognizer:(id)recognizer
 {
     objc_setAssociatedObject(self, @selector(longPressGestureRecognizer), recognizer, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-- (UILongPressGestureRecognizer *)longPressGestureRecognizer
+- (id)longPressGestureRecognizer
 {
     return objc_getAssociatedObject(self, _cmd);
 }
@@ -118,10 +118,29 @@
 - (void)setCopyEnable:(BOOL)copyEnable
 {
     self.userInteractionEnabled = copyEnable;
-    if (copyEnable && nil == self.longPressGestureRecognizer) {
-        UILongPressGestureRecognizer *longPressGes = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
-        [self addGestureRecognizer:longPressGes];
-        self.longPressGestureRecognizer = longPressGes;
+    if (copyEnable) {
+        if (nil == self.longPressGestureRecognizer) {
+            if (@available(iOS 13, *)) {
+                // FIXME: strong delegate?
+                UIContextMenuInteraction *menuInter = [[UIContextMenuInteraction alloc] initWithDelegate:self];
+                [self addInteraction:menuInter];
+                self.longPressGestureRecognizer = menuInter;
+            } else {
+                UILongPressGestureRecognizer *longPressGes = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
+                [self addGestureRecognizer:longPressGes];
+                self.longPressGestureRecognizer = longPressGes;
+            }
+        }
+        
+    } else {
+        if (nil != self.longPressGestureRecognizer) {
+            if (@available(iOS 13, *)) {
+                [self removeInteraction:self.longPressGestureRecognizer];
+            } else {
+                [self removeGestureRecognizer:self.longPressGestureRecognizer];
+            }
+            self.longPressGestureRecognizer = nil;
+        }
     }
     objc_setAssociatedObject(self, @selector(copyEnable), @(copyEnable), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
@@ -138,18 +157,35 @@
 
 - (BOOL)canPerformAction:(SEL)action withSender:(id)sender
 {
-    return (action == @selector(copy:));
+    return action == @selector(copy:);
+//    || action == @selector(select:)
+//    || action == @selector(selectAll:);
 }
+
+//- (void)select:(nullable id)sender API_AVAILABLE(ios(3.0))
+//{
+//
+//}
+//
+//- (void)selectAll:(nullable id)sender API_AVAILABLE(ios(3.0))
+//{
+//
+//}
 
 - (void)copy:(id)sender
 {
     UIPasteboard *pboard = UIPasteboard.generalPasteboard;
     id<TCLabelHelperDelegate> delegate = self.tc_delegate;
     
+    NSString *str = nil;
     if (nil != delegate && [delegate respondsToSelector:@selector(copyStringForLabel:)]) {
-        pboard.string = [delegate copyStringForLabel:self];
+        str = [delegate copyStringForLabel:self];
     } else {
-        pboard.string = self.text;
+        str = self.text;
+    }
+    
+    if (str.length > 0) {
+        pboard.string = str;
     }
 }
 
@@ -176,6 +212,27 @@
             [menu setMenuVisible:YES animated:YES];
         }
     }
+}
+
+
+// MARK: UIContextMenuInteractionDelegate
+
+- (nullable UIContextMenuConfiguration *)contextMenuInteraction:(UIContextMenuInteraction *)interaction configurationForMenuAtLocation:(CGPoint)location API_AVAILABLE(ios(13.0))
+{
+    __weak typeof(self) wSelf = self;
+    return [UIContextMenuConfiguration configurationWithIdentifier:nil previewProvider:nil actionProvider:^UIMenu * _Nullable(NSArray<UIMenuElement *> * _Nonnull suggestedActions) {
+        NSMutableArray<UIMenuElement *> *arry = NSMutableArray.array;
+        [arry addObject:({
+            NSBundle* uikitBundle = [NSBundle bundleForClass:wSelf.class];
+            NSString *str = [uikitBundle localizedStringForKey:@"Copy" value:@"Copy" table:nil];
+            UIAction *act = [UIAction actionWithTitle:str image:[UIImage systemImageNamed:@"doc.on.doc"] identifier:nil handler:^(__kindof UIAction * _Nonnull action) {
+                [wSelf copy:nil];
+            }];
+            act;
+        })];
+        UIMenu *menu = [UIMenu menuWithTitle:@"" image:nil identifier:nil options:0 children:arry];
+        return menu;
+    }];
 }
 
 @end

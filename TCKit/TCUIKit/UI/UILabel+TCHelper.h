@@ -26,7 +26,7 @@ typedef NS_ENUM(NSUInteger, TCTextVerticalAlignment) {
 
 @end
 
-@interface UILabel (TCHelper)
+@interface UILabel (TCHelper) <UIContextMenuInteractionDelegate>
 
 @property (nonatomic, assign) TCTextVerticalAlignment textVerticalAlignment;
 @property (nonatomic, assign) UIEdgeInsets contentEdgeInsets;
