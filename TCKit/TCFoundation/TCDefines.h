@@ -53,17 +53,17 @@ NS_INLINE BOOL IS_IPAD(void)
     return UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad;
 }
 
-//NS_INLINE BOOL IS_MAC(void)
-//{
-//    if (@available(macOS 11, iOS 1024, *)) {
-//        return YES;
-//    }
-//    
-//    if (@available(iOS 14, *)) {
-//        return UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomMac;
-//    }
-//    return NO;
-//}
+NS_INLINE BOOL IS_MAC(void)
+{
+    if (@available(macOS 11, iOS 1024, *)) {
+        return YES;
+    }
+    
+    if (@available(iOS 14, *)) {
+        return UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomMac;
+    }
+    return NO;
+}
 
 NS_INLINE NSComparisonResult COMPARE_SYSTEM_VERSION(NSString *v)
 {

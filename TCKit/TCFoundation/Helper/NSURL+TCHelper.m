@@ -726,19 +726,28 @@ static int tc_CCHmacUpdate(void *c, const void *data, CC_LONG len)
         return NO;
     }
     
-    NSString *const utiMust = (NULL == uti || (*uti).length < 1) ? (NSString *)kUTTypeData : *uti;
-    if (NULL != uti && (*uti).length < 1) {
+    BOOL const isURL = [(NSObject *)item isKindOfClass:NSURL.class];
+    NSString *utiMust = nil;
+    if (NULL == uti || (*uti).length < 1) {
+        if (isURL) {
+            utiMust = ((NSURL *)item).isFileURL ? (NSString *)kUTTypeFileURL : (NSString *)kUTTypeURL;
+        } else {
+            utiMust = (NSString *)kUTTypeData;
+        }
         *uti = utiMust;
+    } else {
+        utiMust = *uti;
     }
+
     if (@available(iOS 11, *)) {
         NSItemProvider *fileProvider = [[NSItemProvider alloc] initWithItem:item typeIdentifier:utiMust];
-        fileProvider.suggestedName = TCPercentEscapedStringFromFileName(suggestedName) ?: ([(NSObject *)item isKindOfClass:NSURL.class] ? ((NSURL *)item).lastPathComponent : nil);
+        fileProvider.suggestedName = TCPercentEscapedStringFromFileName(suggestedName) ?: (isURL ? ((NSURL *)item).lastPathComponent : nil);
         [self setItemProviders:@[fileProvider] localOnly:YES expirationDate:[NSDate dateWithMinutesFromNow:10]];
     } else {
         NSData *data = nil;
         if ([(NSObject *)item isKindOfClass:NSData.class]) {
             data = (typeof(data))item;
-        } else if ([(NSObject *)item isKindOfClass:NSURL.class]) {
+        } else if (isURL) {
             data = [NSData dataWithContentsOfAlwaysMappedURL:(NSURL *)item error:NULL];
         }
         

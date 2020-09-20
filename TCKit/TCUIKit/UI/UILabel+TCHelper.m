@@ -16,6 +16,7 @@
 @implementation UILabel (TCHelper)
 
 @dynamic contentEdgeInsets;
+@dynamic menuDelegate;
 
 + (void)load
 {
@@ -24,6 +25,17 @@
         [self tc_swizzle:@selector(textRectForBounds:limitedToNumberOfLines:)];
         [self tc_swizzle:@selector(drawTextInRect:)];
     });
+}
+
+__weak static id<TCLabelHelperDelegate> s_menuDelegate = nil;
++ (nullable id<TCLabelHelperDelegate>)menuDelegate
+{
+    return s_menuDelegate;
+}
+
++ (void)setMenuDelegate:(id<TCLabelHelperDelegate> _Nullable)menuDelegate
+{
+    s_menuDelegate = menuDelegate;
 }
 
 - (UIEdgeInsets)contentEdgeInsets
@@ -41,7 +53,6 @@
 - (TCTextVerticalAlignment)textVerticalAlignment
 {
     NSNumber *alignment = objc_getAssociatedObject(self, _cmd);
-    
     if (nil != alignment) {
         return (TCTextVerticalAlignment)alignment.integerValue;
     }
@@ -95,24 +106,24 @@
 
 #pragma mark - copy
 
-- (void)setTc_delegate:(id<TCLabelHelperDelegate>)tc_delegate
+- (void)setMenuDelegate:(id<TCLabelHelperDelegate>)delegate
 {
-    [self bk_weaklyAssociateValue:tc_delegate withKey:@selector(tc_delegate)];
+    [self bk_weaklyAssociateValue:delegate withKey:@selector(menuDelegate)];
 }
 
-- (id<TCLabelHelperDelegate>)tc_delegate
+- (id<TCLabelHelperDelegate>)menuDelegate
 {
     return [self bk_associatedValueForKey:_cmd];
 }
 
 - (void)setLongPressGestureRecognizer:(id)recognizer
 {
-    objc_setAssociatedObject(self, @selector(longPressGestureRecognizer), recognizer, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [self bk_weaklyAssociateValue:recognizer withKey:@selector(longPressGestureRecognizer)];
 }
 
 - (id)longPressGestureRecognizer
 {
-    return objc_getAssociatedObject(self, _cmd);
+    return [self bk_associatedValueForKey:_cmd];
 }
 
 - (void)setCopyEnable:(BOOL)copyEnable
@@ -174,18 +185,23 @@
 
 - (void)copy:(id)sender
 {
-    UIPasteboard *pboard = UIPasteboard.generalPasteboard;
-    id<TCLabelHelperDelegate> delegate = self.tc_delegate;
-    
     NSString *str = nil;
+    id<TCLabelHelperDelegate> delegate = self.menuDelegate;
     if (nil != delegate && [delegate respondsToSelector:@selector(copyStringForLabel:)]) {
         str = [delegate copyStringForLabel:self];
     } else {
+        delegate = self.class.menuDelegate;
+        if (nil != delegate && [delegate respondsToSelector:@selector(copyStringForLabel:)]) {
+            str = [delegate copyStringForLabel:self];
+        }
+    }
+    
+    if (nil == str) {
         str = self.text;
     }
     
     if (str.length > 0) {
-        pboard.string = str;
+        UIPasteboard.generalPasteboard.string = str;
     }
 }
 
@@ -223,13 +239,23 @@
     return [UIContextMenuConfiguration configurationWithIdentifier:nil previewProvider:nil actionProvider:^UIMenu * _Nullable(NSArray<UIMenuElement *> * _Nonnull suggestedActions) {
         NSMutableArray<UIMenuElement *> *arry = NSMutableArray.array;
         [arry addObject:({
-            NSBundle* uikitBundle = [NSBundle bundleForClass:wSelf.class];
+            NSBundle *uikitBundle = [NSBundle bundleForClass:wSelf.class];
             NSString *str = [uikitBundle localizedStringForKey:@"Copy" value:@"Copy" table:nil];
             UIAction *act = [UIAction actionWithTitle:str image:[UIImage systemImageNamed:@"doc.on.doc"] identifier:nil handler:^(__kindof UIAction * _Nonnull action) {
                 [wSelf copy:nil];
             }];
             act;
         })];
+        
+        id<TCLabelHelperDelegate> delegate = wSelf.menuDelegate;
+        if (nil != delegate && [delegate respondsToSelector:@selector(menuItemsForLabel:)]) {
+            [arry addObjectsFromArray:[delegate menuItemsForLabel:wSelf] ?: @[]];
+        } else {
+            delegate = wSelf.class.menuDelegate;
+            if (nil != delegate && [delegate respondsToSelector:@selector(menuItemsForLabel:)]) {
+                [arry addObjectsFromArray:[delegate menuItemsForLabel:wSelf] ?: @[]];
+            }
+        }
         UIMenu *menu = [UIMenu menuWithTitle:@"" image:nil identifier:nil options:0 children:arry];
         return menu;
     }];

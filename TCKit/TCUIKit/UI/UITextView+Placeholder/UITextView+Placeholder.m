@@ -27,6 +27,7 @@
 #import <objc/runtime.h>
 #import "UITextView+Placeholder.h"
 #import "NSObject+TCUtilities.h"
+//#import "UILabel+TCHelper.h"
 
 @implementation UITextView (Placeholder)
 
@@ -105,7 +106,7 @@
             label.lineBreakMode = self.textContainer.lineBreakMode;
             label.numberOfLines = 0;
             label.font = self.font;
-            label.userInteractionEnabled = NO;
+//            label.userInteractionEnabled = NO;
             objc_setAssociatedObject(self, @selector(placeholderLabel), label, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
             
             [NSNotificationCenter.defaultCenter addObserver:self
@@ -116,6 +117,7 @@
             for (NSString *key in self.class.observingKeys) {
                 [self addObserver:self forKeyPath:key options:NSKeyValueObservingOptionNew context:NULL];
             }
+//            label.copyEnable = YES;
         }
         return label;
     };

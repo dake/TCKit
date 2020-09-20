@@ -10,8 +10,6 @@
 
 #import <UIKit/UIKit.h>
 
-NS_ASSUME_NONNULL_BEGIN
-
 typedef NS_ENUM(NSUInteger, TCTextVerticalAlignment) {
     kTCTextVerticalAlignmentDefault = 0,
     kTCTextVerticalAlignmentTop,
@@ -19,10 +17,16 @@ typedef NS_ENUM(NSUInteger, TCTextVerticalAlignment) {
     kTCTextVerticalAlignmentBottom,
 };
 
+NS_ASSUME_NONNULL_BEGIN
+
 @protocol TCLabelHelperDelegate <NSObject>
 
 @optional
-- (NSString *)copyStringForLabel:(UILabel *)sender;
+- (nullable NSString *)copyStringForLabel:(UILabel *)sender;
+- (nullable NSArray<UIMenuElement *> *)menuItemsForLabel:(UILabel *)sender API_AVAILABLE(ios(13.0));
+
++ (nullable NSString *)copyStringForLabel:(UILabel *)sender;
++ (nullable NSArray<UIMenuElement *> *)menuItemsForLabel:(UILabel *)sender API_AVAILABLE(ios(13.0));
 
 @end
 
@@ -30,8 +34,12 @@ typedef NS_ENUM(NSUInteger, TCTextVerticalAlignment) {
 
 @property (nonatomic, assign) TCTextVerticalAlignment textVerticalAlignment;
 @property (nonatomic, assign) UIEdgeInsets contentEdgeInsets;
-@property (nullable, nonatomic, weak) id<TCLabelHelperDelegate> tc_delegate;
+
+@property (nullable, nonatomic, weak) id<TCLabelHelperDelegate> menuDelegate;
 @property (nonatomic, assign) BOOL copyEnable;
+
++ (nullable id<TCLabelHelperDelegate>)menuDelegate;
++ (void)setMenuDelegate:(id<TCLabelHelperDelegate> _Nullable)menuDelegate;
 
 - (void)showMenu:(CGRect)rect;
 
