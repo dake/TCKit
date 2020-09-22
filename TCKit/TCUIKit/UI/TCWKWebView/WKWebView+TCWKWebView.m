@@ -280,8 +280,8 @@
     // load local request on iOS8, must move files to tmp
     typeof(request) req = request;
 #if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_9_0
-    if (SYSTEM_VERSION_LESS_THAN(@"9.0") &&
-        nil != req.URL && req.URL.isFileURL &&
+    if (@available(iOS 9, *)) {
+    } else if (nil != req.URL && req.URL.isFileURL &&
         ![req.URL.path hasPrefix:NSTemporaryDirectory()]) {
         
         _LocalURLFixer *fixer = objc_getAssociatedObject(self, _cmd);
