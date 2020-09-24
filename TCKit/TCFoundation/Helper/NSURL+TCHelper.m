@@ -683,7 +683,7 @@ static int tc_CCHmacUpdate(void *c, const void *data, CC_LONG len)
 - (BOOL)moveItemMustAtURL:(NSURL *)srcURL toURL:(NSURL *)dstURL error:(NSError **)error
 {
     NSError *err = nil;
-    if ([self moveItemAtURL:srcURL toURL:dstURL error:&err] || 0 == rename(srcURL.fileSystemRepresentation, dstURL.fileSystemRepresentation)) {
+    if ([self moveItemAtURL:srcURL toURL:dstURL error:&err]) {
         return YES;
     }
     
@@ -694,6 +694,15 @@ static int tc_CCHmacUpdate(void *c, const void *data, CC_LONG len)
         if (err.code == NSFileWriteFileExistsError && [err.domain isEqualToString:NSCocoaErrorDomain]) {
             return NO;
         }
+    } else if ([NSFileManager.defaultManager fileExistsAtPath:dstURL.path]) {
+        if (NULL != error) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteFileExistsError userInfo:nil];
+        }
+        return NO;
+    }
+    
+    if (0 == rename(srcURL.fileSystemRepresentation, dstURL.fileSystemRepresentation)) {
+        return YES;
     }
     
     BOOL suc = [self linkCopyItemAtURL:srcURL toURL:dstURL error:NULL];
