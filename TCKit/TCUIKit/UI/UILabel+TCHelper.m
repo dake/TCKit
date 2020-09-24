@@ -27,6 +27,27 @@
     });
 }
 
+- (nullable NSMutableAttributedString *)attributedStringForText:(NSString * _Nullable)text
+{
+    if (text.length < 1) {
+        return nil;
+    }
+  
+    NSMutableDictionary *attributes = NSMutableDictionary.dictionary;
+    NSMutableParagraphStyle *paragraphStyle = NSParagraphStyle.defaultParagraphStyle.mutableCopy;
+    paragraphStyle.lineBreakMode = self.lineBreakMode;
+    attributes[NSParagraphStyleAttributeName] = paragraphStyle;
+    
+    if (nil != self.font) {
+        attributes[NSFontAttributeName] = self.font;
+    }
+    if (nil != self.textColor) {
+        attributes[NSForegroundColorAttributeName] = self.textColor;
+    }
+
+   return [[NSMutableAttributedString alloc] initWithString:text attributes:attributes];
+}
+
 __weak static id<TCLabelHelperDelegate> s_menuDelegate = nil;
 + (nullable id<TCLabelHelperDelegate>)menuDelegate
 {

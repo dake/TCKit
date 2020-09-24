@@ -38,6 +38,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, weak) id<TCLabelHelperDelegate> menuDelegate;
 @property (nonatomic, assign) BOOL copyEnable;
 
+
+- (nullable NSMutableAttributedString *)attributedStringForText:(NSString * _Nullable)text;
+
 + (nullable id<TCLabelHelperDelegate>)menuDelegate;
 + (void)setMenuDelegate:(id<TCLabelHelperDelegate> _Nullable)menuDelegate;
 

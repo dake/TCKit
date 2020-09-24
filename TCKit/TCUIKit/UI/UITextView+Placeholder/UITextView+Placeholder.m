@@ -57,6 +57,37 @@
     [self tc_dealloc];
 }
 
+- (nullable NSMutableAttributedString *)lineBreakedForText:(NSString * _Nullable)text
+{
+    if (text.length < 1) {
+        return nil;
+    }
+  
+    NSMutableDictionary *attributes = NSMutableDictionary.dictionary;
+    NSMutableParagraphStyle *paragraphStyle = NSParagraphStyle.defaultParagraphStyle.mutableCopy;
+    paragraphStyle.lineBreakMode = self.textContainer.lineBreakMode;
+    attributes[NSParagraphStyleAttributeName] = paragraphStyle;
+    
+    if (nil != self.font) {
+        attributes[NSFontAttributeName] = self.font;
+    }
+    if (nil != self.textColor) {
+        attributes[NSForegroundColorAttributeName] = self.textColor;
+    }
+
+   return [[NSMutableAttributedString alloc] initWithString:text attributes:attributes];
+}
+
+- (void)setLineBreakText:(NSString * _Nullable)text
+{
+    if (text.length < 1 || NSLineBreakByWordWrapping == self.textContainer.lineBreakMode) {
+        self.text = text;
+        return;
+    }
+
+    self.attributedText = [self lineBreakedForText:text];
+}
+
 
 #pragma mark - Class Methods
 #pragma mark `defaultPlaceholderColor`

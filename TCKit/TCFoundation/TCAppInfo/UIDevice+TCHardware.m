@@ -1,5 +1,5 @@
 /** Thanks to
-https://github.com/xtcmoons/XTCCategories/blob/6df5718bc3231c268bf8c73e6b41c865fd4670a1/Categories/UIKit/UIDevice%2BXTCAdd.m
+ https://github.com/xtcmoons/XTCCategories/blob/6df5718bc3231c268bf8c73e6b41c865fd4670a1/Categories/UIKit/UIDevice%2BXTCAdd.m
  https://github.com/p709723778/UIDevice-SPPlatform/blob/624d71bb426fc77382c1d527cdd347eed213c7ed/Objective-C/SPPlatform/SPPlatform/UIDevice%2BCategory/UIDevice%2BSPPlatform.m
  https://github.com/lmirosevic/GBDeviceInfo
  https://github.com/SlaunchaMan/Orchard/blob/cf8bb36aa7f1821703b8e7cda3eada1d853c70f5/Orchard-ObjC/iOS/OrchardiOSDevice.m
@@ -58,9 +58,9 @@ static NSString *s_device_names[kTCDeviceCount] = {
     [kTCDeviceXS] = @"iPhone XS",
     [kTCDeviceXSMax] = @"iPhone XS Max",
     
-    [kTCDevice11] = @"iPhone 11",
-    [kTCDevice11Pro] = @"iPhone 11 Pro",
-    [kTCDevice11ProMax] = @"iPhone 11 Pro MAX",
+    [kTCDevice11iPhone] = @"iPhone 11",
+    [kTCDevice11ProiPhone] = @"iPhone 11 Pro",
+    [kTCDevice11ProMaxiPhone] = @"iPhone 11 Pro Max",
     [kTCDeviceSE2iPhone] = @"iPhone SE 2",
     
     
@@ -99,19 +99,19 @@ static NSString *s_device_names[kTCDeviceCount] = {
     [kTCDeviceUnknowniPad] = @"Unknown iPad",
     
     // iPad pro
-    [kTCDevice1GiPadPro9_7] = @"iPad Pro 1 (9.7 inch)",
-    [kTCDevice1GiPadPro12_9] = @"iPad Pro 1 (12.9 inch)",
+    [kTCDevice1GiPadPro9_7] = @"iPad Pro 1 (9.7-inch)",
+    [kTCDevice1GiPadPro12_9] = @"iPad Pro 1 (12.9-inch)",
     
-    [kTCDevice1GiPadPro10_5] = @"iPad Pro 1 (10.5 inch)",
-    [kTCDevice2GiPadPro12_9] = @"iPad Pro 2 (12.9 inch)",
+    [kTCDevice1GiPadPro10_5] = @"iPad Pro 1 (10.5-inch)",
+    [kTCDevice2GiPadPro12_9] = @"iPad Pro 2 (12.9-inch)",
 
-    [kTCDevice1GiPadPro11] = @"iPad Pro 1 (11 inch)",
-    [kTCDevice1GiPadPro11_1TB] = @"iPad Pro 1 (11 inch, 1TB)",
-    [kTCDevice3GiPadPro12_9] = @"iPad Pro 3 (12.9 inch)",
-    [kTCDevice3GiPadPro12_9_1TB] = @"iPad Pro 3 (12.9 inch, 1TB)",
+    [kTCDevice1GiPadPro11] = @"iPad Pro 1 (11-inch)",
+    [kTCDevice1GiPadPro11_1TB] = @"iPad Pro 1 (11-inch, 1TB)",
+    [kTCDevice3GiPadPro12_9] = @"iPad Pro 3 (12.9-inch)",
+    [kTCDevice3GiPadPro12_9_1TB] = @"iPad Pro 3 (12.9-inch, 1TB)",
     
-    [kTCDevice2GiPadPro11] = @"iPad Pro 2 (11 inch)",
-    [kTCDevice4GiPadPro12_9] = @"iPad Pro 4 (12.9 inch)",
+    [kTCDevice2GiPadPro11] = @"iPad Pro 2 (11-inch)",
+    [kTCDevice4GiPadPro12_9] = @"iPad Pro 4 (12.9-inch)",
     
     // Apple TV
     [kTCDeviceAppleTV2] = @"Apple TV 2",
@@ -302,13 +302,13 @@ static NSString *s_device_names[kTCDeviceCount] = {
         NSInteger subVersion = [[[platform componentsSeparatedByString:@","] lastObject] integerValue];
         switch (subVersion) {
             case 1:
-                return kTCDevice11;
+                return kTCDevice11iPhone;
                 
             case 3:
-                return kTCDevice11Pro;
+                return kTCDevice11ProiPhone;
                 
             case 5:
-                return kTCDevice11ProMax;
+                return kTCDevice11ProMaxiPhone;
                 
             case 8:
                 return kTCDeviceSE2iPhone;

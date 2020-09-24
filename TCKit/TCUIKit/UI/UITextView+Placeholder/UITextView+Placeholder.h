@@ -37,6 +37,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (UIColor *)defaultPlaceholderColor;
 
+- (void)setLineBreakText:(NSString * _Nullable)text;
+- (nullable NSMutableAttributedString *)lineBreakedForText:(NSString * _Nullable)text;
+
 @end
 
 
