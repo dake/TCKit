@@ -426,6 +426,12 @@ forHTTPHeaderField:(NSString *)field;
 
 @end
 
+
+@interface AFMultipartBodyStream : NSInputStream <NSCopying>
+
+
+@end
+
 #pragma mark -
 
 ///----------------

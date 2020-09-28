@@ -644,19 +644,30 @@ NSTimeInterval const kAFUploadStream3GSuggestedDelay = 0.2;
         maxLength:(NSUInteger)length;
 @end
 
-@interface AFMultipartBodyStream : NSInputStream <NSStreamDelegate>
+#pragma mark -
+
+@interface AFMultipartBodyStream () <NSStreamDelegate>
+
 @property (nonatomic, assign) NSUInteger numberOfBytesInPacket;
 @property (nonatomic, assign) NSTimeInterval delay;
-@property (nonatomic, strong) NSInputStream *inputStream;
+//@property (nonatomic, strong) NSInputStream *inputStream;
 @property (readonly, nonatomic, assign) unsigned long long contentLength;
 @property (readonly, nonatomic, assign, getter = isEmpty) BOOL empty;
 
 - (instancetype)initWithStringEncoding:(NSStringEncoding)encoding;
 - (void)setInitialAndFinalBoundaries;
 - (void)appendHTTPBodyPart:(AFHTTPBodyPart *)bodyPart;
+
+@property (readwrite, nonatomic, assign) NSStringEncoding stringEncoding;
+@property (readwrite, nonatomic, strong) NSMutableArray<AFHTTPBodyPart *> *HTTPBodyParts;
+@property (readwrite, nonatomic, strong) NSEnumerator *HTTPBodyPartEnumerator;
+@property (readwrite, nonatomic, strong) AFHTTPBodyPart *currentHTTPBodyPart;
+@property (readwrite, nonatomic, strong) NSOutputStream *outputStream;
+@property (readwrite, nonatomic, strong) NSMutableData *buffer;
+
+
 @end
 
-#pragma mark -
 
 @interface AFStreamingMultipartFormData ()
 @property (readwrite, nonatomic, copy) NSMutableURLRequest *request;
@@ -847,14 +858,6 @@ NSTimeInterval const kAFUploadStream3GSuggestedDelay = 0.2;
 @property (readwrite, copy) NSError *streamError;
 @end
 
-@interface AFMultipartBodyStream () <NSCopying>
-@property (readwrite, nonatomic, assign) NSStringEncoding stringEncoding;
-@property (readwrite, nonatomic, strong) NSMutableArray *HTTPBodyParts;
-@property (readwrite, nonatomic, strong) NSEnumerator *HTTPBodyPartEnumerator;
-@property (readwrite, nonatomic, strong) AFHTTPBodyPart *currentHTTPBodyPart;
-@property (readwrite, nonatomic, strong) NSOutputStream *outputStream;
-@property (readwrite, nonatomic, strong) NSMutableData *buffer;
-@end
 
 @implementation AFMultipartBodyStream
 #if (defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000) || (defined(__MAC_OS_X_VERSION_MAX_ALLOWED) && __MAC_OS_X_VERSION_MAX_ALLOWED >= 1100)
@@ -871,20 +874,20 @@ NSTimeInterval const kAFUploadStream3GSuggestedDelay = 0.2;
 
     self.stringEncoding = encoding;
     self.HTTPBodyParts = NSMutableArray.array;
-    self.numberOfBytesInPacket = NSIntegerMax;
+    self.numberOfBytesInPacket = NSUIntegerMax;
 
     return self;
 }
 
 - (void)setInitialAndFinalBoundaries {
-    if ([self.HTTPBodyParts count] > 0) {
+    if (self.HTTPBodyParts.count > 0) {
         for (AFHTTPBodyPart *bodyPart in self.HTTPBodyParts) {
             bodyPart.hasInitialBoundary = NO;
             bodyPart.hasFinalBoundary = NO;
         }
 
-        [[self.HTTPBodyParts firstObject] setHasInitialBoundary:YES];
-        [[self.HTTPBodyParts lastObject] setHasFinalBoundary:YES];
+        self.HTTPBodyParts.firstObject.hasInitialBoundary = YES;
+        self.HTTPBodyParts.lastObject.hasFinalBoundary = YES;
     }
 }
 
@@ -893,7 +896,7 @@ NSTimeInterval const kAFUploadStream3GSuggestedDelay = 0.2;
 }
 
 - (BOOL)isEmpty {
-    return [self.HTTPBodyParts count] == 0;
+    return self.HTTPBodyParts.count < 1;
 }
 
 #pragma mark - NSInputStream
@@ -901,7 +904,7 @@ NSTimeInterval const kAFUploadStream3GSuggestedDelay = 0.2;
 - (NSInteger)read:(uint8_t *)buffer
         maxLength:(NSUInteger)length
 {
-    if ([self streamStatus] == NSStreamStatusClosed) {
+    if (NSStreamStatusClosed == self.streamStatus) {
         return 0;
     }
 
@@ -938,7 +941,7 @@ NSTimeInterval const kAFUploadStream3GSuggestedDelay = 0.2;
 }
 
 - (BOOL)hasBytesAvailable {
-    return [self streamStatus] == NSStreamStatusOpen;
+    return NSStreamStatusOpen == self.streamStatus;
 }
 
 #pragma mark - NSStream
@@ -951,11 +954,12 @@ NSTimeInterval const kAFUploadStream3GSuggestedDelay = 0.2;
     self.streamStatus = NSStreamStatusOpen;
 
     [self setInitialAndFinalBoundaries];
-    self.HTTPBodyPartEnumerator = [self.HTTPBodyParts objectEnumerator];
+    self.HTTPBodyPartEnumerator = self.HTTPBodyParts.objectEnumerator;
 }
 
 - (void)close {
     self.streamStatus = NSStreamStatusClosed;
+    self.HTTPBodyPartEnumerator = nil;
 }
 
 - (id)propertyForKey:(__unused NSString *)key {
@@ -1052,9 +1056,8 @@ typedef enum {
 }
 
 - (void)dealloc {
-    if (_inputStream) {
+    if (nil != _inputStream) {
         [_inputStream close];
-        _inputStream = nil;
     }
 }
 
@@ -1169,7 +1172,7 @@ typedef enum {
 
     _phaseReadOffset += range.length;
 
-    if (((NSUInteger)_phaseReadOffset) >= [data length]) {
+    if (((NSUInteger)_phaseReadOffset) >= data.length) {
         [self transitionToNextPhase];
     }
 
@@ -1177,34 +1180,36 @@ typedef enum {
 }
 
 - (BOOL)transitionToNextPhase {
-    if (![[NSThread currentThread] isMainThread]) {
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            [self transitionToNextPhase];
-        });
+//    if (![[NSThread currentThread] isMainThread]) {
+//        dispatch_sync(dispatch_get_main_queue(), ^{
+//            [self transitionToNextPhase];
+//        });
+//        return YES;
+//    }
+    
+    @synchronized (self) {
+        switch (_phase) {
+            case AFEncapsulationBoundaryPhase:
+                _phase = AFHeaderPhase;
+                break;
+            case AFHeaderPhase:
+                [self.inputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+                [self.inputStream open];
+                _phase = AFBodyPhase;
+                break;
+            case AFBodyPhase:
+                [self.inputStream close];
+                _phase = AFFinalBoundaryPhase;
+                break;
+            case AFFinalBoundaryPhase:
+            default:
+                _phase = AFEncapsulationBoundaryPhase;
+                break;
+        }
+        _phaseReadOffset = 0;
+        
         return YES;
     }
-
-    switch (_phase) {
-        case AFEncapsulationBoundaryPhase:
-            _phase = AFHeaderPhase;
-            break;
-        case AFHeaderPhase:
-            [self.inputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
-            [self.inputStream open];
-            _phase = AFBodyPhase;
-            break;
-        case AFBodyPhase:
-            [self.inputStream close];
-            _phase = AFFinalBoundaryPhase;
-            break;
-        case AFFinalBoundaryPhase:
-        default:
-            _phase = AFEncapsulationBoundaryPhase;
-            break;
-    }
-    _phaseReadOffset = 0;
-
-    return YES;
 }
 
 #pragma mark - NSCopying
