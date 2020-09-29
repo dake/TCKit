@@ -282,16 +282,21 @@ static uLong tc_file_crc(NSURL *url, uLong (*fun_init)(uLong crc, const Bytef *b
 
 + (nullable NSURL *)availableURLWithName:(NSString *)name at:(NSURL *)dir
 {
+    return [self availableURLWithName:name at:dir isDirectory:NO];
+}
+
++ (nullable NSURL *)availableURLWithName:(NSString *)name at:(NSURL *)dir isDirectory:(BOOL)isDir
+{
     NSString *fileName = name;
     NSString *ext = nil;
     NSString *rawName = [fileName stringByDeletingFixedPathExtension:&ext];
-    NSURL *dst = [dir URLByAppendingPathComponent:fileName];
+    NSURL *dst = [dir URLByAppendingPathComponent:fileName isDirectory:isDir];
     int i = 2;
     while (nil != dst && [NSFileManager.defaultManager fileExistsAtPath:dst.path]) {
         if (ext.length > 0) {
-            dst = [dir URLByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d.%@", rawName, i++, ext]];
+            dst = [dir URLByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d.%@", rawName, i++, ext] isDirectory:isDir];
         } else {
-            dst = [dir URLByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", rawName, i++]];
+            dst = [dir URLByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", rawName, i++] isDirectory:isDir];
         }
     }
     return dst;
