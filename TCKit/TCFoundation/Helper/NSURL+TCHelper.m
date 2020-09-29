@@ -280,6 +280,23 @@ static uLong tc_file_crc(NSURL *url, uLong (*fun_init)(uLong crc, const Bytef *b
     return url;
 }
 
++ (nullable NSURL *)availableURLWithName:(NSString *)name at:(NSURL *)dir
+{
+    NSString *fileName = name;
+    NSString *ext = nil;
+    NSString *rawName = [fileName stringByDeletingFixedPathExtension:&ext];
+    NSURL *dst = [dir URLByAppendingPathComponent:fileName];
+    int i = 2;
+    while (nil != dst && [NSFileManager.defaultManager fileExistsAtPath:dst.path]) {
+        if (ext.length > 0) {
+            dst = [dir URLByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d.%@", rawName, i++, ext]];
+        } else {
+            dst = [dir URLByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", rawName, i++]];
+        }
+    }
+    return dst;
+}
+
 - (nullable NSURL *)URLByAppendingPathExtensionMust:(NSString *)str
 {
     if (nil == str || str.length < 1) {
@@ -789,18 +806,7 @@ static int tc_CCHmacUpdate(void *c, const void *data, CC_LONG len)
                     if (nil != item && [NSFileManager.defaultManager isReadableFileAtPath:item.path]) {
                         NSURL *dirURL = [NSObject defaultTmpDirectoryInDomain:@"tc_pasteboard_shared" create:YES];
                         if (nil != dirURL) {
-                            NSString *fileName = item.lastPathComponent;
-                            NSString *ext = nil;
-                            NSString *rawName = [fileName stringByDeletingFixedPathExtension:&ext];
-                            NSURL *tmpURL = [dirURL URLByAppendingPathComponent:fileName];
-                            int i = 2;
-                            while (nil != tmpURL && [NSFileManager.defaultManager fileExistsAtPath:tmpURL.path]) {
-                                if (ext.length > 0) {
-                                    tmpURL = [dirURL URLByAppendingPathComponent:[rawName stringByAppendingFormat:@" %d.%@", i++, ext]];
-                                } else {
-                                    tmpURL = [dirURL URLByAppendingPathComponent:[rawName stringByAppendingFormat:@" %d", i++]];
-                                }
-                            }
+                            NSURL *tmpURL = [NSURL availableURLWithName:item.lastPathComponent at:dirURL];
                             if (nil != tmpURL && [NSFileManager.defaultManager linkCopyItemAtURL:item toURL:tmpURL error:NULL]) {
                                 fileURL = tmpURL;
                             }
@@ -842,19 +848,8 @@ static int tc_CCHmacUpdate(void *c, const void *data, CC_LONG len)
     if (nil == dirURL) {
         return nil;
     }
-    
-    NSString *fileName = suggestedName ?: NSUUID.UUID.UUIDString;
-    NSString *ext = nil;
-    NSString *rawName = [fileName stringByDeletingFixedPathExtension:&ext];
-    NSURL *tmpURL = [dirURL URLByAppendingPathComponent:fileName];
-    int i = 2;
-    while (nil != tmpURL && [NSFileManager.defaultManager fileExistsAtPath:tmpURL.path]) {
-        if (ext.length > 0) {
-            tmpURL = [dirURL URLByAppendingPathComponent:[rawName stringByAppendingFormat:@" %d.%@", i++, ext]];
-        } else {
-            tmpURL = [dirURL URLByAppendingPathComponent:[rawName stringByAppendingFormat:@" %d", i++]];
-        }
-    }
+
+    NSURL *tmpURL = [NSURL availableURLWithName:suggestedName ?: NSUUID.UUID.UUIDString at:dirURL];
     if (nil != tmpURL && [data writeToURL:tmpURL atomically:YES]) {
         return tmpURL;
     }
