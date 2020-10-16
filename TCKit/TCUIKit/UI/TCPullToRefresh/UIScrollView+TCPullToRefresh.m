@@ -314,6 +314,9 @@ static char const kHeaderClassKey;
         refreshHeaderView = [[self.headerClass alloc] initWithFrame:frame];
         refreshHeaderView.delegate = self;
         refreshHeaderView.contentInset = self.contentInset;
+        if (@available(iOS 11, *)) {
+            self.refreshHeaderView.adjustedContentInset = self.adjustedContentInset;
+        }
         refreshHeaderView.tag = kHeaderTag;
         [self addSubview:refreshHeaderView];
         
@@ -369,10 +372,13 @@ static char const kHeaderClassKey;
 {
     self.reloading = YES;
     self.loadType = kTCRefreshPages;
-    
     if (nil != self.refreshHeaderView && self.refreshEnabled) {
         if (animated) {
             self.refreshHeaderView.contentInset = self.contentInset;
+            if (@available(iOS 11, *)) {
+                self.refreshHeaderView.adjustedContentInset = self.adjustedContentInset;
+            }
+           
             [self.refreshHeaderView showRefreshView:self];
         }
     }
