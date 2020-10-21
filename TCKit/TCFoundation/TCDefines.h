@@ -55,14 +55,22 @@ NS_INLINE BOOL IS_IPAD(void)
 
 NS_INLINE BOOL IS_MAC(void)
 {
-    if (@available(macOS 11, iOS 1024, *)) {
-        return YES;
-    }
-    
-    if (@available(iOS 14, *)) {
-        return UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomMac;
-    }
-    return NO;
+    static BOOL flag = NO;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        if (@available(iOS 14, macOS 11, *)) {
+            if (UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomMac
+                || NSProcessInfo.processInfo.iOSAppOnMac) {
+                flag = YES;
+            }
+        } else if (@available(iOS 13, macOS 10.5, *)) {
+            if (NSProcessInfo.processInfo.macCatalystApp) {
+                flag = YES;
+            }
+        }
+    });
+
+    return flag;
 }
 
 NS_INLINE NSComparisonResult COMPARE_SYSTEM_VERSION(NSString *v)

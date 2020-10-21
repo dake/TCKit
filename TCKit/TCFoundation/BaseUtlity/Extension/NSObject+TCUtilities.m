@@ -33,6 +33,7 @@ BOOL tcSwizzleMethod(TCSwizzleInput input, id block, IMP *origIMP, NSError **err
     Method (*getMethod)(Class cls, SEL name) = input.isClassMethod ? class_getClassMethod : class_getInstanceMethod;
     
     Method m1 = getMethod(input.klass, input.srcSel);
+    NSCParameterAssert(m1);
     if (NULL == m1) {
         if (NULL != err) {
             NSError *error = [NSError errorWithDomain:@"swizzle.TCKit" code:-2 userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"no original method: %@, swizzle is unnecessary!", NSStringFromSelector(input.srcSel)]}];
@@ -48,7 +49,7 @@ BOOL tcSwizzleMethod(TCSwizzleInput input, id block, IMP *origIMP, NSError **err
     if (NULL == input.dstSel) {
         input.dstSel = NSSelectorFromString([NSString stringWithFormat:@"tc_%@", NSStringFromSelector(input.srcSel)]);
     }
-    
+    NSCParameterAssert(input.dstSel);
     
     Method m2 = getMethod(input.klass, input.dstSel);
     if (nil != block) {
@@ -56,6 +57,10 @@ BOOL tcSwizzleMethod(TCSwizzleInput input, id block, IMP *origIMP, NSError **err
         if (NULL == m2) {
             m2 = getMethod(klass, input.dstSel);
         }
+    }
+    NSCParameterAssert(m2);
+    if (NULL == m2) {
+        return NO;
     }
     
     if (class_addMethod(klass, input.srcSel, method_getImplementation(m2), method_getTypeEncoding(m2))) {
