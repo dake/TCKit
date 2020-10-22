@@ -150,42 +150,42 @@ size_t _TCEndian_readf(FILE *stream, const char *format, ...)
         /* extract field size and byte order */
         switch (*c++) {
             case 'b':
-                size  = 1;
+                size = 1;
                 order = LITTLE_ENDIAN;
                 break;
                 
             case 'B':
-                size  = 1;
+                size = 1;
                 order = BIG_ENDIAN;
                 break;
                 
             case 'w':
-                size  = 2;
+                size = 2;
                 order = LITTLE_ENDIAN;
                 break;
                 
             case 'W':
-                size  = 2;
+                size = 2;
                 order = BIG_ENDIAN;
                 break;
                 
             case 'd':
-                size  = 4;
+                size = 4;
                 order = LITTLE_ENDIAN;
                 break;
                 
             case 'D':
-                size  = 4;
+                size = 4;
                 order = BIG_ENDIAN;
                 break;
                 
             case 'q':
-                size  = 8;
+                size = 8;
                 order = LITTLE_ENDIAN;
                 break;
                 
             case 'Q':
-                size  = 8;
+                size = 8;
                 order = BIG_ENDIAN;
                 break;
                 

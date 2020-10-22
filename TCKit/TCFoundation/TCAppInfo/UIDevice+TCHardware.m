@@ -54,9 +54,9 @@ static NSString *s_device_names[kTCDeviceCount] = {
     [kTCDevice8PlusiPhone] = @"iPhone 8 Plus",
     [kTCDeviceXiPhone] = @"iPhone X",
     
-    [kTCDeviceXR] = @"iPhone XR",
-    [kTCDeviceXS] = @"iPhone XS",
-    [kTCDeviceXSMax] = @"iPhone XS Max",
+    [kTCDeviceXR] = @"iPhone Xr",
+    [kTCDeviceXS] = @"iPhone Xs",
+    [kTCDeviceXSMax] = @"iPhone Xs Max",
     
     [kTCDevice11iPhone] = @"iPhone 11",
     [kTCDevice11ProiPhone] = @"iPhone 11 Pro",
@@ -1073,7 +1073,7 @@ static NSString *s_device_names[kTCDeviceCount] = {
 //        if(((rt->rtm_addrs & (RTA_DST|RTA_GATEWAY)) == (RTA_DST|RTA_GATEWAY))
 //           && sa_tab[RTAX_DST]->sa_family == AF_INET
 //           && sa_tab[RTAX_GATEWAY]->sa_family == AF_INET) {
-//            unsigned char octet[4]  = {0,0,0,0};
+//            unsigned char octet[4] = {0,0,0,0};
 //            int i;
 //            for (i=0; i<4; i++) {
 //                octet[i] = ( ((struct sockaddr_in *)(sa_tab[RTAX_GATEWAY]))->sin_addr.s_addr >> (i*8) ) & 0xFF;
