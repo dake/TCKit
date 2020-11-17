@@ -2183,7 +2183,7 @@
 		B76D742B1F1315A400CF77FA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1210;
+				LastUpgradeCheck = 1220;
 				ORGANIZATIONNAME = PixelCyber;
 				TargetAttributes = {
 					B72A5F561F1F4066002D900D = {
