@@ -29,4 +29,8 @@ enum {
 
 #import "TCWKWebView.h"
 
+#ifndef TARGET_IS_EXTENSION
+#import "UIApplication+TCHelper.h"
+#endif
+
 #endif /* TCUIKit_h */

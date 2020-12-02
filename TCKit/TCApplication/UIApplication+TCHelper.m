@@ -24,18 +24,19 @@ NSString *const kTCUIApplicationDelegateChangedNotification = @"TCUIApplicationD
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
+#if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_10_0
+        if (@available(iOS 10, *)) {
+            
+        } else {
             SEL sel = @selector(openURL:options:completionHandler:);
-            if (NULL == sel) {
-                sel = NSSelectorFromString(@"openURL:options:completionHandler:");
-            }
             Method m1 = class_getInstanceMethod(self, sel);
             
             if (NULL != sel && NULL == m1) {
                 IMP handler = imp_implementationWithBlock(^(UIApplication *app, NSURL *url, NSDictionary<NSString *, id> *options, void (^ __nullable completion)(BOOL success)) {
-        #pragma clang diagnostic push
-        #pragma clang diagnostic ignored "-Wdeprecated"
+                    //        #pragma clang diagnostic push
+                    //        #pragma clang diagnostic ignored "-Wdeprecated"
                     BOOL ret = [app openURL:url];
-        #pragma clang diagnostic pop
+                    //        #pragma clang diagnostic pop
                     if (nil != completion) {
                         if (NSThread.isMainThread) {
                             completion(ret);
@@ -51,8 +52,9 @@ NSString *const kTCUIApplicationDelegateChangedNotification = @"TCUIApplicationD
                     NSCAssert(false, @"add %@ failed", NSStringFromSelector(sel));
                 }
             }
-            
-            [self tc_swizzle:@selector(setDelegate:)];
+        }
+#endif
+        [self tc_swizzle:@selector(setDelegate:)];
     });
 }
 
@@ -82,9 +84,9 @@ NSString *const kTCUIApplicationDelegateChangedNotification = @"TCUIApplicationD
     return MIN(size.width, size.height);
 }
 
-- (CGFloat)statusBarHeight
++ (UIInterfaceOrientation)statusBarOrientation
 {
-    return self.class.statusBarHeight;
+    return UIApplication.sharedApplication.statusBarOrientation;
 }
 
 @end

@@ -569,6 +569,9 @@ static NSString *s_device_names[kTCDeviceCount] = {
 
 + (BOOL)cellularAccessable
 {
+    if (IS_MAC()) {
+        return NO;
+    }
     CTTelephonyNetworkInfo *ctInfo = [[CTTelephonyNetworkInfo alloc] init];
     return nil != ctInfo.subscriberCellularProvider && nil != ctInfo.subscriberCellularProvider.carrierName && nil != ctInfo.currentRadioAccessTechnology;
 }

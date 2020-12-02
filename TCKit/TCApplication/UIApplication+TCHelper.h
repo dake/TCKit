@@ -27,7 +27,7 @@ extern NSString *const kTCUIApplicationDelegateChangedNotification;
 @interface UIViewController (UIApplication)
 
 + (CGFloat)statusBarHeight;
-- (CGFloat)statusBarHeight;
++ (UIInterfaceOrientation)statusBarOrientation;
 
 @end
 
