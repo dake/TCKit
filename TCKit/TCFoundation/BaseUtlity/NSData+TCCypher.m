@@ -768,10 +768,12 @@ static uint8_t nibbleFromChar(unichar c) {
     
     for (NSUInteger i = 0; i < len; i++, b++) {
         if (b[0] == '=' && i+1 < len && b[1] == '\n') {
-            b++,i++;
+            b++;
+            i++;
             continue;
         } else if (*b == '=' && i+2 < len) {
-            b++, i++;
+            b++;
+            i++;
             if (*b >= 'A' && *b <= 'F') {
                 ch = 16*(*b-'A'+10);
             } else if (*b >= 'a' && *b <= 'f') {
@@ -780,7 +782,8 @@ static uint8_t nibbleFromChar(unichar c) {
                 ch = 16*(*b-'0');
             }
             
-            b++, i++;
+            b++;
+            i++;
             
             if (*b >= 'A' && *b <= 'F') {
                 ch += *b-'A'+10;

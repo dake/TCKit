@@ -633,7 +633,8 @@ static CGImageRef TC_CGImageCreateOrientationUp(UIImage *img, CGBitmapInfo destB
     }
     
     vImageScale_ARGB8888(&saBuffer, &inBuffer, NULL, kvImageEdgeExtend);
-    free(saBuffer.data), saBuffer.data = NULL;
+    free(saBuffer.data);
+    saBuffer.data = NULL;
     
     // create vImage_Buffer for output
     vImage_Buffer outBuffer = inBuffer;
@@ -652,7 +653,8 @@ static CGImageRef TC_CGImageCreateOrientationUp(UIImage *img, CGBitmapInfo destB
     ?: vImageBoxConvolve_ARGB8888(&outBuffer, &inBuffer, NULL, 0, 0, boxSize, boxSize, NULL, kvImageEdgeExtend)
     ?: vImageBoxConvolve_ARGB8888(&inBuffer, &outBuffer, NULL, 0, 0, boxSize, boxSize, NULL, kvImageEdgeExtend);
     
-    free(inBuffer.data), inBuffer.data = NULL;
+    free(inBuffer.data);
+    inBuffer.data = NULL;
     if (error) {
         CGColorSpaceRelease(colorSpace);
         return nil;

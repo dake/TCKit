@@ -321,7 +321,8 @@ static TCMappingMeta *metaForProperty(objc_property_t property, Class klass, NSA
     }
     
     if (NULL != attrs) {
-        free(attrs), attrs = NULL;
+        free(attrs);
+        attrs = NULL;
     }
     
     if (tc_isObjForInfo(info) && !tc_isNoClassObj(tc_typeForInfo(info)) && Nil == typeClass) {

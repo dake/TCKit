@@ -87,7 +87,8 @@
         return;
     }
     
-    [_timer invalidate], _timer = nil;
+    [_timer invalidate];
+    _timer = nil;
     [self complete:NO];
 }
 
