@@ -10,28 +10,51 @@
 
 @implementation NSBundle (TCHelper)
 
-+ (instancetype)hostMainBundle
+//+ (nullable NSBundle *)hostMainBundle
+//{
+//    static NSBundle *s_bundle = nil;
+//    static dispatch_once_t onceToken;
+//    dispatch_once(&onceToken, ^{
+//        NSBundle *bundle = NSBundle.mainBundle;
+//        if ([bundle.bundleURL.pathExtension isEqualToString:@"appex"]) {
+//            NSURL *url = bundle.bundleURL.URLByDeletingLastPathComponent.URLByDeletingLastPathComponent;
+//            NSBundle *bundle2 = [NSBundle bundleWithURL:url];
+////            NSCParameterAssert(bundle2);
+//            if (nil != bundle2) {
+//                s_bundle = bundle2;
+//            } else {
+//                DLog(@"hostMainBundle == nil");
+//            }
+//        } else if ([bundle.bundleURL.pathExtension isEqualToString:@"app"]) {
+//            s_bundle = bundle;
+//        }
+//    });
+//    return s_bundle;
+//}
+
+- (BOOL)isHostMainBundle
 {
-    static NSBundle *s_bundle = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        s_bundle = NSBundle.mainBundle;
-        if ([s_bundle.bundleURL.pathExtension isEqualToString:@"appex"]) {
-            NSURL *url = s_bundle.bundleURL.URLByDeletingLastPathComponent.URLByDeletingLastPathComponent;
-            NSBundle *bundle = [NSBundle bundleWithURL:url];
-            if (nil != bundle) {
-                s_bundle = bundle;
-            }
+    return [self.bundleURL.pathExtension isEqualToString:@"app"];
+//    return [NSBundle.hostMainBundle isEqual:self];
+}
+
++ (nullable NSString *)hostMainBundleIdentifier
+{
+    NSBundle *bundle = NSBundle.mainBundle;
+    if (bundle.isHostMainBundle) {
+        return bundle.bundleIdentifier;
+    }
+    NSString *str = bundle.bundleIdentifier;
+    NSRange range = [str rangeOfString:@"." options:NSBackwardsSearch];
+    if (NSNotFound == range.location) {
+        if ([str isEqual:@"*"]) {
+            return str;
         }
-    });
-    return s_bundle;
+        return nil;
+    }
+    
+    return [str substringToIndex:range.location];
 }
-
-+ (BOOL)isHostMainBundle
-{
-    return [NSBundle.mainBundle isEqual:self.hostMainBundle];
-}
-
 
 - (nullable NSString *)bundleVersion
 {
@@ -48,11 +71,6 @@
     return [self objectForInfoDictionaryKey:(id)kCFBundleNameKey];
 }
 
-//- (nullable NSString *)bundleIdentifier
-//{
-//    return [self objectForInfoDictionaryKey:(id)kCFBundleIdentifierKey];
-//}
-
 - (nullable NSString *)displayName
 {
     NSString *name = [self objectForInfoDictionaryKey:@"CFBundleDisplayName"];
@@ -61,11 +79,15 @@
 
 @end
 
-@implementation UIImage (AppExtension)
-
-+ (UIImage *)hostMainBundleImageNamed:(NSString *)name
-{
-    return [UIImage imageNamed:name inBundle:NSBundle.hostMainBundle compatibleWithTraitCollection:nil];
-}
-
-@end
+//@implementation UIImage (AppExtension)
+//
+//+ (UIImage *)hostMainBundleImageNamed:(NSString *)name
+//{
+//    NSBundle *bundle = NSBundle.hostMainBundle;
+//    if (nil == bundle) {
+//        return nil;
+//    }
+//    return [UIImage imageNamed:name inBundle:bundle compatibleWithTraitCollection:nil];
+//}
+//
+//@end

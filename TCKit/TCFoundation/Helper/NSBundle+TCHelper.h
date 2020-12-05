@@ -13,23 +13,23 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSBundle (TCHelper)
 
-+ (instancetype)hostMainBundle;
-+ (BOOL)isHostMainBundle;
+//+ (nullable NSBundle *)hostMainBundle;
++ (nullable NSString *)hostMainBundleIdentifier;
+- (BOOL)isHostMainBundle;
 
 - (nullable NSString *)bundleVersion;
 - (nullable NSString *)bundleShortVersion;
 - (nullable NSString *)bundleName;
-//- (nullable NSString *)bundleIdentifier;
 - (nullable NSString *)displayName;
 
 
 @end
 
 
-@interface UIImage (AppExtension)
-
-+ (nullable UIImage *)hostMainBundleImageNamed:(NSString *)name NS_AVAILABLE_IOS(8_0);
-
-@end
+//@interface UIImage (AppExtension)
+//
+//+ (nullable UIImage *)hostMainBundleImageNamed:(NSString *)name NS_AVAILABLE_IOS(8_0);
+//
+//@end
 
 NS_ASSUME_NONNULL_END
