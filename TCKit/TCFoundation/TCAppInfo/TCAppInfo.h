@@ -23,10 +23,6 @@ extern NSString *const kTCApplicationDidReceiveDiskSpaceWarning;
 
 + (NSString *)appVersion:(TCMigrationVersionType)type;
 
-+ (NSString *)bundleName;
-+ (NSString *)displayName;
-+ (NSString *)bundleIdentifier;
-
 + (NSString *)uuidForDevice;
 
 
