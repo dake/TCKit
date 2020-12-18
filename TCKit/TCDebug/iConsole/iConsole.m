@@ -276,8 +276,10 @@ static void exceptionHandler(NSException *exception)
             parentCtrler = parentCtrler.presentedViewController;
         }
         [parentCtrler addChildViewController:ctrler];
+        [ctrler beginAppearanceTransition:YES animated:NO];
         [parentCtrler.view addSubview:ctrler.view];
         [ctrler didMoveToParentViewController:parentCtrler];
+        [ctrler endAppearanceTransition];
         
         _animating = YES;
         [UIView beginAnimations:nil context:nil];
@@ -314,9 +316,12 @@ static void exceptionHandler(NSException *exception)
 - (void)consoleHidden
 {
     _animating = NO;
+    
+    [self beginAppearanceTransition:NO animated:NO];
     [self willMoveToParentViewController:nil];
     [self.view removeFromSuperview];
     [self removeFromParentViewController];
+    [self endAppearanceTransition];
 }
 
 - (void)rotateView:(NSNotification *)notification
