@@ -267,7 +267,7 @@ static void exceptionHandler(NSException *exception)
         //            self.navigationController.navigationBar.barStyle = UIBarStyleDefault;
         ////            self.navigationController.navigationBar.hidden = YES;
         //
-        //            UIImage *bgImg = [[UIImage alloc] init];//[UIImage imageWithColor:[UIColor whiteColor] size:CGSizeMake(8, 8)];
+        //            UIImage *bgImg = [[UIImage alloc] init];//[UIImage imageWithColor:UIColor.whiteColor size:CGSizeMake(8, 8)];
         //            [self.navigationController.navigationBar setBackgroundImage:bgImg forBarMetrics:UIBarMetricsDefault];
         //        }
         
