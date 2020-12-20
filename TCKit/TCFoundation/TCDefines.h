@@ -44,6 +44,15 @@ __strong void(^block)(void) __attribute__((cleanup(_tc_blockCleanUp), unused)) =
 
 #pragma mark - UIDevice Helpers
 
+NS_INLINE BOOL IS_IPHONE(void)
+{
+    /*
+     When you do need to know the device type, use higher-level APIs whenever possible.
+     On macOS, the UITraitCollection and UIDevice classes report the following iOS idiom types instead of UIUserInterfaceIdiom.mac
+     */
+    return UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPhone;
+}
+
 NS_INLINE BOOL IS_IPAD(void)
 {
     /*
