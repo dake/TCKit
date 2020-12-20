@@ -28,7 +28,7 @@
 NSString * const AnimatedGIFImageErrorDomain = @"com.compuserve.gif.image.error";
 
 __attribute__((overloadable)) UIImage * UIImageWithAnimatedGIFData(NSData *data) {
-    return UIImageWithAnimatedGIFData(data, [[UIScreen mainScreen] scale], 0.0f, nil);
+    return UIImageWithAnimatedGIFData(data, UIScreen.mainScreen.scale, 0.0f, nil);
 }
 
 __attribute__((overloadable)) UIImage * UIImageWithAnimatedGIFData(NSData *data, CGFloat scale, NSTimeInterval duration, NSError * __autoreleasing *error) {

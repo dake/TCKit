@@ -49,7 +49,7 @@ static char const kAlignmentRectInsetsKey;
 //- (void)viewRoundedRect:(UIView *)itemView byConers:(UIRectCorner)corners
 //{
 //    UIBezierPath *cornerPath = [UIBezierPath bezierPathWithRoundedRect:itemView.bounds byRoundingCorners:corners cornerRadii:CGSizeMake(7.0, 7.0)];
-//    CAShapeLayer *maskLayer = [CAShapeLayer layer];
+//    CAShapeLayer *maskLayer = CAShapeLayer.layer;
 //    maskLayer.frame = itemView.bounds;
 //    maskLayer.path = cornerPath.CGPath;
 //    itemView.layer.mask = maskLayer;
