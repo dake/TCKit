@@ -69,7 +69,8 @@ NS_INLINE BOOL IS_MAC(void)
     dispatch_once(&onceToken, ^{
         if (@available(iOS 14, macOS 11, *)) {
             if (UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomMac
-                || NSProcessInfo.processInfo.iOSAppOnMac) {
+                || ([NSProcessInfo.processInfo respondsToSelector:@selector(isiOSAppOnMac)] && NSProcessInfo.processInfo.isiOSAppOnMac)
+                || NSProcessInfo.processInfo.macCatalystApp) {
                 flag = YES;
             }
         } else if (@available(iOS 13, macOS 10.5, *)) {
