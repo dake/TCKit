@@ -123,7 +123,6 @@ static char const kAlignmentRectInsetsKey;
 @end
 
 
-
 @implementation TCUIAction
 
 - (BOOL)hasNextLevelMenu
@@ -202,8 +201,10 @@ static char const kAlignmentRectInsetsKey;
     }
     
     NSCParameterAssert(nil == self.handler);
+    BOOL reverse = self.reverseOrder;
     NSMutableArray<UIMenuElement *> *items = NSMutableArray.array;
-    for (TCUIAction *action in self.children) {
+    for (TCUIAction *action in (reverse ? self.children.reverseObjectEnumerator : self.children)) {
+        action.reverseOrder = reverse;
         [items addObject:action.UIMenuElement];
     }
     
@@ -244,7 +245,10 @@ static char const kAlignmentRectInsetsKey;
         action.enabled = 0 == (TCMenuElementAttributesDisabled & attr);
         [items addObject:action];
     }
-    for (TCUIAction *action in self.children) {
+    
+    BOOL reverse = self.reverseOrder;
+    for (TCUIAction *action in (reverse ? self.children.reverseObjectEnumerator : self.children)) {
+        action.reverseOrder = reverse;
         [items addObjectsFromArray:action.UIAlertActions];
     }
     
@@ -280,7 +284,10 @@ static char const kAlignmentRectInsetsKey;
         }];
         [items addObject:action];
     }
-    for (TCUIAction *action in self.children) {
+    
+    BOOL reverse = self.reverseOrder;
+    for (TCUIAction *action in (reverse ? self.children.reverseObjectEnumerator : self.children)) {
+        action.reverseOrder = reverse;
         [items addObjectsFromArray:action.UITableViewRowActions];
     }
     
@@ -289,5 +296,48 @@ static char const kAlignmentRectInsetsKey;
 
 @end
 
+
+@interface TCUIDeferredAction ()
+
+@property (nonatomic, copy) void (^elementProvider)(void (^completion)(NSArray<TCUIAction *> *elements));
+
+@end
+
+@implementation TCUIDeferredAction
+
++ (instancetype)elementWithProvider:(void (^)(void (^completion)(NSArray<TCUIAction *> *elements)))elementProvider
+{
+    NSCParameterAssert(elementProvider);
+    TCUIDeferredAction *action = [[self alloc] init];
+    action.elementProvider = elementProvider;
+    
+    return action;
+}
+
+- (__kindof UIMenuElement *)UIMenuElement
+{
+    UIDeferredMenuElement *item = [UIDeferredMenuElement elementWithProvider:^(void (^ _Nonnull completion)(NSArray<UIMenuElement *> * _Nonnull)) {
+        // force retain
+        __weak typeof(self) wSelf = self;
+        self.elementProvider(^(NSArray<TCUIAction *> *elements) {
+            BOOL reverse = self.reverseOrder;
+            NSMutableArray<UIMenuElement *> *arry = NSMutableArray.array;
+            for (TCUIAction *action in (reverse ? elements.reverseObjectEnumerator : elements)) {
+                action.reverseOrder = reverse;
+                [arry addObject:action.UIMenuElement];
+            }
+            UIImage *icon = nil != wSelf.imageBlock ? wSelf.imageBlock() : nil;
+            if (nil != icon || wSelf.title.length > 0) {
+                UIMenu *menu = [UIMenu menuWithTitle:wSelf.title ?: @"" image:icon identifier:wSelf.identifier options:wSelf.UIMenuOptions children:arry];
+                completion(@[menu]);
+            } else {
+                completion(arry);
+            }
+        });
+    }];
+    return item;
+}
+
+@end
 
 #endif

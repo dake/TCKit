@@ -11,7 +11,6 @@
 #import <UIKit/UIKit.h>
 
 
-
 NS_ASSUME_NONNULL_BEGIN
 
 extern NSString *const kTCCellIdentifier;
@@ -67,6 +66,7 @@ typedef void (^TCUIActionHandler)(__kindof TCUIAction *action);
 
 @interface TCUIAction : NSObject
 
+@property (nonatomic, assign) BOOL reverseOrder;
 @property (nonatomic, assign) BOOL menuOnly;
 
 /// Short display title.
@@ -113,6 +113,13 @@ typedef void (^TCUIActionHandler)(__kindof TCUIAction *action);
 // UIMenuItem
 
 // UIBarItem block 封装
+
+@end
+
+
+UIKIT_EXTERN API_AVAILABLE(ios(14.0)) @interface TCUIDeferredAction : TCUIAction
+
++ (instancetype)elementWithProvider:(void (^)(void (^completion)(NSArray<TCUIAction *> *elements)))elementProvider;
 
 @end
 
