@@ -761,9 +761,9 @@ static int tc_CCHmacUpdate(void *c, const void *data, CC_LONG len)
     NSString *utiMust = nil;
     if (NULL == uti || (*uti).length < 1) {
         if (isURL) {
-            utiMust = ((NSURL *)item).isFileURL ? (NSString *)kUTTypeFileURL : (NSString *)kUTTypeURL;
+            utiMust = ((NSURL *)item).isFileURL ? (__bridge NSString *)kUTTypeFileURL : (__bridge NSString *)kUTTypeURL;
         } else {
-            utiMust = (NSString *)kUTTypeData;
+            utiMust = (__bridge NSString *)kUTTypeData;
         }
         *uti = utiMust;
     } else {
