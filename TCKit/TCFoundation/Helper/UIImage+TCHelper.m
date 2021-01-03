@@ -46,9 +46,13 @@
     return [self.class imageWithCGImage:self.CGImage scale:scale orientation:self.imageOrientation];
 }
 
-- (BOOL)hasAlpha
+BOOL tcCGImageHasAlpha(CGImageRef imgRef)
 {
-    switch (CGImageGetAlphaInfo(self.CGImage)) {
+    if (NULL == imgRef) {
+        return NO;
+    }
+    
+    switch (CGImageGetAlphaInfo(imgRef)) {
         case kCGImageAlphaPremultipliedLast:
         case kCGImageAlphaPremultipliedFirst:
         case kCGImageAlphaLast:
@@ -59,5 +63,12 @@
             return NO;
     }
 }
+
+- (BOOL)hasAlpha
+{
+    return tcCGImageHasAlpha(self.CGImage);
+}
+
+
 
 @end

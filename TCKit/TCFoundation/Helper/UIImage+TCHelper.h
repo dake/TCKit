@@ -10,6 +10,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern BOOL tcCGImageHasAlpha(CGImageRef imgRef);
+
 @interface UIImage (TCHelper)
 
 // main bundle
