@@ -717,7 +717,7 @@ static NSString * const AFNSURLSessionTaskDidSuspendNotification = @"com.alamofi
 
 #pragma mark -
 
-- (void)setResponseSerializer:(id <AFURLResponseSerialization>)responseSerializer {
+- (void)setResponseSerializer:(id<AFURLResponseSerialization>)responseSerializer {
     NSCParameterAssert(responseSerializer);
 
     _responseSerializer = responseSerializer;
