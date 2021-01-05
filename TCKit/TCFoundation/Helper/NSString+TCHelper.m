@@ -548,7 +548,7 @@ bool tc_is_ip_addr(char const *host, bool *ipv6)
 + (NSStringEncoding)encodingForIANACharset:(NSString *)iana
 {
     NSStringEncoding encoding = kCFStringEncodingInvalidId;
-    if (nil == iana) {
+    if (iana.length < 1) {
         return encoding;
     }
     
