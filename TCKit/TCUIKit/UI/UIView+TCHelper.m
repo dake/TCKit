@@ -222,13 +222,7 @@ static char const kAlignmentRectInsetsKey;
     if (self.hasNextLevelMenu && nil != self.handler) {
         TCMenuElementAttributes attr = nil != self.attributesWithoutIcon ? self.attributesWithoutIcon.unsignedIntegerValue : self.attributes;
         UIAlertActionStyle style = 0 != (TCMenuOptionsDestructive & self.options) ? UIAlertActionStyleDestructive : (0 != (TCMenuElementAttributesCancel & attr) ? UIAlertActionStyleCancel : UIAlertActionStyleDefault);
-        UIAlertAction *action = [UIAlertAction actionWithTitle:self.titleWithoutIcon ?: self.title style:style handler:^(UIAlertAction * _Nonnull action) {
-            // force retain
-            if (nil != self.handler) {
-                self.handler(self);
-            }
-        }];
-        action.enabled = 0 == (TCMenuElementAttributesDisabled & attr);
+        UIAlertAction *action = [self _convert2UIAlerAction:style attr:attr];
         return @[action];
     }
     
@@ -236,13 +230,7 @@ static char const kAlignmentRectInsetsKey;
     if (self.title.length > 0 && (nil != self.handler || self.children.count < 1)) {
         TCMenuElementAttributes attr = nil != self.attributesWithoutIcon ? self.attributesWithoutIcon.unsignedIntegerValue : self.attributes;
         UIAlertActionStyle style = 0 != (TCMenuElementAttributesDestructive & attr) ? UIAlertActionStyleDestructive : (0 != (TCMenuElementAttributesCancel & attr) ? UIAlertActionStyleCancel : UIAlertActionStyleDefault);
-        UIAlertAction *action = [UIAlertAction actionWithTitle:self.titleWithoutIcon ?: self.title style:style handler:^(UIAlertAction * _Nonnull action) {
-            // force retain
-            if (nil != self.handler) {
-                self.handler(self);
-            }
-        }];
-        action.enabled = 0 == (TCMenuElementAttributesDisabled & attr);
+        UIAlertAction *action = [self _convert2UIAlerAction:style attr:attr];
         [items addObject:action];
     }
     
@@ -253,6 +241,37 @@ static char const kAlignmentRectInsetsKey;
     }
     
     return items;
+}
+
+- (UIAlertAction *)_convert2UIAlerAction:(UIAlertActionStyle)style attr:(TCMenuElementAttributes)attr
+{
+    NSString *title = nil;
+    if (@available(iOS 13, *)) {
+        title = self.title ?: self.titleWithoutIcon;
+    } else {
+        title = self.titleWithoutIcon ?: self.title;
+    }
+    UIAlertAction *action = [UIAlertAction actionWithTitle:title style:style handler:^(UIAlertAction * _Nonnull action) {
+        // force retain
+        if (nil != self.handler) {
+            self.handler(self);
+        }
+    }];
+    action.enabled = 0 == (TCMenuElementAttributesDisabled & attr);
+    
+    // https://github.com/stringcode86/AlertViewController
+    @try {
+        if (nil != self.imageBlock && [action respondsToSelector:@selector(setImage:)]) {
+            UIImage *icon = self.imageBlock();
+            if (nil != icon) {
+                [action setValue:icon forKey:NSStringFromSelector(@selector(image))];
+            }
+        }
+    } @catch (NSException *exception) {
+        
+    } @finally {
+        return action;
+    }
 }
 
 - (NSArray<UITableViewRowAction *> *)UITableViewRowActions
