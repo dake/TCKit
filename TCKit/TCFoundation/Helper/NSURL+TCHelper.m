@@ -423,7 +423,7 @@ static uLong tc_file_crc(NSURL *url, uLong (*fun_init)(uLong crc, const Bytef *b
     }
     
     unsigned long long size = 0;
-    NSURL *url = self.safeURLByResolvingSymlinksInPath;
+    NSURL *url = self;
     NSArray<NSString *> *subPath = [NSFileManager.defaultManager contentsOfDirectoryAtPath:url.path error:NULL];
     if (subPath.count > 0) {
         for (NSString *fileName in subPath) {
