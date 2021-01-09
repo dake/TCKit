@@ -273,7 +273,7 @@ static uLong tc_file_crc(NSURL *url, uLong (*fun_init)(uLong crc, const Bytef *b
 - (NSURL *)safeURLByResolvingSymlinksInPath
 {
     NSURL *url = self.URLByResolvingSymlinksInPath;
-    if (nil == url || [url isEqual:self]) {
+    if (nil == url || [url isEqualToFile:self]) {
         return self;
     }
     
