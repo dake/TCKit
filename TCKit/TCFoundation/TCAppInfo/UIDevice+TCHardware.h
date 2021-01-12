@@ -11,43 +11,49 @@ typedef NS_ENUM(NSInteger, TCDevicePlatform) {
     kTCDeviceSimulatorAppleTV,
     
     
-    kTCDevice1GiPhone,
-    kTCDevice3GiPhone,
-    kTCDevice3GSiPhone,
+    kTCDevice1GiPhone, // 3.5
+    kTCDevice3GiPhone, // 3.5
+    kTCDevice3GSiPhone, // 3.5
     
-    kTCDevice4iPhone,
-    kTCDevice4SiPhone,
+    kTCDevice4iPhone, // 3.5
+    kTCDevice4SiPhone, // 3.5
     
-    kTCDevice5iPhone,
-    kTCDevice5CiPhone,
-    kTCDevice5SiPhone,
+    kTCDevice5iPhone, // 4
+    kTCDevice5CiPhone, // 4
+    kTCDevice5SiPhone, // 4
     
-    kTCDevice6iPhone,
-    kTCDevice6PlusiPhone,
+    kTCDevice6iPhone, // 4.7
+    kTCDevice6PlusiPhone, // 5.5
     
-    kTCDeviceSEiPhone,
-    kTCDevice6SiPhone,
-    kTCDevice6SPlusiPhone,
+    kTCDeviceSEiPhone, // 4
+    kTCDevice6SiPhone, // 4.7
+    kTCDevice6SPlusiPhone, // 5.5
     
-    kTCDevice7iPhone,
-    kTCDevice7PlusiPhone,
+    kTCDevice7iPhone, // 4.7
+    kTCDevice7PlusiPhone, // 5.5
     
-    kTCDevice8iPhone,
-    kTCDevice8PlusiPhone,
-    kTCDeviceXiPhone,
+    kTCDevice8iPhone, // 4.7
+    kTCDevice8PlusiPhone, // 5.5
+    kTCDeviceXiPhone, // 5.8
     
     // 2018
-    kTCDeviceXR,
-    kTCDeviceXS,
-    kTCDeviceXSMax,
+    kTCDeviceiPhoneXR, // 6.1
+    kTCDeviceiPhoneXS, // 5.8
+    kTCDeviceiPhoneXSMax, // 6.5
     
     // 2020
-    kTCDeviceSE2iPhone,
+    kTCDeviceSE2iPhone, // 4.7
     
     // 2019
-    kTCDevice11iPhone,
-    kTCDevice11ProiPhone,
-    kTCDevice11ProMaxiPhone,
+    kTCDevice11iPhone, // 6.1
+    kTCDevice11iPhonePro, // 5.8
+    kTCDevice11iPhoneProMax, // 6.5
+    
+    // 2020
+    kTCDevice12iPhoneMini, // 5.4
+    kTCDevice12iPhone, // 6.1
+    kTCDevice12iPhonePro, // 6.1
+    kTCDevice12iPhoneProMax, // 6.7
     
     kTCDevice1GiPod,
     kTCDevice2GiPod,
@@ -57,20 +63,20 @@ typedef NS_ENUM(NSInteger, TCDevicePlatform) {
     kTCDevice6GiPod,
     kTCDevice7GiPod,
     
-    kTCDevice1GiPad,
-    kTCDevice2GiPad,
-    kTCDevice1GiPadMini,
+    kTCDevice1GiPad, // 9.7
+    kTCDevice2GiPad, // 9.7
+    kTCDevice1GiPadMini, // 7.9
     
-    kTCDevice3GiPad,
-    kTCDevice4GiPad,
-    kTCDevice5GiPad,
+    kTCDevice3GiPad, // 9.7
+    kTCDevice4GiPad, // 9.7
+    kTCDevice5GiPad, // 9.7
     
-    kTCDevice1GiPadAir,
-    kTCDevice2GiPadMini,
-    kTCDevice3GiPadMini,
-    kTCDevice4GiPadMini,
-    
-    kTCDevice2GiPadAir,
+    kTCDevice1GiPadAir, // 9.7
+    kTCDevice2GiPadMini, // 7.9
+    kTCDevice3GiPadMini, // 7.9
+    kTCDevice4GiPadMini, // 7.9
+     
+    kTCDevice2GiPadAir, // 9.7
     
     kTCDevice1GiPadPro9_7,
     kTCDevice1GiPadPro10_5,
@@ -78,21 +84,25 @@ typedef NS_ENUM(NSInteger, TCDevicePlatform) {
     kTCDevice1GiPadPro12_9,
     kTCDevice2GiPadPro12_9,
     
-    kTCDevice5GiPadMini,
-    kTCDevice3GiPadAir,
+    kTCDevice5GiPadMini, // 7.9
+    kTCDevice3GiPadAir, // 10.5
     
     
     // 2018
-    kTCDevice6GiPad,
+    kTCDevice6GiPad, // 9.7
     kTCDevice1GiPadPro11,
     kTCDevice1GiPadPro11_1TB,
     kTCDevice3GiPadPro12_9,
     kTCDevice3GiPadPro12_9_1TB,
     
     // 2019
-    kTCDevice7GiPad,
+    kTCDevice7GiPad, // 10.2
     kTCDevice2GiPadPro11,
     kTCDevice4GiPadPro12_9,
+    
+    // 2020
+    kTCDevice8GiPad, // 10.2
+    kTCDevice4GiPadAir, // 10.9
     
     kTCDeviceAppleTV2,
     kTCDeviceAppleTV3,
@@ -117,14 +127,16 @@ typedef NS_ENUM(NSInteger, TCDeviceFamily) {
 
 typedef NS_ENUM(NSInteger, TCDeviceScreen) {
     kTCDeviceScreenUnknown = 0,
-    kTCDeviceScreen3_5inch,
-    kTCDeviceScreen4inch,
-    kTCDeviceScreen4_7inch,
-    kTCDeviceScreen5_5inch,
-    kTCDeviceScreen5_8inch,
     
-    kTCDeviceScreen6_1inch,
-    kTCDeviceScreen6_5inch,
+    kTCDeviceScreen3_5inch, // 320 x 480 pt
+    kTCDeviceScreen4inch, // 320 x 568 pt
+    kTCDeviceScreen4_7inch, // 375 x 667 pt
+    kTCDeviceScreen5_5inch, // 414 x 736 pt
+    kTCDeviceScreen5_8inch, // 375 x 812 pt
+    
+    kTCDeviceScreen6_1inch, // 390 x 844 pt
+    kTCDeviceScreen6_5inch, // 414pt x 896 pt
+    kTCDeviceScreen6_7inch, // 428 x 926 pt
     
     kTCDeviceScreen7_9inch,
     kTCDeviceScreen9_7inch,

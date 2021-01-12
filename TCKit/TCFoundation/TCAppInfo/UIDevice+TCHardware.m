@@ -54,15 +54,19 @@ static NSString *s_device_names[kTCDeviceCount] = {
     [kTCDevice8PlusiPhone] = @"iPhone 8 Plus",
     [kTCDeviceXiPhone] = @"iPhone X",
     
-    [kTCDeviceXR] = @"iPhone Xr",
-    [kTCDeviceXS] = @"iPhone Xs",
-    [kTCDeviceXSMax] = @"iPhone Xs Max",
+    [kTCDeviceiPhoneXR] = @"iPhone Xr",
+    [kTCDeviceiPhoneXS] = @"iPhone Xs",
+    [kTCDeviceiPhoneXSMax] = @"iPhone Xs Max",
     
     [kTCDevice11iPhone] = @"iPhone 11",
-    [kTCDevice11ProiPhone] = @"iPhone 11 Pro",
-    [kTCDevice11ProMaxiPhone] = @"iPhone 11 Pro Max",
+    [kTCDevice11iPhonePro] = @"iPhone 11 Pro",
+    [kTCDevice11iPhoneProMax] = @"iPhone 11 Pro Max",
     [kTCDeviceSE2iPhone] = @"iPhone SE 2",
     
+    [kTCDevice12iPhoneMini] = @"iPhone 12 mini",
+    [kTCDevice12iPhone] = @"iPhone 12",
+    [kTCDevice12iPhonePro] = @"iPhone 12 Pro",
+    [kTCDevice12iPhoneProMax] = @"iPhone 12 Pro Max",
     
     [kTCDeviceUnknowniPhone] = @"Unknown iPhone",
     
@@ -112,6 +116,9 @@ static NSString *s_device_names[kTCDeviceCount] = {
     
     [kTCDevice2GiPadPro11] = @"iPad Pro 2 (11-inch)",
     [kTCDevice4GiPadPro12_9] = @"iPad Pro 4 (12.9-inch)",
+    
+    [kTCDevice8GiPad] = @"iPad 8 2020",
+    [kTCDevice4GiPadAir] = @"iPad Air 4",
     
     // Apple TV
     [kTCDeviceAppleTV2] = @"Apple TV 2",
@@ -285,14 +292,14 @@ static NSString *s_device_names[kTCDeviceCount] = {
         NSInteger subVersion = [[[platform componentsSeparatedByString:@","] lastObject] integerValue];
         switch (subVersion) {
             case 8:
-                return kTCDeviceXR;
+                return kTCDeviceiPhoneXR;
                 
             case 2:
-                return kTCDeviceXS;
+                return kTCDeviceiPhoneXS;
                 
             case 4:
             case 6:
-                return kTCDeviceXSMax;
+                return kTCDeviceiPhoneXSMax;
                 
             default:
                 break;
@@ -305,13 +312,32 @@ static NSString *s_device_names[kTCDeviceCount] = {
                 return kTCDevice11iPhone;
                 
             case 3:
-                return kTCDevice11ProiPhone;
+                return kTCDevice11iPhonePro;
                 
             case 5:
-                return kTCDevice11ProMaxiPhone;
+                return kTCDevice11iPhoneProMax;
                 
             case 8:
                 return kTCDeviceSE2iPhone;
+                
+            default:
+                break;
+        }
+    }
+    else if ([platform hasPrefix:@"iPhone13,"]) {
+        NSInteger subVersion = [[[platform componentsSeparatedByString:@","] lastObject] integerValue];
+        switch (subVersion) {
+            case 1:
+                return kTCDevice12iPhoneMini;
+                
+            case 2:
+                return kTCDevice12iPhone;
+                
+            case 3:
+                return kTCDevice12iPhonePro;
+                
+            case 4:
+                return kTCDevice12iPhoneProMax;
                 
             default:
                 break;
@@ -427,6 +453,21 @@ static NSString *s_device_names[kTCDeviceCount] = {
             case 4:
                 return kTCDevice3GiPadAir;
                 
+            case 6:
+            case 7:
+                return kTCDevice8GiPad;
+                
+            default:
+                break;
+        }
+    }
+    else if ([platform hasPrefix:@"iPad13,"]) {
+        NSInteger subVersion = [[[platform componentsSeparatedByString:@","] lastObject] integerValue];
+        switch (subVersion) {
+            case 1:
+            case 2:
+                return kTCDevice4GiPadAir;
+                
             default:
                 break;
         }
@@ -491,6 +532,8 @@ static NSString *s_device_names[kTCDeviceCount] = {
         return kTCDeviceScreen5_8inch;
     } else if (screenHeight == 896.0f) {
         return UIScreen.mainScreen.scale > 2.9f ? kTCDeviceScreen6_5inch : kTCDeviceScreen6_1inch;
+    } else if (screenHeight == 926.0f) {
+        return kTCDeviceScreen6_7inch;
     } else if (screenHeight == 1024.0f) {
         TCDevicePlatform plat = self.platformType;
         switch (plat) {
@@ -500,6 +543,7 @@ static NSString *s_device_names[kTCDeviceCount] = {
             case kTCDevice4GiPadMini:
                 return kTCDeviceScreen7_9inch;
                 
+            case kTCDevice3GiPadAir:
             case kTCDevice1GiPadPro10_5:
                 return kTCDeviceScreen10_5inch;
                 
@@ -534,6 +578,8 @@ static NSString *s_device_names[kTCDeviceCount] = {
             return @"6.1〃";
         case kTCDeviceScreen6_5inch:
             return @"6.5〃";
+        case kTCDeviceScreen6_7inch:
+            return @"6.7〃";
         case kTCDeviceScreen7_9inch:
             return @"7.9〃";
         case kTCDeviceScreen9_7inch:
