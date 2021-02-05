@@ -841,19 +841,26 @@ static NSString *s_device_names[kTCDeviceCount] = {
         return nil;
     }
     
-    if ((kTCNetworkInterfaceTypeUSB == type || kTCNetworkInterfaceTypeBluetooth == type)
-        // iPod, iPad, >= iOS11
-        && !UIDevice.hasCellular
-        && [UIDevice.currentDevice.systemVersion compare:@"11" options:NSNumericSearch] != NSOrderedAscending) {
-        if (kTCNetworkInterfaceTypeUSB == type) {
-            type = kTCNetworkInterfaceTypeBluetooth;
-        } else {
-            type = kTCNetworkInterfaceTypeUSB;
+    // iPod, iPad, >= iOS11
+    if (@available(iOS 11, *)) {
+        if ((kTCNetworkInterfaceTypeUSB == type || kTCNetworkInterfaceTypeBluetooth == type)
+            && !UIDevice.hasCellular) {
+            if (kTCNetworkInterfaceTypeUSB == type) {
+                type = kTCNetworkInterfaceTypeBluetooth;
+            } else {
+                type = kTCNetworkInterfaceTypeUSB;
+            }
         }
     }
     
+    const char *ifType = NULL;
+    if (kTCNetworkInterfaceTypeWiFi == type && IS_MAC()) {
+        ifType = "en1";
+    } else {
+        ifType = kMap[type];
+    }
+    
     __block BOOL v6 = NO;
-    const char *ifType = kMap[type];
     __block NSString *ip = nil;
     [self enumerateNetworkInterfaces:^(struct ifaddrs * _Nonnull addr, BOOL * _Nonnull stop) {
         unsigned int flags = addr->ifa_flags;

@@ -147,6 +147,7 @@ static char const kBtnExtraKey;
         [self tc_swizzle:@selector(setImage:forState:)];
         [self tc_swizzle:@selector(setTitle:forState:)];
         [self tc_swizzle:@selector(setAttributedTitle:forState:)];
+        [self tc_swizzle:@selector(sizeToFit)];
     });
 }
 
@@ -163,6 +164,31 @@ static char const kBtnExtraKey;
     return observer;
 }
 
+- (void)tc_sizeToFit
+{
+    [self tc_sizeToFit];
+    if (self.paddingBetweenTitleAndImage != 0) {
+        CGRect frame = self.frame;
+        
+        switch (self.layoutStyle) {
+            case kTCButtonLayoutStyleImageLeftTitleRight:
+            case kTCButtonLayoutStyleImageRightTitleLeft:
+                frame.size.width += self.paddingBetweenTitleAndImage;
+                break;
+                
+            case kTCButtonLayoutStyleImageTopTitleBottom:
+            case kTCButtonLayoutStyleImageBottomTitleTop:
+                frame.size.height += self.paddingBetweenTitleAndImage;
+                break;
+                
+            default:
+                return;
+        }
+        
+        self.frame = frame;
+    }
+}
+
 - (void)tc_setImage:(UIImage *)image forState:(UIControlState)state
 {
     UIImage *oldImg = [self imageForState:state];
@@ -176,7 +202,7 @@ static char const kBtnExtraKey;
 {
     NSString *oldTitle = [self titleForState:state];
     [self tc_setTitle:title forState:state];
-    if (![oldTitle isEqualToString:title] && !CGRectIsEmpty(self.frame)) {
+    if ((title != oldTitle || nil != title) && ![oldTitle isEqualToString:title] && !CGRectIsEmpty(self.frame)) {
         [self updateLayoutStyle];
     }
 }
@@ -185,7 +211,7 @@ static char const kBtnExtraKey;
 {
     NSAttributedString *oldTitle = [self attributedTitleForState:state];
     [self tc_setAttributedTitle:title forState:state];
-    if (![oldTitle isEqual:title] && !CGRectIsEmpty(self.frame)) {
+    if ((title != oldTitle || nil != title) && ![oldTitle isEqual:title] && !CGRectIsEmpty(self.frame)) {
         [self updateLayoutStyle];
     }
 }
@@ -432,10 +458,10 @@ static char const kBtnExtraKey;
         self.titleEdgeInsets = UIEdgeInsetsZero;
         self.imageEdgeInsets = UIEdgeInsetsZero;
         
+        CGFloat pad = self.paddingBetweenTitleAndImage * 0.5f;
         CGRect contentRect = [self contentRectForBounds:self.bounds];
         CGSize imageSize = [self imageRectForContentRect:contentRect].size;
         CGSize titleSize = [self titleRectForContentRect:contentRect].size;
-        CGFloat pad = self.paddingBetweenTitleAndImage * 0.5f;
         
         self.titleEdgeInsets = UIEdgeInsetsMake(0, -imageSize.width - pad, 0, imageSize.width + pad);
         self.imageEdgeInsets = UIEdgeInsetsMake(0, titleSize.width + pad, 0, -titleSize.width - pad);
@@ -449,7 +475,7 @@ static char const kBtnExtraKey;
                     size.width = width;
                     self.layoutSizeNeedChangeBlock(self, size);
                 } else {
-                    self.contentEdgeInsets = UIEdgeInsetsMake(0, expand, 0, expand);
+//                    self.contentEdgeInsets = UIEdgeInsetsMake(0, expand, 0, expand);
                 }
             }
         }];
@@ -459,7 +485,6 @@ static char const kBtnExtraKey;
 - (void)imageAndTitleToFitHorizonal
 {
     if (nil != self.titleLabel && nil != self.imageView) {
-        
         self.titleEdgeInsets = UIEdgeInsetsZero;
         self.imageEdgeInsets = UIEdgeInsetsZero;
         
@@ -481,7 +506,7 @@ static char const kBtnExtraKey;
                     size.width = width;
                     self.layoutSizeNeedChangeBlock(self, size);
                 } else {
-                    self.contentEdgeInsets = UIEdgeInsetsMake(0, expand, 0, expand);
+//                    self.contentEdgeInsets = UIEdgeInsetsMake(0, expand, 0, expand);
                 }
             }
         }];
