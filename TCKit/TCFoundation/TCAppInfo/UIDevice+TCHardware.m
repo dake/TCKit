@@ -825,10 +825,11 @@ static NSString *s_device_names[kTCDeviceCount] = {
 
 + (NSString *)ipFromInterface:(TCNetworkInterfaceType)type destination:(BOOL)destination ipv6:(BOOL *)ipv6
 {
-    static const char *kMap[] = {
+    const char *kMap[] = {
         [kTCNetworkInterfaceTypeLoopback] = "lo0",
         [kTCNetworkInterfaceTypeCellular] = "pdp_ip0",
-        [kTCNetworkInterfaceTypeWiFi] = "en0",
+        [kTCNetworkInterfaceTypeWiFi] = IS_MAC() ? "en1" : "en0",
+        [kTCNetworkInterfaceTypeEthernet] = "en0",
         [kTCNetworkInterfaceTypeHotspot] = "bridge100",
         [kTCNetworkInterfaceTypeUSB] = "en2",
         [kTCNetworkInterfaceTypeBluetooth] = "en3",
@@ -838,6 +839,10 @@ static NSString *s_device_names[kTCDeviceCount] = {
     };
     
     if (type < 0 || type >= kTCNetworkInterfaceTypeCount) {
+        return nil;
+    }
+    
+    if (kTCNetworkInterfaceTypeEthernet == type && !IS_MAC()) {
         return nil;
     }
     
@@ -853,12 +858,7 @@ static NSString *s_device_names[kTCDeviceCount] = {
         }
     }
     
-    const char *ifType = NULL;
-    if (kTCNetworkInterfaceTypeWiFi == type && IS_MAC()) {
-        ifType = "en1";
-    } else {
-        ifType = kMap[type];
-    }
+    const char *ifType = kMap[type];
     
     __block BOOL v6 = NO;
     __block NSString *ip = nil;
