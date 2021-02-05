@@ -1016,7 +1016,7 @@ static NSString *s_device_names[kTCDeviceCount] = {
 
 + (void)HTTPProxy:(NSString **)host port:(NSNumber **)port
 {
-    [self HTTPProxy:host port:port hostKey:(id)kCFNetworkProxiesHTTPProxy portKey:(id)kCFNetworkProxiesHTTPPort];
+    [self HTTPProxy:host port:port hostKey:(__bridge id)kCFNetworkProxiesHTTPProxy portKey:(__bridge id)kCFNetworkProxiesHTTPPort];
 }
 
 + (void)HTTPSProxy:(NSString **)host port:(NSNumber **)port
