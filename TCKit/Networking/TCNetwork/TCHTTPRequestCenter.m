@@ -329,7 +329,7 @@
             return YES;
         }
         
-        BOOL rawJSON = kTCHTTPMethodPostJSON == request.method;
+        BOOL rawJSON = kTCHTTPMethodPostJSON == request.method || request.useJsonSerializer;
         if (rawJSON) {
             if (![requestMgr.requestSerializer isKindOfClass:AFJSONRequestSerializer.class ]) {
                 _httpSerializer = requestMgr.requestSerializer;

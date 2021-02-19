@@ -91,6 +91,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) id parameters;
 @property (nonatomic, assign) NSTimeInterval timeoutInterval; // default: 30s
 @property (nonatomic, assign) TCHTTPMethod method;
+@property (nonatomic, assign) BOOL useJsonSerializer;
 
 @property (nonatomic, assign) BOOL overrideIfImpact; // default: YES, NO: abandon current request, if a same one existed
 @property (nonatomic, assign) BOOL ignoreParamFilter;
