@@ -585,6 +585,25 @@ bool tc_is_ip_addr(char const *host, bool *ipv6)
     return [self stringWithData:data usedEncoding:enc force:force fast:NO];
 }
 
++ (NSStringEncoding)tc_safe_stringEncodingForData:(NSData *)data
+                                  encodingOptions:(nullable NSDictionary<NSStringEncodingDetectionOptionsKey, id> *)opts
+                                  convertedString:(NSString * _Nullable * _Nullable)string
+                              usedLossyConversion:(nullable BOOL *)usedLossyConversion API_AVAILABLE(macos(10.10), ios(8.0), watchos(2.0), tvos(9.0))
+{
+    NSStringEncoding detectedEnc = kCFStringEncodingInvalidId;
+    @try {
+        // 此方法巨慢
+        detectedEnc = [self stringEncodingForData:data
+                                  encodingOptions:opts
+                                  convertedString:string
+                              usedLossyConversion:usedLossyConversion];
+    } @catch (NSException *exception) {
+        
+    } @finally {
+        return detectedEnc;
+    }
+}
+
 + (nullable instancetype)stringWithData:(NSData *)data usedEncoding:(nullable NSStringEncoding *)enc force:(BOOL)force fast:(BOOL)fast
 {
     if (data.length < 1) {
@@ -639,16 +658,16 @@ bool tc_is_ip_addr(char const *host, bool *ipv6)
     }
     
     NSString *text = nil;
-    // 此方法巨慢
-    NSStringEncoding detectedEnc = [NSString stringEncodingForData:data
-                                                   encodingOptions:@{
-                                                                     NSStringEncodingDetectionSuggestedEncodingsKey: s_tryEncodings,
-                                                                     NSStringEncodingDetectionAllowLossyKey: @NO,
-                                                                     NSStringEncodingDetectionUseOnlySuggestedEncodingsKey: @YES,
-                                                                     }
-                                                   convertedString:&text
-                                               usedLossyConversion:NULL];
     
+    // 此方法巨慢
+    NSStringEncoding detectedEnc = [NSString tc_safe_stringEncodingForData:data
+                                                           encodingOptions:@{
+                                                               NSStringEncodingDetectionSuggestedEncodingsKey: s_tryEncodings,
+                                                               NSStringEncodingDetectionAllowLossyKey: @NO,
+                                                               NSStringEncodingDetectionUseOnlySuggestedEncodingsKey: @YES,
+                                                           }
+                                                           convertedString:&text
+                                                       usedLossyConversion:NULL];
     
     if (nil != text) {
         if (NULL != enc) {
@@ -680,14 +699,14 @@ bool tc_is_ip_addr(char const *host, bool *ipv6)
     NSMutableArray<NSNumber *> *ignore = s_tryEncodings.mutableCopy;
     [ignore addObject:@(NSASCIIStringEncoding)];
     // 此方法巨慢
-    detectedEnc = [NSString stringEncodingForData:data
-                                  encodingOptions:@{
-                                                    NSStringEncodingDetectionDisallowedEncodingsKey: ignore,
-                                                    NSStringEncodingDetectionAllowLossyKey: @NO,
-                                                    NSStringEncodingDetectionFromWindowsKey: @YES,
-                                                    }
-                                  convertedString:&text
-                              usedLossyConversion:NULL];
+    detectedEnc = [NSString tc_safe_stringEncodingForData:data
+                                          encodingOptions:@{
+                                              NSStringEncodingDetectionDisallowedEncodingsKey: ignore,
+                                              NSStringEncodingDetectionAllowLossyKey: @NO,
+                                              NSStringEncodingDetectionFromWindowsKey: @YES,
+                                          }
+                                          convertedString:&text
+                                      usedLossyConversion:NULL];
     
     if (nil != text) {
         if (NULL != enc) {

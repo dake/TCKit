@@ -36,18 +36,17 @@ NSString * const AFNetworkingOperationFailingURLResponseErrorKey = @"com.alamofi
 NSString * const AFNetworkingOperationFailingURLResponseDataErrorKey = @"com.alamofire.serialization.response.error.data";
 
 static NSError * AFErrorWithUnderlyingError(NSError *error, NSError *underlyingError) {
-    if (!error) {
+    if (nil == error) {
         return underlyingError;
     }
 
-    if (!underlyingError || error.userInfo[NSUnderlyingErrorKey]) {
+    if (nil == underlyingError || nil != error.userInfo[NSUnderlyingErrorKey]) {
         return error;
     }
 
-    NSMutableDictionary *mutableUserInfo = [error.userInfo mutableCopy];
+    NSMutableDictionary *mutableUserInfo = error.userInfo.mutableCopy ?: NSMutableDictionary.dictionary;
     mutableUserInfo[NSUnderlyingErrorKey] = underlyingError;
-
-    return [[NSError alloc] initWithDomain:error.domain code:error.code userInfo:mutableUserInfo];
+    return [NSError errorWithDomain:error.domain code:error.code userInfo:mutableUserInfo];
 }
 
 static BOOL AFErrorOrUnderlyingErrorHasCodeInDomain(NSError *error, NSInteger code, NSString *domain) {
@@ -112,34 +111,32 @@ static id AFJSONObjectByRemovingKeysWithNullValues(id JSONObject, NSJSONReadingO
     BOOL responseIsValid = YES;
     NSError *validationError = nil;
 
-    if (response && [response isKindOfClass:[NSHTTPURLResponse class]]) {
+    if (nil != response && [response isKindOfClass:NSHTTPURLResponse.class]) {
         if (self.acceptableContentTypes.count > 0 && ![self.acceptableContentTypes containsObject:response.MIMEType] &&
-            !(response.MIMEType == nil && data.length < 1)) {
-
-            if ([data length] > 0 && [response URL]) {
-                NSMutableDictionary *mutableUserInfo = [@{
-                                                          NSLocalizedDescriptionKey: [NSString stringWithFormat:NSLocalizedStringFromTable(@"Request failed: unacceptable content-type: %@", @"AFNetworking", nil), [response MIMEType]],
-                                                          NSURLErrorFailingURLErrorKey:[response URL],
-                                                          AFNetworkingOperationFailingURLResponseErrorKey: response,
-                                                        } mutableCopy];
-                if (data) {
-                    mutableUserInfo[AFNetworkingOperationFailingURLResponseDataErrorKey] = data;
-                }
-
+            (nil != response.MIMEType || data.length > 0)) {
+            
+            if (data.length > 0 && nil != response.URL) {
+                NSDictionary *mutableUserInfo = @{
+                    NSLocalizedDescriptionKey: [NSString stringWithFormat:NSLocalizedStringFromTable(@"Request failed: unacceptable content-type: %@", @"AFNetworking", nil), [response MIMEType]],
+                    NSURLErrorFailingURLErrorKey: response.URL,
+                    AFNetworkingOperationFailingURLResponseErrorKey: response,
+                    AFNetworkingOperationFailingURLResponseDataErrorKey: data,
+                };
+                
                 validationError = AFErrorWithUnderlyingError([NSError errorWithDomain:AFURLResponseSerializationErrorDomain code:NSURLErrorCannotDecodeContentData userInfo:mutableUserInfo], validationError);
             }
 
             responseIsValid = NO;
         }
 
-        if (self.acceptableStatusCodes && ![self.acceptableStatusCodes containsIndex:(NSUInteger)response.statusCode] && [response URL]) {
+        if (nil != self.acceptableStatusCodes && ![self.acceptableStatusCodes containsIndex:(NSUInteger)response.statusCode] && nil != response.URL) {
             NSMutableDictionary *mutableUserInfo = [@{
                                                NSLocalizedDescriptionKey: [NSString stringWithFormat:NSLocalizedStringFromTable(@"Request failed: %@ (%ld)", @"AFNetworking", nil), [NSHTTPURLResponse localizedStringForStatusCode:response.statusCode], (long)response.statusCode],
-                                               NSURLErrorFailingURLErrorKey:[response URL],
+                                               NSURLErrorFailingURLErrorKey: response.URL,
                                                AFNetworkingOperationFailingURLResponseErrorKey: response,
                                        } mutableCopy];
 
-            if (data) {
+            if (nil != data) {
                 mutableUserInfo[AFNetworkingOperationFailingURLResponseDataErrorKey] = data;
             }
 
@@ -149,7 +146,7 @@ static id AFJSONObjectByRemovingKeysWithNullValues(id JSONObject, NSJSONReadingO
         }
     }
 
-    if (error && !responseIsValid) {
+    if (NULL != error && !responseIsValid) {
         *error = validationError;
     }
 
@@ -235,25 +232,26 @@ static id AFJSONObjectByRemovingKeysWithNullValues(id JSONObject, NSJSONReadingO
                           error:(NSError *__autoreleasing *)error
 {
     if (![self validateResponse:(NSHTTPURLResponse *)response data:data error:error]) {
-        if (!error || AFErrorOrUnderlyingErrorHasCodeInDomain(*error, NSURLErrorCannotDecodeContentData, AFURLResponseSerializationErrorDomain)) {
+        if (NULL == error || AFErrorOrUnderlyingErrorHasCodeInDomain(*error, NSURLErrorCannotDecodeContentData, AFURLResponseSerializationErrorDomain)) {
             return nil;
         }
     }
 
     // Workaround for behavior of Rails to return a single space for `head :ok` (a workaround for a bug in Safari), which is not interpreted as valid input by NSJSONSerialization.
     // See https://github.com/rails/rails/issues/1742
-    BOOL isSpace = [data isEqualToData:[NSData dataWithBytes:" " length:1]];
     NSUInteger len = data.length;
-    if (len == 0 || isSpace) {
+    if (len < 1 || (len == 1 && ((char *)data.bytes)[0] == ' ')) {
         return nil;
     }
     
     NSError *serializationError = nil;
     id responseObject = [NSJSONSerialization JSONObjectWithData:data options:self.readingOptions error:&serializationError];
-    if (nil == responseObject)
-    {
-        if (error) {
-            *error = AFErrorWithUnderlyingError(serializationError, *error);
+    if (nil == responseObject) {
+        if (NULL != error && nil != serializationError) {
+            NSError *err = *error;
+            if (nil == err || ![err.domain isEqualToString:AFURLResponseSerializationErrorDomain]) {
+                *error = AFErrorWithUnderlyingError(serializationError, err);
+            }
         }
         return nil;
     }
@@ -326,7 +324,7 @@ static id AFJSONObjectByRemovingKeysWithNullValues(id JSONObject, NSJSONReadingO
                           error:(NSError *__autoreleasing *)error
 {
     if (![self validateResponse:(NSHTTPURLResponse *)response data:data error:error]) {
-        if (!error || AFErrorOrUnderlyingErrorHasCodeInDomain(*error, NSURLErrorCannotDecodeContentData, AFURLResponseSerializationErrorDomain)) {
+        if (NULL == error || AFErrorOrUnderlyingErrorHasCodeInDomain(*error, NSURLErrorCannotDecodeContentData, AFURLResponseSerializationErrorDomain)) {
             return nil;
         }
     }
@@ -371,18 +369,19 @@ static id AFJSONObjectByRemovingKeysWithNullValues(id JSONObject, NSJSONReadingO
                           error:(NSError *__autoreleasing *)error
 {
     if (![self validateResponse:(NSHTTPURLResponse *)response data:data error:error]) {
-        if (!error || AFErrorOrUnderlyingErrorHasCodeInDomain(*error, NSURLErrorCannotDecodeContentData, AFURLResponseSerializationErrorDomain)) {
+        if (NULL == error || AFErrorOrUnderlyingErrorHasCodeInDomain(*error, NSURLErrorCannotDecodeContentData, AFURLResponseSerializationErrorDomain)) {
             return nil;
         }
     }
 
     NSError *serializationError = nil;
     NSXMLDocument *document = [[NSXMLDocument alloc] initWithData:data options:self.options error:&serializationError];
-
-    if (!document)
-    {
-        if (error) {
-            *error = AFErrorWithUnderlyingError(serializationError, *error);
+    if (nil == document) {
+        if (NULL != error && nil != serializationError) {
+            NSError *err = *error;
+            if (nil == err || ![err.domain isEqualToString:AFURLResponseSerializationErrorDomain]) {
+                *error = AFErrorWithUnderlyingError(serializationError, err);
+            }
         }
         return nil;
     }
@@ -458,23 +457,24 @@ static id AFJSONObjectByRemovingKeysWithNullValues(id JSONObject, NSJSONReadingO
                           error:(NSError *__autoreleasing *)error
 {
     if (![self validateResponse:(NSHTTPURLResponse *)response data:data error:error]) {
-        if (!error || AFErrorOrUnderlyingErrorHasCodeInDomain(*error, NSURLErrorCannotDecodeContentData, AFURLResponseSerializationErrorDomain)) {
+        if (NULL == error || AFErrorOrUnderlyingErrorHasCodeInDomain(*error, NSURLErrorCannotDecodeContentData, AFURLResponseSerializationErrorDomain)) {
             return nil;
         }
     }
 
-    if (!data) {
+    if (nil == data) {
         return nil;
     }
     
     NSError *serializationError = nil;
-    
     id responseObject = [NSPropertyListSerialization propertyListWithData:data options:self.readOptions format:NULL error:&serializationError];
     
-    if (!responseObject)
-    {
-        if (error) {
-            *error = AFErrorWithUnderlyingError(serializationError, *error);
+    if (nil == responseObject) {
+        if (NULL != error && nil != serializationError) {
+            NSError *err = *error;
+            if (nil == err || ![err.domain isEqualToString:AFURLResponseSerializationErrorDomain]) {
+                *error = AFErrorWithUnderlyingError(serializationError, err);
+            }
         }
         return nil;
     }
@@ -675,7 +675,7 @@ static UIImage * AFInflatedImageFromResponseWithDataAtScale(NSHTTPURLResponse *r
                           error:(NSError *__autoreleasing *)error
 {
     if (![self validateResponse:(NSHTTPURLResponse *)response data:data error:error]) {
-        if (!error || AFErrorOrUnderlyingErrorHasCodeInDomain(*error, NSURLErrorCannotDecodeContentData, AFURLResponseSerializationErrorDomain)) {
+        if (NULL == error || AFErrorOrUnderlyingErrorHasCodeInDomain(*error, NSURLErrorCannotDecodeContentData, AFURLResponseSerializationErrorDomain)) {
             return nil;
         }
     }

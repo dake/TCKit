@@ -812,12 +812,26 @@ static uint8_t nibbleFromChar(unichar c) {
 
 + (nullable instancetype)dataWithContentsOfAlwaysMappedFile:(NSString *)path error:(NSError **)errorPtr
 {
-    return [self dataWithContentsOfFile:path options:NSDataReadingUncached|NSDataReadingMappedAlways error:errorPtr];
+    __kindof NSData *data = nil;
+    @try {
+        data = [self dataWithContentsOfFile:path options:NSDataReadingUncached|NSDataReadingMappedAlways error:errorPtr];
+    } @catch (NSException *exception) {
+        
+    } @finally {
+        return data;
+    }
 }
 
 + (nullable instancetype)dataWithContentsOfAlwaysMappedURL:(NSURL *)url error:(NSError **)errorPtr
 {
-    return [self dataWithContentsOfURL:url options:NSDataReadingUncached|NSDataReadingMappedAlways error:errorPtr];
+    __kindof NSData *data = nil;
+    @try {
+        data = [self dataWithContentsOfURL:url options:NSDataReadingUncached|NSDataReadingMappedAlways error:errorPtr];
+    } @catch (NSException *exception) {
+        
+    } @finally {
+        return data;
+    }
 }
 
 - (NSRange)rangeOfString:(NSString *)strToFind encoding:(NSStringEncoding)encoding options:(NSDataSearchOptions)mask range:(NSRange * _Nullable)searchRange
