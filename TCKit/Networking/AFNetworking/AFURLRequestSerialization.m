@@ -231,7 +231,7 @@ static void *AFHTTPRequestSerializerObserverContext = &AFHTTPRequestSerializerOb
 #elif defined(__MAC_OS_X_VERSION_MIN_REQUIRED)
     userAgent = [NSString stringWithFormat:@"%@/%@ (Mac OS X %@)", [NSBundle.mainBundle infoDictionary][(__bridge NSString *)kCFBundleExecutableKey] ?: [NSBundle.mainBundle infoDictionary][(__bridge NSString *)kCFBundleIdentifierKey], [NSBundle.mainBundle infoDictionary][@"CFBundleShortVersionString"] ?: [NSBundle.mainBundle infoDictionary][(__bridge NSString *)kCFBundleVersionKey], [[NSProcessInfo processInfo] operatingSystemVersionString]];
 #endif
-    if (userAgent) {
+    if (nil != userAgent) {
         if (![userAgent canBeConvertedToEncoding:NSASCIIStringEncoding]) {
             NSMutableString *mutableUserAgent = [userAgent mutableCopy];
             if (CFStringTransform((__bridge CFMutableStringRef)(mutableUserAgent), NULL, (__bridge CFStringRef)@"Any-Latin; Latin-ASCII; [:^ASCII:] Remove", false)) {
@@ -484,7 +484,7 @@ forHTTPHeaderField:(NSString *)field
     NSMutableURLRequest *mutableRequest = [request mutableCopy];
 
     [self.HTTPRequestHeaders enumerateKeysAndObjectsUsingBlock:^(id field, id value, BOOL * __unused stop) {
-        if (![request valueForHTTPHeaderField:field]) {
+        if (nil == [request valueForHTTPHeaderField:field]) {
             [mutableRequest setValue:value forHTTPHeaderField:field];
         }
     }];
@@ -1259,7 +1259,7 @@ typedef enum {
     NSMutableURLRequest *mutableRequest = [request mutableCopy];
 
     [self.HTTPRequestHeaders enumerateKeysAndObjectsUsingBlock:^(id field, id value, BOOL * __unused stop) {
-        if (![request valueForHTTPHeaderField:field]) {
+        if (nil == [request valueForHTTPHeaderField:field]) {
             [mutableRequest setValue:value forHTTPHeaderField:field];
         }
     }];
@@ -1352,7 +1352,7 @@ typedef enum {
     NSMutableURLRequest *mutableRequest = [request mutableCopy];
 
     [self.HTTPRequestHeaders enumerateKeysAndObjectsUsingBlock:^(id field, id value, BOOL * __unused stop) {
-        if (![request valueForHTTPHeaderField:field]) {
+        if (nil == [request valueForHTTPHeaderField:field]) {
             [mutableRequest setValue:value forHTTPHeaderField:field];
         }
     }];
