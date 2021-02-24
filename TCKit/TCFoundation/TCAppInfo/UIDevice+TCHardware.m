@@ -799,7 +799,22 @@ static NSDictionary<NSNumber *, NSString *> *tc_ifMap(void)
     dispatch_once(&onceToken, ^{
         BOOL const isMac = IS_MAC();
         BOOL iOS11NoSim = NO;
-        if (!isMac) {
+        __block BOOL hasEn7 = NO;
+        __block BOOL isDTK = YES;
+        if (isMac) {
+            [UIDevice enumerateNetworkInterfaces:^(struct ifaddrs * _Nonnull addr, BOOL * _Nonnull stop) {
+                if (NULL == addr->ifa_name) {
+                    return;
+                }
+                
+                if (isDTK && (0 == strcmp(addr->ifa_name, "en6") || 0 == strcmp(addr->ifa_name, "en8"))) {
+                    isDTK = NO;
+                } else if (!hasEn7 && 0 == strcmp(addr->ifa_name, "en7")) {
+                    hasEn7 = YES;
+                }
+            }];
+            
+        } else {
             // iPod, iPad, >= iOS11
             if (@available(iOS 11, *)) {
                 if (!UIDevice.hasCellular) {
@@ -808,15 +823,60 @@ static NSDictionary<NSNumber *, NSString *> *tc_ifMap(void)
             }
         }
         
+        /*
+         networksetup -listallhardwareports
+         
+         M1 mba 13:
+         
+         Hardware Port: Ethernet Adaptor (en3)
+         Device: en3
+         Ethernet Address: 1e:00:8a:02:ac:79
+
+         Hardware Port: Ethernet Adaptor (en4)
+         Device: en4
+         Ethernet Address: 1e:00:8a:02:ac:7a
+
+         Hardware Port: USB 10/100/1000 LAN
+         Device: en8
+         Ethernet Address: 00:e0:4c:68:00:0d
+
+         Hardware Port: Wi-Fi
+         Device: en0
+         Ethernet Address: 50:ed:3c:19:11:56
+
+         Hardware Port: Bluetooth PAN
+         Device: en5
+         Ethernet Address: 50:ed:3c:19:9e:18
+
+         Hardware Port: Thunderbolt 1
+         Device: en1
+         Ethernet Address: 36:89:b2:72:05:c0
+
+         Hardware Port: Thunderbolt 1
+         Device: en2
+         Ethernet Address: 36:89:b2:72:05:c4
+
+         Hardware Port: Thunderbolt Bridge
+         Device: bridge0
+         Ethernet Address: 36:89:b2:72:05:c0
+
+         VLAN Configurations
+         ===================
+         */
+        
         // https://unix.stackexchange.com/questions/603506/what-are-these-ifconfig-interfaces-on-macos
+        // https://developer.apple.com/forums/thread/652667
         kMap = @{
             @(kTCNetworkInterfaceTypeLoopback): @"lo0",
             @(kTCNetworkInterfaceTypeCellular): @"pdp_ip0",
             @(kTCNetworkInterfaceTypeWiFi): isMac ? @"en1" : @"en0",
             @(kTCNetworkInterfaceTypeEthernet): isMac ? @"en0" : @"",
             @(kTCNetworkInterfaceTypeHotspot): @"bridge100",
-            @(kTCNetworkInterfaceTypeCable): isMac ? @"en8" : (iOS11NoSim ? @"en3" : @"en2"),
-            @(kTCNetworkInterfaceTypeBluetooth): isMac ? @"en6" : (iOS11NoSim ? @"en2" : @"en3"),
+            
+            // DTK mac: en5, m1 mac: en8
+            @(kTCNetworkInterfaceTypeCable): isMac ? (isDTK ? @"en5" : @"en8") : (iOS11NoSim ? @"en3" : @"en2"),
+            // m1 mac: en5
+            @(kTCNetworkInterfaceTypeBluetooth): isMac ? (isDTK ? @"en4" : (hasEn7 ? @"en7" : @"en5")) : (iOS11NoSim ? @"en2" : @"en3"),
             
             //        @(kTCNetworkInterfaceTypeNEVPN): @"utun1",
             @(kTCNetworkInterfaceTypePersonalVPN): @"ipsec0",
