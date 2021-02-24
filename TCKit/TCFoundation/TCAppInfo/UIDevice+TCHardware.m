@@ -610,6 +610,9 @@ static NSString *s_device_names[kTCDeviceCount] = {
     if ([platform hasPrefix:@"iPad"]) return kTCDeviceFamilyiPad;
     if ([platform hasPrefix:@"AppleTV"]) return kTCDeviceFamilyAppleTV;
     
+    // ???: Carplay
+    if ([platform hasPrefix:@"Carplay"]) return kTCDeviceFamilyCarplay;
+    
     return kTCDeviceFamilyUnknown;
 }
 
@@ -789,6 +792,52 @@ static NSString *s_device_names[kTCDeviceCount] = {
     return ipv4Available;
 }
 
+static NSDictionary<NSNumber *, NSString *> *tc_ifMap(void)
+{
+    static NSDictionary<NSNumber *, NSString *> *kMap = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        BOOL const isMac = IS_MAC();
+        BOOL iOS11NoSim = NO;
+        if (!isMac) {
+            // iPod, iPad, >= iOS11
+            if (@available(iOS 11, *)) {
+                if (!UIDevice.hasCellular) {
+                    iOS11NoSim = YES;
+                }
+            }
+        }
+        
+        // https://unix.stackexchange.com/questions/603506/what-are-these-ifconfig-interfaces-on-macos
+        kMap = @{
+            @(kTCNetworkInterfaceTypeLoopback): @"lo0",
+            @(kTCNetworkInterfaceTypeCellular): @"pdp_ip0",
+            @(kTCNetworkInterfaceTypeWiFi): isMac ? @"en1" : @"en0",
+            @(kTCNetworkInterfaceTypeEthernet): isMac ? @"en0" : @"",
+            @(kTCNetworkInterfaceTypeHotspot): @"bridge100",
+            @(kTCNetworkInterfaceTypeCable): isMac ? @"en8" : (iOS11NoSim ? @"en3" : @"en2"),
+            @(kTCNetworkInterfaceTypeBluetooth): isMac ? @"en6" : (iOS11NoSim ? @"en2" : @"en3"),
+            
+            //        @(kTCNetworkInterfaceTypeNEVPN): @"utun1",
+            @(kTCNetworkInterfaceTypePersonalVPN): @"ipsec0",
+        };
+    });
+    
+    return kMap;
+}
+
++ (TCNetworkInterfaceType)interfaceTypeWithName:(NSString *)name
+{
+    __block TCNetworkInterfaceType type = kTCNetworkInterfaceTypeUnknown;
+    [tc_ifMap() enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull key, NSString * _Nonnull obj, BOOL * _Nonnull stop) {
+        if ([obj isEqualToString:name]) {
+            type = key.integerValue;
+            *stop = YES;
+        }
+    }];
+    return type;
+}
+
 + (void)enumerateNetworkInterfaces:(void (^)(struct ifaddrs *addr, BOOL *stop))block
 {
     if (nil == block) {
@@ -825,39 +874,16 @@ static NSString *s_device_names[kTCDeviceCount] = {
 
 + (NSString *)ipFromInterface:(TCNetworkInterfaceType)type destination:(BOOL)destination ipv6:(BOOL *)ipv6
 {
-    BOOL const isMac = IS_MAC();
-    BOOL iOS11NoSim = NO;
-    if (!isMac) {
-        // iPod, iPad, >= iOS11
-        if (@available(iOS 11, *)) {
-            if (!UIDevice.hasCellular) {
-                iOS11NoSim = YES;
-            }
-        }
-    }
-    
-    // https://unix.stackexchange.com/questions/603506/what-are-these-ifconfig-interfaces-on-macos
-    const char *kMap[] = {
-        [kTCNetworkInterfaceTypeLoopback] = "lo0",
-        [kTCNetworkInterfaceTypeCellular] = "pdp_ip0",
-        [kTCNetworkInterfaceTypeWiFi] = isMac ? "en1" : "en0",
-        [kTCNetworkInterfaceTypeEthernet] = isMac ? "en0" : NULL,
-        [kTCNetworkInterfaceTypeHotspot] = "bridge100",
-        [kTCNetworkInterfaceTypeCable] = isMac ? "en8" : (iOS11NoSim ? "en3" : "en2"),
-        [kTCNetworkInterfaceTypeBluetooth] = isMac ? "en6" : (iOS11NoSim ? "en2" : "en3"),
-        
-//        [kTCNetworkInterfaceTypeNEVPN] = @"utun1",
-        [kTCNetworkInterfaceTypePersonalVPN] = "ipsec0",
-    };
-    
     if (type < 0 || type >= kTCNetworkInterfaceTypeCount) {
         return nil;
     }
     
-    const char *const ifType = kMap[type];
-    if (NULL == ifType) {
+    NSString *const name = tc_ifMap()[@(type)];
+    if (name.length < 1) {
         return nil;
     }
+
+    const char *const ifType = name.UTF8String;
     
     __block BOOL v6 = NO;
     __block NSString *ip = nil;

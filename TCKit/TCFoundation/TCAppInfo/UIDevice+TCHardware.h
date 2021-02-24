@@ -123,6 +123,7 @@ typedef NS_ENUM(NSInteger, TCDeviceFamily) {
     kTCDeviceFamilyiPod,
     kTCDeviceFamilyiPad,
     kTCDeviceFamilyAppleTV,
+    kTCDeviceFamilyCarplay,
 };
 
 typedef NS_ENUM(NSInteger, TCDeviceScreen) {
@@ -218,6 +219,7 @@ typedef NS_ENUM(NSInteger, TCNetworkInterfaceType) {
     kTCNetworkInterfaceTypeCount,
 };
 
++ (TCNetworkInterfaceType)interfaceTypeWithName:(NSString *)name;
 + (nullable NSString *)ipFromInterface:(TCNetworkInterfaceType)type ipv6:(BOOL *_Nullable)ipv6;
 + (nullable NSString *)ipFromInterface:(TCNetworkInterfaceType)type destination:(BOOL)destination ipv6:(BOOL *_Nullable)ipv6;
 
