@@ -762,7 +762,7 @@ static NSString *s_device_names[kTCDeviceCount] = {
             
             NSString *address = @(str);
             NSArray *addressComponents = [address componentsSeparatedByString:@":"];
-            if (![addressComponents.firstObject isEqualToString:@"fe80"]){ // fe80 prefix in link-local ip
+            if (![addressComponents.firstObject isEqualToString:@"fe80"]) { // fe80 prefix in link-local ip
                 ipv6Available = YES;
                 *stop = YES;
             }
@@ -841,7 +841,7 @@ static NSString *s_device_names[kTCDeviceCount] = {
         [kTCNetworkInterfaceTypeLoopback] = "lo0",
         [kTCNetworkInterfaceTypeCellular] = "pdp_ip0",
         [kTCNetworkInterfaceTypeWiFi] = isMac ? "en1" : "en0",
-        [kTCNetworkInterfaceTypeEthernet] = isMac ? "en0" : "",
+        [kTCNetworkInterfaceTypeEthernet] = isMac ? "en0" : NULL,
         [kTCNetworkInterfaceTypeHotspot] = "bridge100",
         [kTCNetworkInterfaceTypeCable] = isMac ? "en8" : (iOS11NoSim ? "en3" : "en2"),
         [kTCNetworkInterfaceTypeBluetooth] = isMac ? "en6" : (iOS11NoSim ? "en2" : "en3"),
@@ -854,11 +854,10 @@ static NSString *s_device_names[kTCDeviceCount] = {
         return nil;
     }
     
-    if (kTCNetworkInterfaceTypeEthernet == type && !isMac) {
+    const char *const ifType = kMap[type];
+    if (NULL == ifType) {
         return nil;
     }
-    
-    const char *ifType = kMap[type];
     
     __block BOOL v6 = NO;
     __block NSString *ip = nil;
