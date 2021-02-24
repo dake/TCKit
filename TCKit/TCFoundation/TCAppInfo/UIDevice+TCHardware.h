@@ -209,7 +209,7 @@ typedef NS_ENUM(NSInteger, TCNetworkInterfaceType) {
     kTCNetworkInterfaceTypeHotspot, // bridge100
     
     kTCNetworkInterfaceTypeEthernet,// mac: en0
-    kTCNetworkInterfaceTypeUSB, // en2, iOS 11 iPod: en3
+    kTCNetworkInterfaceTypeCable, // en2, iOS 11 iPod: en3, mac :en8
     kTCNetworkInterfaceTypeBluetooth, // en3, iOS 11 iPod: en2
     
     kTCNetworkInterfaceTypeNEVPN, // utun1, ios13: utun5, ios14: utun2

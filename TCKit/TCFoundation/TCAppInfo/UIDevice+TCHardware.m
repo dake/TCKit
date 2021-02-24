@@ -831,7 +831,7 @@ static NSString *s_device_names[kTCDeviceCount] = {
         [kTCNetworkInterfaceTypeWiFi] = IS_MAC() ? "en1" : "en0",
         [kTCNetworkInterfaceTypeEthernet] = "en0",
         [kTCNetworkInterfaceTypeHotspot] = "bridge100",
-        [kTCNetworkInterfaceTypeUSB] = "en2",
+        [kTCNetworkInterfaceTypeCable] = "en2",
         [kTCNetworkInterfaceTypeBluetooth] = "en3",
         
 //        [kTCNetworkInterfaceTypeNEVPN] = @"utun1",
@@ -848,12 +848,12 @@ static NSString *s_device_names[kTCDeviceCount] = {
     
     // iPod, iPad, >= iOS11
     if (@available(iOS 11, *)) {
-        if ((kTCNetworkInterfaceTypeUSB == type || kTCNetworkInterfaceTypeBluetooth == type)
+        if ((kTCNetworkInterfaceTypeCable == type || kTCNetworkInterfaceTypeBluetooth == type)
             && !UIDevice.hasCellular) {
-            if (kTCNetworkInterfaceTypeUSB == type) {
+            if (kTCNetworkInterfaceTypeCable == type) {
                 type = kTCNetworkInterfaceTypeBluetooth;
             } else {
-                type = kTCNetworkInterfaceTypeUSB;
+                type = kTCNetworkInterfaceTypeCable;
             }
         }
     }
