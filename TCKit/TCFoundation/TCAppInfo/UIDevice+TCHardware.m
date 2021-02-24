@@ -825,14 +825,26 @@ static NSString *s_device_names[kTCDeviceCount] = {
 
 + (NSString *)ipFromInterface:(TCNetworkInterfaceType)type destination:(BOOL)destination ipv6:(BOOL *)ipv6
 {
+    BOOL const isMac = IS_MAC();
+    BOOL iOS11NoSim = NO;
+    if (!isMac) {
+        // iPod, iPad, >= iOS11
+        if (@available(iOS 11, *)) {
+            if (!UIDevice.hasCellular) {
+                iOS11NoSim = YES;
+            }
+        }
+    }
+    
+    // https://unix.stackexchange.com/questions/603506/what-are-these-ifconfig-interfaces-on-macos
     const char *kMap[] = {
         [kTCNetworkInterfaceTypeLoopback] = "lo0",
         [kTCNetworkInterfaceTypeCellular] = "pdp_ip0",
-        [kTCNetworkInterfaceTypeWiFi] = IS_MAC() ? "en1" : "en0",
-        [kTCNetworkInterfaceTypeEthernet] = "en0",
+        [kTCNetworkInterfaceTypeWiFi] = isMac ? "en1" : "en0",
+        [kTCNetworkInterfaceTypeEthernet] = isMac ? "en0" : "",
         [kTCNetworkInterfaceTypeHotspot] = "bridge100",
-        [kTCNetworkInterfaceTypeCable] = "en2",
-        [kTCNetworkInterfaceTypeBluetooth] = "en3",
+        [kTCNetworkInterfaceTypeCable] = isMac ? "en8" : (iOS11NoSim ? "en3" : "en2"),
+        [kTCNetworkInterfaceTypeBluetooth] = isMac ? "en6" : (iOS11NoSim ? "en2" : "en3"),
         
 //        [kTCNetworkInterfaceTypeNEVPN] = @"utun1",
         [kTCNetworkInterfaceTypePersonalVPN] = "ipsec0",
@@ -842,20 +854,8 @@ static NSString *s_device_names[kTCDeviceCount] = {
         return nil;
     }
     
-    if (kTCNetworkInterfaceTypeEthernet == type && !IS_MAC()) {
+    if (kTCNetworkInterfaceTypeEthernet == type && !isMac) {
         return nil;
-    }
-    
-    // iPod, iPad, >= iOS11
-    if (@available(iOS 11, *)) {
-        if ((kTCNetworkInterfaceTypeCable == type || kTCNetworkInterfaceTypeBluetooth == type)
-            && !UIDevice.hasCellular) {
-            if (kTCNetworkInterfaceTypeCable == type) {
-                type = kTCNetworkInterfaceTypeBluetooth;
-            } else {
-                type = kTCNetworkInterfaceTypeCable;
-            }
-        }
     }
     
     const char *ifType = kMap[type];
