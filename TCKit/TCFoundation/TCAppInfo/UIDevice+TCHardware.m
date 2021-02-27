@@ -241,8 +241,8 @@ static NSString *s_device_names[kTCDeviceCount] = {
     NSString *const platform = self.platform;
 
     // iPhone
-    if ([platform isEqualToString:@"iPhone1,1"])         return kTCDevice1GiPhone;
-    else if ([platform isEqualToString:@"iPhone1,2"])    return kTCDevice3GiPhone;
+    if ([platform isEqualToString:@"iPhone1,1"])          return kTCDevice1GiPhone;
+    else if ([platform isEqualToString:@"iPhone1,2"])     return kTCDevice3GiPhone;
     else if ([platform hasPrefix:@"iPhone2,"])            return kTCDevice3GSiPhone;
     else if ([platform hasPrefix:@"iPhone3,"])            return kTCDevice4iPhone;
     else if ([platform hasPrefix:@"iPhone4,"])            return kTCDevice4SiPhone;
@@ -254,7 +254,7 @@ static NSString *s_device_names[kTCDeviceCount] = {
             return kTCDevice5CiPhone;
         }
     }
-    else if ([platform hasPrefix:@"iPhone6,"])            return kTCDevice5SiPhone;
+    else if ([platform hasPrefix:@"iPhone6,"])           return kTCDevice5SiPhone;
     else if ([platform hasPrefix:@"iPhone7,1"])          return kTCDevice6PlusiPhone;
     else if ([platform hasPrefix:@"iPhone7,2"])          return kTCDevice6iPhone;
     else if ([platform hasPrefix:@"iPhone8,1"])          return kTCDevice6SiPhone;
@@ -618,10 +618,10 @@ static NSString *s_device_names[kTCDeviceCount] = {
 
 + (BOOL)cellularAccessable
 {
-    if (IS_MAC()) {
-        return NO;
-    }
-    CTTelephonyNetworkInfo *ctInfo = [[CTTelephonyNetworkInfo alloc] init];
+//    if (IS_MAC()) {
+//        return NO;
+//    }
+    CTTelephonyNetworkInfo *ctInfo = CTTelephonyNetworkInfo.alloc.init;
     return nil != ctInfo.subscriberCellularProvider && nil != ctInfo.subscriberCellularProvider.carrierName && nil != ctInfo.currentRadioAccessTechnology;
 }
 
