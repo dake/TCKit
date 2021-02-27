@@ -18,7 +18,7 @@
  
  Requests recently added:
  Layton at PolarBearFarm - color descriptions 
-    e.g. (UIColor.warmGrayWithHintOfBlueTouchOfRedAndSplashOfYellowColor)
+ e.g. (UIColor.warmGrayWithHintOfBlueTouchOfRedAndSplashOfYellowColor)
  Added: Auto color descriptions, especially using xkcd 
  
  Kevin / Eridius 
