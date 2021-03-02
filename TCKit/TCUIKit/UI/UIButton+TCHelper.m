@@ -147,7 +147,7 @@ static char const kBtnExtraKey;
         [self tc_swizzle:@selector(setImage:forState:)];
         [self tc_swizzle:@selector(setTitle:forState:)];
         [self tc_swizzle:@selector(setAttributedTitle:forState:)];
-        [self tc_swizzle:@selector(sizeToFit)];
+//        [self tc_swizzle:@selector(sizeToFit)];
     });
 }
 
@@ -164,30 +164,35 @@ static char const kBtnExtraKey;
     return observer;
 }
 
-- (void)tc_sizeToFit
-{
-    [self tc_sizeToFit];
-    if (self.paddingBetweenTitleAndImage != 0) {
-        CGRect frame = self.frame;
-        
-        switch (self.layoutStyle) {
-            case kTCButtonLayoutStyleImageLeftTitleRight:
-            case kTCButtonLayoutStyleImageRightTitleLeft:
-                frame.size.width += self.paddingBetweenTitleAndImage;
-                break;
-                
-            case kTCButtonLayoutStyleImageTopTitleBottom:
-            case kTCButtonLayoutStyleImageBottomTitleTop:
-                frame.size.height += self.paddingBetweenTitleAndImage;
-                break;
-                
-            default:
-                return;
-        }
-        
-        self.frame = frame;
-    }
-}
+//- (void)tc_sizeToFit
+//{
+//    [self tc_sizeToFit];
+//    if (self.paddingBetweenTitleAndImage != 0 && [self titleForState:self.state].length > 0 && nil != [self imageForState:self.state]) {
+//        CGRect frame = self.frame;
+//
+//        switch (self.layoutStyle) {
+//            case kTCButtonLayoutStyleImageLeftTitleRight:
+//            case kTCButtonLayoutStyleImageRightTitleLeft:
+//                frame.size.width += self.paddingBetweenTitleAndImage;
+//                break;
+//
+//            case kTCButtonLayoutStyleImageTopTitleBottom:
+//            case kTCButtonLayoutStyleImageBottomTitleTop:
+//                frame.size.height += self.paddingBetweenTitleAndImage;
+//                break;
+//
+//            default:
+//                return;
+//        }
+//
+//        self.frame = frame;
+//    }
+//}
+
+//- (void)origin_sizeToFit
+//{
+//    [self tc_sizeToFit];
+//}
 
 - (void)tc_setImage:(UIImage *)image forState:(UIControlState)state
 {
@@ -458,7 +463,7 @@ static char const kBtnExtraKey;
         self.titleEdgeInsets = UIEdgeInsetsZero;
         self.imageEdgeInsets = UIEdgeInsetsZero;
         
-        CGFloat pad = self.paddingBetweenTitleAndImage * 0.5f;
+        CGFloat pad = ([self titleForState:self.state].length > 0 && nil != [self imageForState:self.state]) ? self.paddingBetweenTitleAndImage * 0.5f : 0.0f;
         CGRect contentRect = [self contentRectForBounds:self.bounds];
         CGSize imageSize = [self imageRectForContentRect:contentRect].size;
         CGSize titleSize = [self titleRectForContentRect:contentRect].size;
