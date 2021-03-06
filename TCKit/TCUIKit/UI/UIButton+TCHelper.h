@@ -12,22 +12,24 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSInteger, TCButtonLayoutStyle) {
-    kTCButtonLayoutStyleDefault = 0,
-    kTCButtonLayoutStyleImageLeftTitleRight,
-    kTCButtonLayoutStyleImageRightTitleLeft,
-    kTCButtonLayoutStyleImageTopTitleBottom,
-    kTCButtonLayoutStyleImageBottomTitleTop,
-};
+//typedef NS_ENUM(NSInteger, TCButtonLayoutStyle) {
+//    kTCButtonLayoutStyleDefault = 0,
+//    kTCButtonLayoutStyleImageLeftTitleRight,
+//    kTCButtonLayoutStyleImageRightTitleLeft,
+//    kTCButtonLayoutStyleImageTopTitleBottom,
+//    kTCButtonLayoutStyleImageBottomTitleTop,
+//};
 
 @interface UIButton (TCHelper)
 
-@property (nonatomic, assign) UIEdgeInsets alignmentRectInsets;
-@property (nonatomic, assign) CGFloat paddingBetweenTitleAndImage;
-
-@property (nonatomic, assign) TCButtonLayoutStyle layoutStyle;
-
 + (nullable UIImage *)imageFromBarButtonSystemItem:(UIBarButtonSystemItem)item;
+
+//@property (nonatomic, assign) UIEdgeInsets alignmentRectInsets;
+//@property (nonatomic, assign) CGFloat paddingBetweenTitleAndImage;
+//
+//@property (nonatomic, assign) TCButtonLayoutStyle layoutStyle;
+
+
 
 
 /**
@@ -44,13 +46,13 @@ typedef NS_ENUM(NSInteger, TCButtonLayoutStyle) {
  [button setAttributedTitle: titleString forState:UIControlStateNormal];
  
  */
-- (void)setEnableUnderline:(BOOL)enableUnderline; // default: NO
-
-
-- (void)resetImageAndTitleEdges;
-- (void)updateLayoutStyle;
-
-- (void)setLayoutSizeNeedChange:(void (^)(__kindof UIButton *sender, CGSize layoutSize))block;
+//- (void)setEnableUnderline:(BOOL)enableUnderline; // default: NO
+//
+//
+//- (void)resetImageAndTitleEdges;
+//- (void)updateLayoutStyle;
+//
+//- (void)setLayoutSizeNeedChange:(void (^)(__kindof UIButton *sender, CGSize layoutSize))block;
 
 
 - (nullable UIColor *)backgroundColorForState:(UIControlState)state;
