@@ -199,7 +199,12 @@ didCompleteWithError:(NSError *)error
     NSData *data = nil;
     if (nil != self.mutableData) {
         @autoreleasepool {
-            data = self.mutableData.copy;
+            if (self.mutableData.length <= 1 * 1024 * 1024U) {
+                data = self.mutableData.copy;
+            } else {
+                data = self.mutableData;
+            }
+      
             //We no longer need the reference, so nil it out to gain back some memory.
             self.mutableData = nil;
         }
