@@ -144,6 +144,9 @@ typedef NS_ENUM(NSInteger, TCDeviceScreen) {
     kTCDeviceScreen10_5inch,
     kTCDeviceScreen11inch,
     kTCDeviceScreen12_9inch,
+    
+    
+    kTCDeviceScreenBigger,
 };
 
 

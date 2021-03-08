@@ -73,7 +73,7 @@ NS_INLINE BOOL IS_MAC(void)
                 || NSProcessInfo.processInfo.macCatalystApp) {
                 flag = YES;
             }
-        } else if (@available(iOS 13, macOS 10.5, *)) {
+        } else if (@available(iOS 13, macOS 10.15, *)) {
             if (NSProcessInfo.processInfo.macCatalystApp) {
                 flag = YES;
             }

@@ -556,6 +556,8 @@ static NSString *s_device_names[kTCDeviceCount] = {
         return kTCDeviceScreen11inch;
     } else if (screenHeight == 1366.0f) {
         return kTCDeviceScreen12_9inch;
+    } else if (screenHeight > 1200.0f) {
+        return kTCDeviceScreenBigger;
     }
     
     return kTCDeviceScreenUnknown;
