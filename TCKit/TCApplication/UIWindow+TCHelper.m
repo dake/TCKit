@@ -12,7 +12,7 @@
 
 @implementation UIWindow (TCHelper)
 
-+ (UIViewController *)keyWindowTopController
++ (UIViewController *)hostWindowTopController
 {
     return UIApplication.sharedApplication.delegate.window.topMostViewController;
 }
@@ -25,10 +25,14 @@
         return nil;
     }
     
-    if (ctrler.childViewControllers.count > 0) {
-        return [self topViewController:ctrler.childViewControllers.firstObject];
+    for (UIViewController *childVC in ctrler.childViewControllers.reverseObjectEnumerator) {
+        if (childVC.isViewLoaded && self == childVC.view.window) {
+            DLog(@">>>> %@  >>>>> displayed child index:%lu", ctrler, (unsigned long)[ctrler.childViewControllers indexOfObjectIdenticalTo:childVC]);
+            return [self topViewController:childVC];
+        }
     }
-    return ctrler;
+
+    return [self topViewController:ctrler];
 }
 
 - (UIViewController *)_topMostViewController
@@ -97,6 +101,20 @@
     } else if ([controller isKindOfClass:UIPageViewController.class]) {
         UIPageViewController *page = (typeof(page))controller;
         UIViewController *ctrler = page.viewControllers.firstObject;
+        for (UIViewController *childVC in page.viewControllers) {
+            if (childVC.isViewLoaded && self == childVC.view.window) {
+                ctrler = childVC;
+                break;
+            }
+        }
+        
+        if (nil != ctrler) {
+            controller = [self topViewController:ctrler];
+        }
+        
+    } else if ([controller isKindOfClass:UISplitViewController.class]) {
+        UISplitViewController *spilt = (typeof(spilt))controller;
+        UIViewController *ctrler = spilt.viewControllers.lastObject;
         if (nil != ctrler) {
             controller = [self topViewController:ctrler];
         }

@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface UIWindow (TCHelper)
 
-+ (nullable __kindof UIViewController *)keyWindowTopController;
++ (nullable __kindof UIViewController *)hostWindowTopController;
 
 - (nullable __kindof UIViewController *)topMostViewController;
 

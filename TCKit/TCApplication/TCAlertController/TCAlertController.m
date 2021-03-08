@@ -169,7 +169,7 @@
 - (void)show
 {
     if (nil == _parentCtrler) {
-        _parentCtrler = UIWindow.keyWindowTopController;
+        _parentCtrler = UIWindow.hostWindowTopController;
     }
     
     if ([_alertView isKindOfClass:UIViewController.class]) {
