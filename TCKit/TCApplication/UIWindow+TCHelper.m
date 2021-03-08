@@ -32,7 +32,7 @@
         }
     }
 
-    return [self topViewController:ctrler];
+    return ctrler;
 }
 
 - (UIViewController *)_topMostViewController
