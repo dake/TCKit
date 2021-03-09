@@ -207,7 +207,7 @@
 
 - (id)pullObject
 {
-    if (self.count == 0) {
+    if (self.count < 1) {
         return nil;
     }
 	
