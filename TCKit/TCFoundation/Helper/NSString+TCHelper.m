@@ -133,14 +133,27 @@
 - (NSString *)stringByDeletingFixedPathExtension:(NSString **)ext
 {
     NSString *pathExt = self.fixedFileExtension;
-    if (nil == pathExt) {
+    if (nil == pathExt || ![self hasSuffix:pathExt]) {
         return self;
     }
     
     if (NULL != ext) {
         *ext = pathExt;
     }
-    return [self substringToIndex:self.length - pathExt.length - 1];
+    
+    NSString *path = [self substringToIndex:self.length - pathExt.length - 1];
+    if (NSOrderedSame == [pathExt compare:@"rar" options:NSCaseInsensitiveSearch]
+        || NSOrderedSame == [pathExt compare:@"7z" options:NSCaseInsensitiveSearch]
+        || NSOrderedSame == [pathExt compare:@"zip" options:NSCaseInsensitiveSearch]
+        || NSOrderedSame == [pathExt compare:@"alz" options:NSCaseInsensitiveSearch]
+        || NSOrderedSame == [pathExt compare:@"mou" options:NSCaseInsensitiveSearch]) {
+        NSString *tmpExt = path.pathExtension;
+        NSUInteger len = tmpExt.length;
+        if (len > 1 && isnumber([tmpExt characterAtIndex:len - 1])) {
+            return path.stringByDeletingPathExtension;
+        }
+    }
+    return path;
 }
 
 - (NSString *)stringByAppendingPathExtensionMust:(NSString *)str
