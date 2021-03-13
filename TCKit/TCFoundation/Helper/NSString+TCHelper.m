@@ -142,6 +142,8 @@
     }
     
     NSString *path = [self substringToIndex:self.length - pathExt.length - 1];
+    
+    // part1.rar part1.7z
     if (NSOrderedSame == [pathExt compare:@"rar" options:NSCaseInsensitiveSearch]
         || NSOrderedSame == [pathExt compare:@"7z" options:NSCaseInsensitiveSearch]
         || NSOrderedSame == [pathExt compare:@"zip" options:NSCaseInsensitiveSearch]
@@ -288,13 +290,34 @@
         return nil;
     }
     
-    if (ext.isInteger && ![ext isEqualToString:@"323"]) { // text/h323
-        return nil;
+    if (ext.isInteger) {
+        if (ext.length != 3U) {
+            return nil;
+        }
+        
+        if (![self hasSuffix:ext]) {
+            // text/h323
+            return [ext isEqualToString:@"323"] ? ext : nil;
+        }
+        
+        NSString *pathExt = [self substringToIndex:self.length - ext.length - 1].pathExtension;
+        // 7z.001  zip.001  rar.001
+        if (NSOrderedSame == [pathExt compare:@"rar" options:NSCaseInsensitiveSearch]
+            || NSOrderedSame == [pathExt compare:@"7z" options:NSCaseInsensitiveSearch]
+            || NSOrderedSame == [pathExt compare:@"zip" options:NSCaseInsensitiveSearch]
+            || NSOrderedSame == [pathExt compare:@"alz" options:NSCaseInsensitiveSearch]
+            || NSOrderedSame == [pathExt compare:@"mou" options:NSCaseInsensitiveSearch]) {
+            return [pathExt stringByAppendingFormat:@".%@", ext];
+        }
+        
+        // text/h323
+        return [ext isEqualToString:@"323"] ? ext : nil;
     }
     
     if (NSNotFound != [ext rangeOfString:@"_"].location && NSOrderedSame != [ext compare:@"thor_bak" options:NSCaseInsensitiveSearch]) {
         return nil;
     }
+    
     return ext;
 }
 
