@@ -91,4 +91,14 @@ case CC_SHA512_DIGEST_LENGTH:
 @end
 
 
+@interface TCURL : NSURL
+
+@property (nonatomic, assign) BOOL autoDelete; // NO
+@property (nullable, nonatomic, strong) id extraInfo;
+
++ (instancetype)URLWithNSURL:(NSURL *)url;
+
+@end
+
+
 NS_ASSUME_NONNULL_END

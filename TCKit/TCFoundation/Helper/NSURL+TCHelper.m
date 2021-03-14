@@ -862,3 +862,24 @@ static int tc_CCHmacUpdate(void *c, const void *data, CC_LONG len)
 }
 
 @end
+
+
+@implementation TCURL : NSURL
+
+- (void)dealloc
+{
+    if (self.autoDelete && self.isFileURL) {
+        [NSFileManager.defaultManager removeItemAtURL:self error:NULL];
+    }
+}
+
++ (instancetype)URLWithNSURL:(NSURL *)url
+{
+    NSCParameterAssert(url);
+    if (url.isFileURL) {
+        return (TCURL *)[self fileURLWithPath:url.path isDirectory:url.hasDirectoryPath];
+    }
+    return (TCURL *)[self URLWithString:url.absoluteString];
+}
+
+@end
