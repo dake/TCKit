@@ -18,10 +18,15 @@
     if (nil == finish) {
         return;
     }
+    
+    dispatch_queue_t const queue = tc_dispatch_get_current_queue();
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
         @autoreleasepool {
             NSData *data = [NSURLSessionTask tc_resumeDataWithIdentifier:policy.downloadIdentifier inDirectory:policy.downloadResumeCacheDirectory];
-            dispatch_async(dispatch_get_main_queue(), ^{
+            if (nil == data) {
+                [NSURLSessionTask tc_purgeResumeDataWithIdentifier:policy.downloadIdentifier  inDirectory:policy.downloadResumeCacheDirectory];
+            }
+            dispatch_async(queue ?: dispatch_get_main_queue(), ^{
                 finish(data);
             });
         }

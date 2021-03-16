@@ -50,7 +50,7 @@ static NSString *tc_md5_32(NSString *str)
         return NO;
     }
     
-    static NSMutableSet *enabledClasses = nil;
+    static NSMutableSet<Class> *enabledClasses = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         enabledClasses = NSMutableSet.set;
@@ -108,10 +108,17 @@ static NSString *tc_md5_32(NSString *str)
     
     __weak typeof(self) wSelf = self;
     [self tc_cancelByProducingResumeData:^(NSData * _Nullable resumeData) {
+        if (nil == wSelf) {
+            if (nil != completionHandler) {
+                completionHandler(resumeData);
+            }
+            return;
+        }
+        
         __strong typeof(wSelf) sSelf = wSelf;
         dispatch_block_t block = ^{
-            if (nil != resumeData) {
-                @autoreleasepool {
+            @autoreleasepool {
+                if (nil != resumeData) {
                     if ([resumeData writeToURL:sSelf.tc_resumeCachePath atomically:YES] &&
                         ![NSURLSessionTask tc_isTmpResumeCache:sSelf.tc_resumeCacheDirectory]) {
                         NSURL *tmpDownloadFile = [sSelf.class tc_resumeInfoTempFileNameFor:resumeData];
@@ -124,15 +131,15 @@ static NSString *tc_md5_32(NSString *str)
                         }
                     }
                 }
-            }
-            
-            if (nil != completionHandler) {
-                completionHandler(resumeData);
+                
+                if (nil != completionHandler) {
+                    completionHandler(resumeData);
+                }
             }
         };
         
         if (NSThread.isMainThread) {
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), block);
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), block);
         } else {
             block();
         }
@@ -177,7 +184,11 @@ static NSString *tc_md5_32(NSString *str)
 
 + (BOOL)tc_isTmpResumeCache:(NSURL *)resumeDirectory
 {
-    return [resumeDirectory.path.stringByStandardizingPath hasPrefix:NSTemporaryDirectory().stringByStandardizingPath];
+    NSString *path = resumeDirectory.path;
+    NSString *tmp = NSTemporaryDirectory();
+    return [path hasPrefix:tmp]
+    || [path.stringByStandardizingPath hasPrefix:tmp]
+    || [path hasPrefix:tmp.stringByStandardizingPath];
 }
 
 - (NSURL *)tc_resumeCachePath
@@ -246,7 +257,11 @@ static NSString *tc_md5_32(NSString *str)
 
 + (nullable NSData *)tc_resumeDataWithIdentifier:(NSString *)identifier inDirectory:(nullable NSURL *)subpath
 {
+    // FIXME: huge file with GBs
     NSData *data = [NSData dataWithContentsOfURL:[self tc_resumeCachePathWithDirectory:subpath identifier:identifier] options:NSDataReadingUncached|NSDataReadingMappedAlways error:NULL];
+    if (nil == data) {
+        return nil;
+    }
     NSURL *tmpDownloadFile = [self tc_resumeInfoTempFileNameFor:data];
     if (nil != tmpDownloadFile) {
         if (![self tc_isTmpResumeCache:subpath]) {
@@ -270,7 +285,6 @@ static NSString *tc_md5_32(NSString *str)
 + (void)tc_purgeResumeDataWithIdentifier:(NSString *)identifier inDirectory:(nullable NSURL *)subpath
 {
     NSURL *url = [self tc_resumeCachePathWithDirectory:subpath identifier:identifier];
-    
     if (![NSFileManager.defaultManager fileExistsAtPath:url.path]) {
         return;
     }

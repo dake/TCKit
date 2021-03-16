@@ -375,8 +375,8 @@
     __weak typeof(self) wSelf = self;
     void (^completionHandler)(NSURLResponse *response, NSURL *filePath, NSError *error) = ^(NSURLResponse * _Nonnull response, NSURL * _Nullable filePath, NSError * _Nullable error) {
         if (nil != error || nil == filePath) {
-            if (request.streamPolicy.shouldResumeDownload && nil != error) {
-                if ([error.domain isEqualToString:NSPOSIXErrorDomain] && ENOENT == error.code) {
+            if (nil != error && request.streamPolicy.shouldResumeDownload) {
+                if (ENOENT == error.code && [error.domain isEqualToString:NSPOSIXErrorDomain]) {
                     [wSelf clearCachedResumeDataForRequest:request];
                 }
             }
