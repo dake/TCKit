@@ -20,10 +20,11 @@ NS_ASSUME_NONNULL_BEGIN
 // must called by task return by -[NSURLSession downloadTaskWith***] like methods.
 - (BOOL)tc_makePersistentResumeCapable;
 
-+ (nullable NSData *)tc_resumeDataWithIdentifier:(NSString *)identifier inDirectory:(nullable NSURL *)subpath;
+// autoHash YES
++ (nullable NSData *)tc_resumeDataWithIdentifier:(NSString *)identifier inDirectory:(nullable NSURL *)subpath autoHash:(BOOL)autoHash;
 
 // call this, while NSURLSessionDownloadTask failed with error: NSPOSIXErrorDomain, code = 2. etc..
-+ (void)tc_purgeResumeDataWithIdentifier:(NSString *)identifier inDirectory:(nullable NSURL *)subpath;
++ (void)tc_purgeResumeDataWithIdentifier:(NSString *)identifier inDirectory:(nullable NSURL *)subpath autoHash:(BOOL)autoHash;
 - (void)tc_purgeResumeData;
 
 @end

@@ -96,7 +96,7 @@ static NSString *tc_md5_32(NSString *str)
 
 - (void)tc_purgeResumeData
 {
-    [NSURLSessionTask tc_purgeResumeDataWithIdentifier:self.tc_resumeIdentifier inDirectory:self.tc_resumeCacheDirectory];
+    [NSURLSessionTask tc_purgeResumeDataWithIdentifier:self.tc_resumeIdentifier inDirectory:self.tc_resumeCacheDirectory autoHash:YES];
 }
 
 - (void)tc_cancelByProducingResumeData:(void (^)(NSData * __nullable resumeData))completionHandler
@@ -177,9 +177,9 @@ static NSString *tc_md5_32(NSString *str)
     }
 }
 
-+ (NSURL *)tc_resumeCachePathWithDirectory:(NSURL *)subpath identifier:(NSString *)indentifier
++ (NSURL *)tc_resumeCachePathWithDirectory:(NSURL *)subpath identifier:(NSString *)indentifier autoHash:(BOOL)autoHash
 {
-    return [subpath URLByAppendingPathComponent:tc_md5_32(indentifier)];
+    return [subpath URLByAppendingPathComponent:autoHash ? tc_md5_32(indentifier) : indentifier];
 }
 
 + (BOOL)tc_isTmpResumeCache:(NSURL *)resumeDirectory
@@ -193,7 +193,7 @@ static NSString *tc_md5_32(NSString *str)
 
 - (NSURL *)tc_resumeCachePath
 {
-    return [self.class tc_resumeCachePathWithDirectory:self.tc_resumeCacheDirectory identifier:self.tc_resumeIdentifier];
+    return [self.class tc_resumeCachePathWithDirectory:self.tc_resumeCacheDirectory identifier:self.tc_resumeIdentifier autoHash:YES];
 }
 
 
@@ -255,10 +255,10 @@ static NSString *tc_md5_32(NSString *str)
 
 #pragma mark -
 
-+ (nullable NSData *)tc_resumeDataWithIdentifier:(NSString *)identifier inDirectory:(nullable NSURL *)subpath
++ (nullable NSData *)tc_resumeDataWithIdentifier:(NSString *)identifier inDirectory:(nullable NSURL *)subpath autoHash:(BOOL)autoHash
 {
     // FIXME: huge file with GBs
-    NSData *data = [NSData dataWithContentsOfURL:[self tc_resumeCachePathWithDirectory:subpath identifier:identifier] options:NSDataReadingUncached|NSDataReadingMappedAlways error:NULL];
+    NSData *data = [NSData dataWithContentsOfURL:[self tc_resumeCachePathWithDirectory:subpath identifier:identifier autoHash:autoHash] options:NSDataReadingUncached|NSDataReadingMappedAlways error:NULL];
     if (nil == data) {
         return nil;
     }
@@ -282,9 +282,9 @@ static NSString *tc_md5_32(NSString *str)
     return data;
 }
 
-+ (void)tc_purgeResumeDataWithIdentifier:(NSString *)identifier inDirectory:(nullable NSURL *)subpath
++ (void)tc_purgeResumeDataWithIdentifier:(NSString *)identifier inDirectory:(nullable NSURL *)subpath autoHash:(BOOL)autoHash
 {
-    NSURL *url = [self tc_resumeCachePathWithDirectory:subpath identifier:identifier];
+    NSURL *url = [self tc_resumeCachePathWithDirectory:subpath identifier:identifier autoHash:autoHash];
     if (![NSFileManager.defaultManager fileExistsAtPath:url.path]) {
         return;
     }
