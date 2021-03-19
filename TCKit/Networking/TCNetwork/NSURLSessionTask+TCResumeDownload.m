@@ -115,34 +115,25 @@ static NSString *tc_md5_32(NSString *str)
             return;
         }
         
-        __strong typeof(wSelf) sSelf = wSelf;
-        dispatch_block_t block = ^{
-            @autoreleasepool {
-                NSData *data = resumeData;
-                if (nil != resumeData && [resumeData writeToURL:sSelf.tc_resumeCachePath atomically:YES]) {
-                    BOOL cacheTmp = NO;
-                    NSURL *tmpDownloadFile = [sSelf.class tc_resumeInfoTempFileNameFor:resumeData cacheTmp:&cacheTmp];
-                    if (nil != tmpDownloadFile && cacheTmp && ![NSURLSessionTask tc_isTmpResumeCache:sSelf.tc_resumeCacheDirectory]) {
-                        NSError *error = nil;
-                        NSURL *cachePath = [sSelf.tc_resumeCacheDirectory URLByAppendingPathComponent:tmpDownloadFile.lastPathComponent];
-                        [NSFileManager.defaultManager removeItemAtURL:cachePath error:NULL];
-                        if (![NSFileManager.defaultManager moveItemAtURL:tmpDownloadFile toURL:cachePath error:&error]) {
-                            data = nil;
-                        }
-                        NSCAssert(nil == error, @"%@", error);
+        @autoreleasepool {
+            NSData *data = resumeData;
+            if (nil != resumeData && [resumeData writeToURL:wSelf.tc_resumeCachePath atomically:YES]) {
+                BOOL cacheTmp = NO;
+                NSURL *tmpDownloadFile = [wSelf.class tc_resumeInfoTempFileNameFor:resumeData cacheTmp:&cacheTmp];
+                if (nil != tmpDownloadFile && cacheTmp && ![NSURLSessionTask tc_isTmpResumeCache:wSelf.tc_resumeCacheDirectory]) {
+                    NSError *error = nil;
+                    NSURL *cachePath = [wSelf.tc_resumeCacheDirectory URLByAppendingPathComponent:tmpDownloadFile.lastPathComponent];
+                    [NSFileManager.defaultManager removeItemAtURL:cachePath error:NULL];
+                    if (![NSFileManager.defaultManager moveItemAtURL:tmpDownloadFile toURL:cachePath error:&error]) {
+                        data = nil;
                     }
-                }
-                
-                if (nil != completionHandler) {
-                    completionHandler(data);
+                    NSCAssert(nil == error, @"%@", error);
                 }
             }
-        };
-        
-        if (NSThread.isMainThread) {
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), block);
-        } else {
-            block();
+            
+            if (nil != completionHandler) {
+                completionHandler(data);
+            }
         }
     }];
 }

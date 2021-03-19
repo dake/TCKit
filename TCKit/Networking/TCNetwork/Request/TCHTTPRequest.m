@@ -186,7 +186,7 @@
         [self.requestTask isKindOfClass:NSURLSessionDownloadTask.class] &&
         [self.requestTask respondsToSelector:@selector(cancelByProducingResumeData:)]) {
         [(NSURLSessionDownloadTask *)self.requestTask cancelByProducingResumeData:^(NSData * _Nullable resumeData) {
-            // not in main thread
+            // may not in main thread
         }];
     } else {
         [self.requestTask cancel];
