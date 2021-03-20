@@ -15,8 +15,6 @@
 
 
 NSString *TCPercentEscapedStringFromString(NSString *string) {
-    NSCharacterSet *allowedCharacterSet = NSCharacterSet.urlComponentAllowedCharacters;
-    
     // FIXME: https://github.com/AFNetworking/AFNetworking/pull/3028
     // return [string stringByAddingPercentEncodingWithAllowedCharacters:allowedCharacterSet];
     
@@ -24,6 +22,7 @@ NSString *TCPercentEscapedStringFromString(NSString *string) {
     
     NSUInteger index = 0;
     NSMutableString *escaped = NSMutableString.string;
+    NSCharacterSet *const allowedCharset = NSCharacterSet.urlComponentAllowedCharacters;
     
     while (index < string.length) {
         NSUInteger length = MIN(string.length - index, batchSize);
@@ -33,7 +32,7 @@ NSString *TCPercentEscapedStringFromString(NSString *string) {
         range = [string rangeOfComposedCharacterSequencesForRange:range];
         
         NSString *substring = [string substringWithRange:range];
-        NSString *encoded = [substring stringByAddingPercentEncodingWithAllowedCharacters:allowedCharacterSet];
+        NSString *encoded = [substring stringByAddingPercentEncodingWithAllowedCharacters:allowedCharset];
         [escaped appendString:encoded];
         
         index += range.length;
@@ -44,17 +43,47 @@ NSString *TCPercentEscapedStringFromString(NSString *string) {
 
 NSString *TCPercentEscapedStringFromFileName(NSString *string)
 {
-    if (string.length < 1) {
+    NSUInteger const len = string.length;
+    if (len < 1) {
         return nil;
     }
     
-    NSString *name = [[string componentsSeparatedByCharactersInSet:NSCharacterSet.illegalFileNameCharacters] componentsJoinedByString:@"_"];
-    if (name.length > NAME_MAX) {
-        name = [name substringFromIndex:name.length - NAME_MAX];
-    } else if ([name isEqualToString:@"_"]) {
-        return nil;
+    NSCharacterSet *const illegalCharset = NSCharacterSet.illegalFileNameCharacters;
+    NSRange range = [string rangeOfCharacterFromSet:illegalCharset];
+    if (range.location == NSNotFound) {
+        if (len > NAME_MAX) {
+            return [string substringFromIndex:len - NAME_MAX];
+        }
+        return string;
     }
-    return name.length < 1 ? nil : name;
+    
+    NSRange range0 = NSMakeRange(0, 0);
+    NSMutableString *str = NSMutableString.string;
+    NSCharacterSet *const allowedCharset = illegalCharset.invertedSet;
+    do {
+        NSUInteger loc0 = NSMaxRange(range0);
+        NSRange prefixRange = NSMakeRange(loc0, range.location - loc0);
+        if (prefixRange.length > 0) {
+            [str appendString:[string substringWithRange:prefixRange]];
+        }
+        range0 = range;
+        [str appendString:[[string substringWithRange:range] stringByAddingPercentEncodingWithAllowedCharacters:allowedCharset]];
+        
+        NSUInteger loc = NSMaxRange(range);
+        if (len < 1 + loc) {
+            break;
+        }
+        range = [string rangeOfCharacterFromSet:illegalCharset options:kNilOptions range:NSMakeRange(loc, len - loc)];
+        if (NSNotFound == range.location) {
+            [str appendString:[string substringFromIndex:loc]];
+            break;
+        }
+    } while (true);
+    
+    if (str.length > NAME_MAX) {
+        return [str substringFromIndex:str.length - NAME_MAX];
+    }
+    return str;
 }
 
 

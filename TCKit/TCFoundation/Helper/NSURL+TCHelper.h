@@ -12,7 +12,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 extern NSString * TCPercentEscapedStringFromString(NSString *string);
-extern NSString *_Nullable TCPercentEscapedStringFromFileName(NSString *string);
+extern NSString *_Nullable TCPercentEscapedStringFromFileName(NSString *_Nullable string);
 
 @interface NSURL (TCHelper)
 
