@@ -25,6 +25,16 @@ NSString *const _uuidsOfUserDevicesToggleKey = @"fc_uuidsOfUserDevicesToggle";
 
 __attribute__((objc_direct_members))
 @implementation FCUUID
+{
+@private
+    NSMutableDictionary *_uuidForKey;
+    NSString *_uuidForSession;
+    NSString *_uuidForInstallation;
+    NSString *_uuidForVendor;
+    NSString *_uuidForDevice;
+    NSString *_uuidsOfUserDevices;
+    BOOL _uuidsOfUserDevices_iCloudAvailable;
+}
 
 
 +(FCUUID *)sharedInstance
@@ -57,11 +67,11 @@ __attribute__((objc_direct_members))
 {
     NSString *value = [self _getValueForKey:key userDefaults:userDefaults keychain:keychain service:service accessGroup:accessGroup];
     
-    if(!value){
+    if(nil == value){
         value = defaultValue;
     }
     
-    if(!value){
+    if(nil == value){
         value = [self uuid];
     }
     
@@ -86,18 +96,18 @@ __attribute__((objc_direct_members))
         value = [NSUserDefaults.standardUserDefaults stringForKey:key];
     }
     
-    return ![value isKindOfClass:NSString.class] ? nil : value;
+    return [value isKindOfClass:NSString.class] ? value : nil;
 }
 
 
 -(void)_setValue:(NSString *)value forKey:(NSString *)key userDefaults:(BOOL)userDefaults keychain:(BOOL)keychain service:(NSString *)service accessGroup:(NSString *)accessGroup synchronizable:(BOOL)synchronizable
 {
-    if( value && userDefaults ){
+    if(nil != value && userDefaults ){
         [NSUserDefaults.standardUserDefaults setObject:value forKey:key];
         [NSUserDefaults.standardUserDefaults synchronize];
     }
     
-    if( value && keychain ){
+    if(nil != value && keychain ){
         UICKeyChainStore *keychain = [UICKeyChainStore keyChainStoreWithService:service accessGroup:accessGroup];
         [keychain setSynchronizable:synchronizable];
         [keychain setString:value forKey:key];
@@ -108,15 +118,7 @@ __attribute__((objc_direct_members))
 -(NSString *)uuid
 {
     //also known as uuid/universallyUniqueIdentifier
-    
-    CFUUIDRef uuidRef = CFUUIDCreate(NULL);
-    CFStringRef uuidStringRef = CFUUIDCreateString(NULL, uuidRef);
-    CFRelease(uuidRef);
-    if (NULL == uuidStringRef) {
-        return nil;
-    }
-    
-    NSString *uuidValue = (__bridge_transfer NSString *)uuidStringRef;
+    NSString *uuidValue = NSUUID.UUID.UUIDString;
     uuidValue = [uuidValue.lowercaseString stringByReplacingOccurrencesOfString:@"-" withString:@""];
     return uuidValue;
 }
@@ -204,11 +206,11 @@ __attribute__((objc_direct_members))
         {
             [self uuidForDevice_updateWithValue:newValue];
             
-            NSMutableOrderedSet *uuidsOfUserDevicesSet = [[NSMutableOrderedSet alloc] initWithArray:[self uuidsOfUserDevices]];
+            NSMutableOrderedSet *uuidsOfUserDevicesSet = [NSMutableOrderedSet orderedSetWithArray:[self uuidsOfUserDevices]];
             [uuidsOfUserDevicesSet addObject:newValue];
             [uuidsOfUserDevicesSet removeObject:oldValue];
             
-            [self uuidsOfUserDevices_updateWithValue:[uuidsOfUserDevicesSet array]];
+            [self uuidsOfUserDevices_updateWithValue:uuidsOfUserDevicesSet.array];
             [self uuidsOfUserDevices_iCloudSync];
             
             return [self uuidForDevice];
@@ -298,18 +300,15 @@ __attribute__((objc_direct_members))
 {
     if( _uuidsOfUserDevices_iCloudAvailable )
     {
-        NSMutableOrderedSet *uuidsSet = [[NSMutableOrderedSet alloc] initWithArray:[self uuidsOfUserDevices]];
-        NSUInteger uuidsCount = [uuidsSet count];
+        NSMutableOrderedSet *uuidsSet = [NSMutableOrderedSet orderedSetWithArray:[self uuidsOfUserDevices]];
+        NSUInteger uuidsCount = uuidsSet.count;
         
-        NSUbiquitousKeyValueStore *iCloud = [NSUbiquitousKeyValueStore defaultStore];
-        NSDictionary *iCloudDict = [iCloud dictionaryRepresentation];
+        NSUbiquitousKeyValueStore *iCloud = NSUbiquitousKeyValueStore.defaultStore;
+        NSDictionary<NSString *, id> *iCloudDict = iCloud.dictionaryRepresentation;
         
         //NSLog(@"uuidsOfUserDevicesSync: %@", iCloudDict);
         
-        [iCloudDict enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
-            
-            NSString *uuidKey = (NSString *)key;
-            
+        [iCloudDict enumerateKeysAndObjectsUsingBlock:^(NSString *uuidKey, id obj, BOOL *stop) {
             if([uuidKey rangeOfString:_uuidForDeviceKey].location == 0)
             {
                 if([obj isKindOfClass:NSString.class])
@@ -329,9 +328,9 @@ __attribute__((objc_direct_members))
             }
         }];
         
-        if([uuidsSet count] > uuidsCount)
+        if(uuidsSet.count > uuidsCount)
         {
-            [self uuidsOfUserDevices_updateWithValue:[uuidsSet array]];
+            [self uuidsOfUserDevices_updateWithValue:uuidsSet.array];
             
             NSDictionary *userInfo = [NSDictionary dictionaryWithObject:[self uuidsOfUserDevices] forKey:@"uuidsOfUserDevices"];
             [NSNotificationCenter.defaultCenter postNotificationName:FCUUIDsOfUserDevicesDidChangeNotification object:self userInfo:userInfo];
@@ -369,14 +368,14 @@ __attribute__((objc_direct_members))
 {
     if(uuidValue != nil)
     {
-        NSString *uuidPattern = @"^[0-9a-f]{32}|[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$";
-        NSRegularExpression *uuidRegExp = [NSRegularExpression regularExpressionWithPattern:uuidPattern options:NSRegularExpressionCaseInsensitive error:nil];
+        static NSString *const uuidPattern = @"^[0-9a-f]{32}|[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$";
+        NSRegularExpression *uuidRegExp = [NSRegularExpression regularExpressionWithPattern:uuidPattern options:NSRegularExpressionCaseInsensitive error:NULL];
         
         NSRange uuidValueRange = NSMakeRange(0, [uuidValue length]);
         NSRange uuidMatchRange = [uuidRegExp rangeOfFirstMatchInString:uuidValue options:0 range:uuidValueRange];
         NSString *uuidMatchValue;
         
-        if(!NSEqualRanges(uuidMatchRange, NSMakeRange(NSNotFound, 0)))
+        if(NSNotFound != uuidMatchRange.location && uuidMatchRange.length > 0)
         {
             uuidMatchValue = [uuidValue substringWithRange:uuidMatchRange];
             
@@ -384,17 +383,12 @@ __attribute__((objc_direct_members))
             {
                 return YES;
             }
-            else {
-                return NO;
-            }
+            
         }
-        else {
-            return NO;
-        }
+        
     }
-    else {
-        return NO;
-    }
+    
+    return NO;
 }
 
 

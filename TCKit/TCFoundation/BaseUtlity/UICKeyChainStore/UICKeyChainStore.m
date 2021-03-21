@@ -124,7 +124,7 @@ static NSString *_defaultService;
 
 + (NSString *)stringForKey:(NSString *)key
 {
-    return [self stringForKey:key service:nil accessGroup:nil error:nil];
+    return [self stringForKey:key service:nil accessGroup:nil error:NULL];
 }
 
 + (NSString *)stringForKey:(NSString *)key error:(NSError *__autoreleasing *)error
@@ -134,7 +134,7 @@ static NSString *_defaultService;
 
 + (NSString *)stringForKey:(NSString *)key service:(NSString *)service
 {
-    return [self stringForKey:key service:service accessGroup:nil error:nil];
+    return [self stringForKey:key service:service accessGroup:nil error:NULL];
 }
 
 + (NSString *)stringForKey:(NSString *)key service:(NSString *)service error:(NSError *__autoreleasing *)error
@@ -144,7 +144,7 @@ static NSString *_defaultService;
 
 + (NSString *)stringForKey:(NSString *)key service:(NSString *)service accessGroup:(NSString *)accessGroup
 {
-    return [self stringForKey:key service:service accessGroup:accessGroup error:nil];
+    return [self stringForKey:key service:service accessGroup:accessGroup error:NULL];
 }
 
 + (NSString *)stringForKey:(NSString *)key service:(NSString *)service accessGroup:(NSString *)accessGroup error:(NSError *__autoreleasing *)error
@@ -168,7 +168,7 @@ static NSString *_defaultService;
 
 + (BOOL)setString:(NSString *)value forKey:(NSString *)key
 {
-    return [self setString:value forKey:key service:nil accessGroup:nil genericAttribute:nil error:nil];
+    return [self setString:value forKey:key service:nil accessGroup:nil genericAttribute:nil error:NULL];
 }
 
 + (BOOL)setString:(NSString *)value forKey:(NSString *)key error:(NSError *__autoreleasing *)error
@@ -178,7 +178,7 @@ static NSString *_defaultService;
 
 + (BOOL)setString:(NSString *)value forKey:(NSString *)key genericAttribute:(id)genericAttribute
 {
-    return [self setString:value forKey:key service:nil accessGroup:nil genericAttribute:genericAttribute error:nil];
+    return [self setString:value forKey:key service:nil accessGroup:nil genericAttribute:genericAttribute error:NULL];
 }
 
 + (BOOL)setString:(NSString *)value forKey:(NSString *)key genericAttribute:(id)genericAttribute error:(NSError * __autoreleasing *)error
@@ -188,7 +188,7 @@ static NSString *_defaultService;
 
 + (BOOL)setString:(NSString *)value forKey:(NSString *)key service:(NSString *)service
 {
-    return [self setString:value forKey:key service:service accessGroup:nil genericAttribute:nil error:nil];
+    return [self setString:value forKey:key service:service accessGroup:nil genericAttribute:nil error:NULL];
 }
 
 + (BOOL)setString:(NSString *)value forKey:(NSString *)key service:(NSString *)service error:(NSError *__autoreleasing *)error
@@ -198,7 +198,7 @@ static NSString *_defaultService;
 
 + (BOOL)setString:(NSString *)value forKey:(NSString *)key service:(NSString *)service genericAttribute:(id)genericAttribute
 {
-    return [self setString:value forKey:key service:service accessGroup:nil genericAttribute:genericAttribute error:nil];
+    return [self setString:value forKey:key service:service accessGroup:nil genericAttribute:genericAttribute error:NULL];
 }
 
 + (BOOL)setString:(NSString *)value forKey:(NSString *)key service:(NSString *)service genericAttribute:(id)genericAttribute error:(NSError * __autoreleasing *)error
@@ -208,7 +208,7 @@ static NSString *_defaultService;
 
 + (BOOL)setString:(NSString *)value forKey:(NSString *)key service:(NSString *)service accessGroup:(NSString *)accessGroup
 {
-    return [self setString:value forKey:key service:service accessGroup:accessGroup genericAttribute:nil error:nil];
+    return [self setString:value forKey:key service:service accessGroup:accessGroup genericAttribute:nil error:NULL];
 }
 
 + (BOOL)setString:(NSString *)value forKey:(NSString *)key service:(NSString *)service accessGroup:(NSString *)accessGroup error:(NSError *__autoreleasing *)error
@@ -218,7 +218,7 @@ static NSString *_defaultService;
 
 + (BOOL)setString:(NSString *)value forKey:(NSString *)key service:(NSString *)service accessGroup:(NSString *)accessGroup genericAttribute:(id)genericAttribute
 {
-    return [self setString:value forKey:key service:service accessGroup:accessGroup genericAttribute:genericAttribute error:nil];
+    return [self setString:value forKey:key service:service accessGroup:accessGroup genericAttribute:genericAttribute error:NULL];
 }
 
 + (BOOL)setString:(NSString *)value forKey:(NSString *)key service:(NSString *)service accessGroup:(NSString *)accessGroup genericAttribute:(id)genericAttribute error:(NSError * __autoreleasing *)error
@@ -241,7 +241,7 @@ static NSString *_defaultService;
 
 + (NSData *)dataForKey:(NSString *)key
 {
-    return [self dataForKey:key service:nil accessGroup:nil error:nil];
+    return [self dataForKey:key service:nil accessGroup:nil error:NULL];
 }
 
 + (NSData *)dataForKey:(NSString *)key error:(NSError *__autoreleasing *)error
@@ -251,7 +251,7 @@ static NSString *_defaultService;
 
 + (NSData *)dataForKey:(NSString *)key service:(NSString *)service
 {
-    return [self dataForKey:key service:service accessGroup:nil error:nil];
+    return [self dataForKey:key service:service accessGroup:nil error:NULL];
 }
 
 + (NSData *)dataForKey:(NSString *)key service:(NSString *)service error:(NSError *__autoreleasing *)error
@@ -261,7 +261,7 @@ static NSString *_defaultService;
 
 + (NSData *)dataForKey:(NSString *)key service:(NSString *)service accessGroup:(NSString *)accessGroup
 {
-    return [self dataForKey:key service:service accessGroup:accessGroup error:nil];
+    return [self dataForKey:key service:service accessGroup:accessGroup error:NULL];
 }
 
 + (NSData *)dataForKey:(NSString *)key service:(NSString *)service accessGroup:(NSString *)accessGroup error:(NSError *__autoreleasing *)error
@@ -285,7 +285,7 @@ static NSString *_defaultService;
 
 + (BOOL)setData:(NSData *)data forKey:(NSString *)key
 {
-    return [self setData:data forKey:key service:nil accessGroup:nil genericAttribute:nil error:nil];
+    return [self setData:data forKey:key service:nil accessGroup:nil genericAttribute:nil error:NULL];
 }
 
 + (BOOL)setData:(NSData *)data forKey:(NSString *)key error:(NSError *__autoreleasing *)error
@@ -295,7 +295,7 @@ static NSString *_defaultService;
 
 + (BOOL)setData:(NSData *)data forKey:(NSString *)key genericAttribute:(id)genericAttribute
 {
-    return [self setData:data forKey:key service:nil accessGroup:nil genericAttribute:genericAttribute error:nil];
+    return [self setData:data forKey:key service:nil accessGroup:nil genericAttribute:genericAttribute error:NULL];
 }
 
 + (BOOL)setData:(NSData *)data forKey:(NSString *)key genericAttribute:(id)genericAttribute error:(NSError * __autoreleasing *)error
@@ -305,7 +305,7 @@ static NSString *_defaultService;
 
 + (BOOL)setData:(NSData *)data forKey:(NSString *)key service:(NSString *)service
 {
-    return [self setData:data forKey:key service:service accessGroup:nil genericAttribute:nil error:nil];
+    return [self setData:data forKey:key service:service accessGroup:nil genericAttribute:nil error:NULL];
 }
 
 + (BOOL)setData:(NSData *)data forKey:(NSString *)key service:(NSString *)service error:(NSError *__autoreleasing *)error
@@ -315,7 +315,7 @@ static NSString *_defaultService;
 
 + (BOOL)setData:(NSData *)data forKey:(NSString *)key service:(NSString *)service genericAttribute:(id)genericAttribute
 {
-    return [self setData:data forKey:key service:service accessGroup:nil genericAttribute:genericAttribute error:nil];
+    return [self setData:data forKey:key service:service accessGroup:nil genericAttribute:genericAttribute error:NULL];
 }
 
 + (BOOL)setData:(NSData *)data forKey:(NSString *)key service:(NSString *)service genericAttribute:(id)genericAttribute error:(NSError * __autoreleasing *)error
@@ -325,7 +325,7 @@ static NSString *_defaultService;
 
 + (BOOL)setData:(NSData *)data forKey:(NSString *)key service:(NSString *)service accessGroup:(NSString *)accessGroup
 {
-    return [self setData:data forKey:key service:service accessGroup:accessGroup genericAttribute:nil error:nil];
+    return [self setData:data forKey:key service:service accessGroup:accessGroup genericAttribute:nil error:NULL];
 }
 
 + (BOOL)setData:(NSData *)data forKey:(NSString *)key service:(NSString *)service accessGroup:(NSString *)accessGroup error:(NSError *__autoreleasing *)error
@@ -335,7 +335,7 @@ static NSString *_defaultService;
 
 + (BOOL)setData:(NSData *)data forKey:(NSString *)key service:(NSString *)service accessGroup:(NSString *)accessGroup genericAttribute:(id)genericAttribute
 {
-    return [self setData:data forKey:key service:service accessGroup:accessGroup genericAttribute:genericAttribute error:nil];
+    return [self setData:data forKey:key service:service accessGroup:accessGroup genericAttribute:genericAttribute error:NULL];
 }
 
 + (BOOL)setData:(NSData *)data forKey:(NSString *)key service:(NSString *)service accessGroup:(NSString *)accessGroup genericAttribute:(id)genericAttribute error:(NSError * __autoreleasing *)error
@@ -370,7 +370,7 @@ static NSString *_defaultService;
 
 - (NSString *)stringForKey:(id)key
 {
-    return [self stringForKey:key error:nil];
+    return [self stringForKey:key error:NULL];
 }
 
 - (NSString *)stringForKey:(id)key error:(NSError *__autoreleasing *)error
@@ -395,7 +395,7 @@ static NSString *_defaultService;
 
 - (BOOL)setString:(NSString *)string forKey:(NSString *)key
 {
-    return [self setString:string forKey:key genericAttribute:nil label:nil comment:nil error:nil];
+    return [self setString:string forKey:key genericAttribute:nil label:nil comment:nil error:NULL];
 }
 
 - (BOOL)setString:(NSString *)string forKey:(NSString *)key error:(NSError *__autoreleasing *)error
@@ -405,7 +405,7 @@ static NSString *_defaultService;
 
 - (BOOL)setString:(NSString *)string forKey:(NSString *)key genericAttribute:(id)genericAttribute
 {
-    return [self setString:string forKey:key genericAttribute:genericAttribute label:nil comment:nil error:nil];
+    return [self setString:string forKey:key genericAttribute:genericAttribute label:nil comment:nil error:NULL];
 }
 
 - (BOOL)setString:(NSString *)string forKey:(NSString *)key genericAttribute:(id)genericAttribute error:(NSError * __autoreleasing *)error
@@ -415,7 +415,7 @@ static NSString *_defaultService;
 
 - (BOOL)setString:(NSString *)string forKey:(NSString *)key label:(NSString *)label comment:(NSString *)comment
 {
-    return [self setString:string forKey:key genericAttribute:nil label:label comment:comment error:nil];
+    return [self setString:string forKey:key genericAttribute:nil label:label comment:comment error:NULL];
 }
 
 - (BOOL)setString:(NSString *)string forKey:(NSString *)key label:(NSString *)label comment:(NSString *)comment error:(NSError *__autoreleasing *)error
@@ -482,7 +482,7 @@ static NSString *_defaultService;
 
 - (BOOL)setData:(NSData *)data forKey:(NSString *)key
 {
-    return [self setData:data forKey:key genericAttribute:nil label:nil comment:nil error:nil];
+    return [self setData:data forKey:key genericAttribute:nil label:nil comment:nil error:NULL];
 }
 
 - (BOOL)setData:(NSData *)data forKey:(NSString *)key error:(NSError *__autoreleasing *)error
@@ -492,7 +492,7 @@ static NSString *_defaultService;
 
 - (BOOL)setData:(NSData *)data forKey:(NSString *)key genericAttribute:(id)genericAttribute
 {
-    return [self setData:data forKey:key genericAttribute:genericAttribute label:nil comment:nil error:nil];
+    return [self setData:data forKey:key genericAttribute:genericAttribute label:nil comment:nil error:NULL];
 }
 
 - (BOOL)setData:(NSData *)data forKey:(NSString *)key genericAttribute:(id)genericAttribute error:(NSError * __autoreleasing *)error
@@ -502,7 +502,7 @@ static NSString *_defaultService;
 
 - (BOOL)setData:(NSData *)data forKey:(NSString *)key label:(NSString *)label comment:(NSString *)comment
 {
-    return [self setData:data forKey:key genericAttribute:nil label:label comment:comment error:nil];
+    return [self setData:data forKey:key genericAttribute:nil label:label comment:comment error:NULL];
 }
 
 - (BOOL)setData:(NSData *)data forKey:(NSString *)key label:(NSString *)label comment:(NSString *)comment error:(NSError *__autoreleasing *)error
@@ -623,7 +623,7 @@ static NSString *_defaultService;
 
 + (BOOL)removeItemForKey:(NSString *)key
 {
-    return [self removeItemForKey:key service:nil accessGroup:nil error:nil];
+    return [self removeItemForKey:key service:nil accessGroup:nil error:NULL];
 }
 
 + (BOOL)removeItemForKey:(NSString *)key error:(NSError *__autoreleasing *)error
@@ -633,7 +633,7 @@ static NSString *_defaultService;
 
 + (BOOL)removeItemForKey:(NSString *)key service:(NSString *)service
 {
-    return [self removeItemForKey:key service:service accessGroup:nil error:nil];
+    return [self removeItemForKey:key service:service accessGroup:nil error:NULL];
 }
 
 + (BOOL)removeItemForKey:(NSString *)key service:(NSString *)service error:(NSError *__autoreleasing *)error
@@ -643,7 +643,7 @@ static NSString *_defaultService;
 
 + (BOOL)removeItemForKey:(NSString *)key service:(NSString *)service accessGroup:(NSString *)accessGroup
 {
-    return [self removeItemForKey:key service:service accessGroup:accessGroup error:nil];
+    return [self removeItemForKey:key service:service accessGroup:accessGroup error:NULL];
 }
 
 + (BOOL)removeItemForKey:(NSString *)key service:(NSString *)service accessGroup:(NSString *)accessGroup error:(NSError *__autoreleasing *)error
@@ -667,7 +667,7 @@ static NSString *_defaultService;
 
 + (BOOL)removeAllItems
 {
-    return [self removeAllItemsForService:nil accessGroup:nil error:nil];
+    return [self removeAllItemsForService:nil accessGroup:nil error:NULL];
 }
 
 + (BOOL)removeAllItemsWithError:(NSError *__autoreleasing *)error
@@ -677,7 +677,7 @@ static NSString *_defaultService;
 
 + (BOOL)removeAllItemsForService:(NSString *)service
 {
-    return [self removeAllItemsForService:service accessGroup:nil error:nil];
+    return [self removeAllItemsForService:service accessGroup:nil error:NULL];
 }
 
 + (BOOL)removeAllItemsForService:(NSString *)service error:(NSError *__autoreleasing *)error
@@ -687,7 +687,7 @@ static NSString *_defaultService;
 
 + (BOOL)removeAllItemsForService:(NSString *)service accessGroup:(NSString *)accessGroup
 {
-    return [self removeAllItemsForService:service accessGroup:accessGroup error:nil];
+    return [self removeAllItemsForService:service accessGroup:accessGroup error:NULL];
 }
 
 + (BOOL)removeAllItemsForService:(NSString *)service accessGroup:(NSString *)accessGroup error:(NSError *__autoreleasing *)error
@@ -724,7 +724,7 @@ static NSString *_defaultService;
 
 - (BOOL)removeAllItems
 {
-    return [self removeAllItemsWithError:nil];
+    return [self removeAllItemsWithError:NULL];
 }
 
 - (BOOL)removeAllItemsWithError:(NSError *__autoreleasing *)error

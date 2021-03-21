@@ -12,16 +12,7 @@ extern NSString *const FCUUIDsOfUserDevicesDidChangeNotification;
 
 __attribute__((objc_subclassing_restricted))
 @interface FCUUID : NSObject
-{
-@private
-    NSMutableDictionary *_uuidForKey;
-    NSString *_uuidForSession;
-    NSString *_uuidForInstallation;
-    NSString *_uuidForVendor;
-    NSString *_uuidForDevice;
-    NSString *_uuidsOfUserDevices;
-    BOOL _uuidsOfUserDevices_iCloudAvailable;
-}
+
 
 +(NSString *)uuid;
 +(NSString *)uuidForKey:(id<NSCopying>)key;
