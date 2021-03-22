@@ -74,7 +74,7 @@
                           cancelAction:(TCAlertAction *)cancelAction
                            otherAction:(TCAlertAction *)otherAction, ...
 {
-    NSMutableArray *arry = nil;
+    NSMutableArray<TCAlertAction *> *arry = nil;
     if (nil != otherAction) {
         arry = NSMutableArray.array;
         TCAlertAction *eachItem = otherAction;

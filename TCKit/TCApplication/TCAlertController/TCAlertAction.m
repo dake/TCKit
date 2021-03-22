@@ -9,7 +9,6 @@
 #ifndef TARGET_IS_EXTENSION
 
 #import "TCAlertAction.h"
-#import <objc/runtime.h>
 
 
 @interface TCAlertAction ()
