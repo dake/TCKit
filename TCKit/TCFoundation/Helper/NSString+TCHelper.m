@@ -21,6 +21,12 @@
 
 @implementation NSString (TCHelper)
 
+- (NSString *)safeStringByRemovingPercentEncoding
+{
+    NSString *str = self.stringByRemovingPercentEncoding;
+    return (nil == str || [str isEqualToString:self]) ? self : str;
+}
+
 - (BOOL)hasInCasePrefix:(NSString *)str
 {
     if (str.length < 1) {

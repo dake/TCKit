@@ -25,6 +25,7 @@ extern bool tc_is_ip_addr(char const *host, bool *_Nullable ipv6);
 
 - (BOOL)hasInCasePrefix:(NSString *)str;
 - (BOOL)hasInCaseSuffix:(NSString *)str;
+- (nullable NSString *)safeStringByRemovingPercentEncoding;
 
 #pragma mark - pattern
 
