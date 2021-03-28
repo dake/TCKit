@@ -277,7 +277,7 @@ __weak static id<TCLabelHelperDelegate> s_menuDelegate = nil;
                 [arry addObjectsFromArray:[delegate menuItemsForLabel:wSelf] ?: @[]];
             }
         }
-        UIMenu *menu = [UIMenu menuWithTitle:@"" image:nil identifier:nil options:0 children:arry];
+        UIMenu *menu = [UIMenu menuWithTitle:@"" image:nil identifier:nil options:kNilOptions children:arry];
         return menu;
     }];
 }

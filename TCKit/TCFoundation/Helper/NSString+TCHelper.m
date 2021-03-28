@@ -252,7 +252,7 @@
     if (lastDot == NSNotFound) {
         lastDot = 0;
     }
-    NSUInteger loc = [ext rangeOfCharacterFromSet:s_queryBeginChar options:0 range:NSMakeRange(lastDot, ext.length - lastDot)].location;
+    NSUInteger loc = [ext rangeOfCharacterFromSet:s_queryBeginChar options:kNilOptions range:NSMakeRange(lastDot, ext.length - lastDot)].location;
     if (loc != NSNotFound) {
         ext = [ext substringToIndex:loc];
     }
@@ -1244,7 +1244,7 @@ static int EscapeMapCompare(const void *ucharVoid, const void *mapVoid) {
     NSMutableString *finalString = [NSMutableString stringWithString:self];
     do {
         NSRange semiColonRange = NSMakeRange(subrange.location, NSMaxRange(range) - subrange.location);
-        semiColonRange = [self rangeOfString:@";" options:0 range:semiColonRange];
+        semiColonRange = [self rangeOfString:@";" options:kNilOptions range:semiColonRange];
         range = NSMakeRange(0, subrange.location);
         // if we don't find a semicolon in the range, we don't have a sequence
         if (semiColonRange.location == NSNotFound) {

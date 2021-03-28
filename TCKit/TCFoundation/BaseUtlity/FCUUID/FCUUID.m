@@ -372,7 +372,7 @@ __attribute__((objc_direct_members))
         NSRegularExpression *uuidRegExp = [NSRegularExpression regularExpressionWithPattern:uuidPattern options:NSRegularExpressionCaseInsensitive error:NULL];
         
         NSRange uuidValueRange = NSMakeRange(0, [uuidValue length]);
-        NSRange uuidMatchRange = [uuidRegExp rangeOfFirstMatchInString:uuidValue options:0 range:uuidValueRange];
+        NSRange uuidMatchRange = [uuidRegExp rangeOfFirstMatchInString:uuidValue options:kNilOptions range:uuidValueRange];
         NSString *uuidMatchValue;
         
         if(NSNotFound != uuidMatchRange.location && uuidMatchRange.length > 0)
