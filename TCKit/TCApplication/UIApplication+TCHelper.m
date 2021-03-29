@@ -86,6 +86,9 @@ NSString *const kTCUIApplicationDelegateChangedNotification = @"TCUIApplicationD
 
 + (UIInterfaceOrientation)statusBarOrientation
 {
+    if (@available(iOS 13, *)) {
+        return UIApplication.sharedApplication.delegate.window.windowScene.interfaceOrientation;
+    }
     return UIApplication.sharedApplication.statusBarOrientation;
 }
 
