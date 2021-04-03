@@ -39,4 +39,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+
+@interface TCRangeInputStream : NSInputStream
+
+@property (nonatomic, assign, readonly) NSRange range;
+
++ (nullable instancetype)inputStreamWithData:(NSData *)data range:(NSRangePointer _Nullable)rangePointer;
++ (nullable instancetype)inputStreamWithFileURL:(NSURL *)url range:(NSRangePointer _Nullable)rangePointer;
++ (nullable instancetype)inputStreamWithFile:(FILE *)file size:(NSUInteger)size range:(NSRangePointer _Nullable)rangePointer;
+//+ (nullable instancetype)inputStreamWithFileDescriptor:(int)file size:(NSUInteger)size range:(NSRangePointer _Nullable)rangePointer;
+
+@end
+
 NS_ASSUME_NONNULL_END
