@@ -21,6 +21,24 @@
 
 @implementation NSString (TCHelper)
 
+- (NSString *)stringByAddSpaceEach
+{
+    NSUInteger len = self.length;
+    if (len < 2) {
+        return self;
+    }
+    
+    NSMutableString *str = NSMutableString.string;
+    [self enumerateSubstringsInRange:NSMakeRange(0, len) options:NSStringEnumerationByComposedCharacterSequences usingBlock:^(NSString * _Nullable substring, NSRange substringRange, NSRange enclosingRange, BOOL * _Nonnull stop) {
+        [str appendString:substring];
+        if (NSMaxRange(substringRange) < len) {
+            [str appendString:@" "];
+        }
+    }];
+    return str;
+}
+
+
 - (NSString *)safeStringByRemovingPercentEncoding
 {
     NSString *str = self.stringByRemovingPercentEncoding;
@@ -528,7 +546,7 @@ bool tc_is_ip_addr(char const *host, bool *ipv6)
     NSRange range = [text rangeOfString:@"://"];
     NSRange begin = NSMakeRange(0, text.length);
     if (NSNotFound != range.location) {
-        begin.location = range.location + range.length;
+        begin.location = NSMaxRange(range);
         begin.length -= begin.location;
     }
     NSRange end = [text rangeOfString:@"/" options:kNilOptions range:begin];
@@ -539,7 +557,7 @@ bool tc_is_ip_addr(char const *host, bool *ipv6)
 
     if (0 == range.location) {
         text = [@"http" stringByAppendingString:text];
-    } else if (NSNotFound == range.location) {
+    } else if (NSNotFound == range.location || begin.location > 0) {
         if ([text isIPAddress:ipv6]) {
             return YES;
         }
