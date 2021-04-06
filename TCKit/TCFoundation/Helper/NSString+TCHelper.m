@@ -666,9 +666,29 @@ bool tc_is_ip_addr(char const *host, bool *ipv6)
 
 - (BOOL)wrongEncoding
 {
+    NSUInteger len = self.length;
+    if (self.length < 1) {
+        return NO;
+    }
     // \0਀Ȁ\0\0\0\0\0\0\0\0Ā\0累栐ꮑࠀ⬧동　\0ꁒ\0ऀ\0Ā\0倀\0Ȁ\0堀\0̀\0搀\0Ѐ\0瀀\0Ԁ\0蠀\0؀\0᠂\0܀\0␂\0ሀ\0簂\0ᄀ�ꯋ뻏響�ꢷ훐ꎣꤾ‼럖
-    NSCharacterSet *set = [NSCharacterSet characterSetWithCharactersInString:@"਀�ꢷ0ऀ�"];
-    return NSNotFound != [self rangeOfCharacterFromSet:set options:NSCaseInsensitiveSearch].location;
+    static NSString *set[] = {
+        @"਀", @"�", @"�ꢷ", @"ꎣ", @"0ऀ"
+    };
+    
+    __block BOOL matched = NO;
+    static NSUInteger maxDetectLen = 100U;
+    [self enumerateSubstringsInRange:NSMakeRange(0, len < maxDetectLen ? len : maxDetectLen) options:NSStringEnumerationByComposedCharacterSequences usingBlock:^(NSString * _Nullable substring, NSRange substringRange, NSRange enclosingRange, BOOL * _Nonnull stop) {
+        for (NSUInteger i = 0; i < sizeof(set)/sizeof(NSString *); ++i) {
+            if ([substring containsString:set[i]]) {
+                *stop = YES;
+                matched = YES;
+                DLog(@"---> wrong encoding char %@: %@, %C", NSStringFromRange(substringRange), [self substringWithRange:substringRange], [[self substringWithRange:substringRange] characterAtIndex:0]);
+                break;
+            }
+        }
+    }];
+
+    return matched;
 }
 
 + (nullable instancetype)stringWithData:(NSData *)data usedEncoding:(nullable NSStringEncoding *)enc force:(BOOL)force fast:(BOOL)fast
