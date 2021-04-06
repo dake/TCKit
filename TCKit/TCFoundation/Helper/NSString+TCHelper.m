@@ -664,6 +664,13 @@ bool tc_is_ip_addr(char const *host, bool *ipv6)
     }
 }
 
+- (BOOL)wrongEncoding
+{
+    // \0਀Ȁ\0\0\0\0\0\0\0\0Ā\0累栐ꮑࠀ⬧동　\0ꁒ\0ऀ\0Ā\0倀\0Ȁ\0堀\0̀\0搀\0Ѐ\0瀀\0Ԁ\0蠀\0؀\0᠂\0܀\0␂\0ሀ\0簂\0ᄀ�ꯋ뻏響�ꢷ훐ꎣꤾ‼럖
+    NSCharacterSet *set = [NSCharacterSet characterSetWithCharactersInString:@"਀�ꢷ0ऀ�"];
+    return NSNotFound != [self rangeOfCharacterFromSet:set options:NSCaseInsensitiveSearch].location;
+}
+
 + (nullable instancetype)stringWithData:(NSData *)data usedEncoding:(nullable NSStringEncoding *)enc force:(BOOL)force fast:(BOOL)fast
 {
     if (data.length < 1) {
@@ -743,7 +750,7 @@ bool tc_is_ip_addr(char const *host, bool *ipv6)
                     NSStringEncoding detectedEnc = value.unsignedIntegerValue;
                     // !!!: 兼容 NSMutableString
                     __kindof NSString *text = [[self alloc] initWithData:data encoding:detectedEnc];
-                    if (nil != text) {
+                    if (nil != text && !text.wrongEncoding) {
                         if (NULL != enc) {
                             *enc = detectedEnc;
                         }
@@ -778,7 +785,7 @@ bool tc_is_ip_addr(char const *host, bool *ipv6)
                 NSStringEncoding detectedEnc = value.unsignedIntegerValue;
                 // !!!: 兼容 NSMutableString
                 __kindof NSString *text = [[self alloc] initWithData:data encoding:detectedEnc];
-                if (nil != text) {
+                if (nil != text && !text.wrongEncoding) {
                     if (NULL != enc) {
                         *enc = detectedEnc;
                     }

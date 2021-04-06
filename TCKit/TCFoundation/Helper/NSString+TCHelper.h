@@ -56,6 +56,7 @@ extern bool tc_is_ip_addr(char const *host, bool *_Nullable ipv6);
 + (nullable instancetype)stringWithData:(NSData *)data usedEncoding:(nullable NSStringEncoding *)enc force:(BOOL)force;
 + (nullable instancetype)stringWithData:(NSData *)data usedEncoding:(nullable NSStringEncoding *)enc force:(BOOL)force fast:(BOOL)fast;
 
+- (BOOL)wrongEncoding;
 
 - (nullable NSString *)stringByEscapingForHTML;
 - (nullable NSString *)stringByEscapingForAsciiHTML;
