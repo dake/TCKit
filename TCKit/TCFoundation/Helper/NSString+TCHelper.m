@@ -280,26 +280,29 @@
     }
     
     NSArray<NSString *> *exts = [ext componentsSeparatedByString:@"."];
-    if (exts.count > 2) {
-        exts = [exts subarrayWithRange:NSMakeRange(exts.count - 2, 2)];
-        NSString *tmp = [exts componentsJoinedByString:@"."];
+    NSUInteger const extsSection = exts.count;
+    
+    if (extsSection >= 2) {
+        NSArray<NSString *> *extsLast2 = [exts subarrayWithRange:NSMakeRange(extsSection- 2, 2)];
+        NSString *tmp = [extsLast2 componentsJoinedByString:@"."];
         if (NSOrderedSame == [tmp compare:@"ips.beta" options:NSCaseInsensitiveSearch]
-            || NSOrderedSame == [exts.firstObject compare:@"tar" options:NSCaseInsensitiveSearch]/*exts.firstObject.isPureAlphabet*/) {
+            || NSOrderedSame == [exts.firstObject compare:@"tar" options:NSCaseInsensitiveSearch]/*exts.firstObject.isPureAlphabet*/
+            || NSOrderedSame == [ext compare:@"qmake.conf" options:NSCaseInsensitiveSearch]
+            || NSOrderedSame == [ext compare:@"qmake.cache" options:NSCaseInsensitiveSearch]
+            || NSOrderedSame == [ext compare:@"qmake.stash" options:NSCaseInsensitiveSearch]
+            || NSOrderedSame == [ext compare:@"qt3d.qrc" options:NSCaseInsensitiveSearch]) {
             ext = tmp;
-        } else {
+        } else if (extsSection > 2) {
             ext = exts.lastObject;
-        }
-    } else if (exts.count == 2) {
-        if (exts[0].length < 1) {
-            ext = exts[1];
-        } else if (exts[1].length < 1) {
-            ext = exts[0];
-        } else if (NSOrderedSame != [ext compare:@"ips.beta" options:NSCaseInsensitiveSearch]
-                   && NSOrderedSame != [exts.firstObject compare:@"tar" options:NSCaseInsensitiveSearch]/*!exts[0].isPureAlphabet*/) {
-            ext = exts[1];
+        } else if (extsSection == 2) {
+            if (exts[1].length < 1) {
+                ext = exts[0];
+            } else {
+                ext = exts[1];
+            }
         }
     }
-    
+ 
     loc = [ext rangeOfCharacterFromSet:s_queryChar].location;
     if (loc != NSNotFound) {
         ext = [ext substringToIndex:loc];
