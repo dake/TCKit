@@ -286,11 +286,23 @@
         NSArray<NSString *> *extsLast2 = [exts subarrayWithRange:NSMakeRange(extsSection- 2, 2)];
         NSString *tmp = [extsLast2 componentsJoinedByString:@"."];
         if (NSOrderedSame == [tmp compare:@"ips.beta" options:NSCaseInsensitiveSearch]
-            || NSOrderedSame == [exts.firstObject compare:@"tar" options:NSCaseInsensitiveSearch]/*exts.firstObject.isPureAlphabet*/
-            || NSOrderedSame == [ext compare:@"qmake.conf" options:NSCaseInsensitiveSearch]
-            || NSOrderedSame == [ext compare:@"qmake.cache" options:NSCaseInsensitiveSearch]
-            || NSOrderedSame == [ext compare:@"qmake.stash" options:NSCaseInsensitiveSearch]
-            || NSOrderedSame == [ext compare:@"qt3d.qrc" options:NSCaseInsensitiveSearch]) {
+            || NSOrderedSame == [tmp compare:@"qmake.conf" options:NSCaseInsensitiveSearch]
+            || NSOrderedSame == [tmp compare:@"qmake.cache" options:NSCaseInsensitiveSearch]
+            || NSOrderedSame == [tmp compare:@"qmake.stash" options:NSCaseInsensitiveSearch]
+            || NSOrderedSame == [tmp compare:@"qt3d.qrc" options:NSCaseInsensitiveSearch]
+            || ({
+            BOOL valid = NO;
+            NSString *suffix = extsLast2[1].lowercaseString;
+            if ([suffix containsString:@"z"] && [@[@"gz", @"bz", @"bz2", @"xz", @"zst", @"z", @"lzma", @"lz"] containsObject:suffix]) {
+                NSString *prefix = extsLast2[0];
+                if (NSOrderedSame == [prefix compare:@"tar" options:NSCaseInsensitiveSearch]
+                    || NSOrderedSame == [prefix compare:@"cpio" options:NSCaseInsensitiveSearch]) {
+                    valid = YES;
+                }
+            }
+
+            valid;
+        })) {
             ext = tmp;
         } else if (extsSection > 2) {
             ext = exts.lastObject;
