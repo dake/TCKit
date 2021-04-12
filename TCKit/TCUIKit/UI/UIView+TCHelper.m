@@ -197,6 +197,12 @@ static char const kAlignmentRectInsetsKey;
         action.discoverabilityTitle = self.discoverabilityTitle;
         action.attributes = self.UIMenuElementAttributes;
         action.state = self.UIMenuElementState;
+        if (self.accessibilityLabel.length > 0) {
+            action.accessibilityLabel = self.accessibilityLabel;
+            if (self.accessibilityLanguage.length > 0) {
+                action.accessibilityLanguage = self.accessibilityLanguage;
+            }
+        }
         return action;
     }
     
@@ -210,6 +216,12 @@ static char const kAlignmentRectInsetsKey;
     
     UIImage *icon = nil != self.imageBlock ? self.imageBlock() : nil;
     UIMenu *menu = [UIMenu menuWithTitle:self.title ?: @"" image:icon identifier:self.identifier options:self.UIMenuOptions children:items];
+    if (self.accessibilityLabel.length > 0) {
+        menu.accessibilityLabel = self.accessibilityLabel;
+        if (self.accessibilityLanguage.length > 0) {
+            menu.accessibilityLanguage = self.accessibilityLanguage;
+        }
+    }
     return menu;
 }
 
@@ -258,6 +270,12 @@ static char const kAlignmentRectInsetsKey;
         }
     }];
     action.enabled = 0 == (TCMenuElementAttributesDisabled & attr);
+    if (self.accessibilityLabel.length > 0) {
+        action.accessibilityLabel = self.accessibilityLabel;
+        if (self.accessibilityLanguage.length > 0) {
+            action.accessibilityLanguage = self.accessibilityLanguage;
+        }
+    }
     
     // https://github.com/stringcode86/AlertViewController
     @try {
@@ -288,6 +306,12 @@ static char const kAlignmentRectInsetsKey;
                 self.handler(self);
             }
         }];
+        if (self.accessibilityLabel.length > 0) {
+            action.accessibilityLabel = self.accessibilityLabel;
+            if (self.accessibilityLanguage.length > 0) {
+                action.accessibilityLanguage = self.accessibilityLanguage;
+            }
+        }
         return @[action];
     }
     
@@ -301,6 +325,12 @@ static char const kAlignmentRectInsetsKey;
                 self.handler(self);
             }
         }];
+        if (self.accessibilityLabel.length > 0) {
+            action.accessibilityLabel = self.accessibilityLabel;
+            if (self.accessibilityLanguage.length > 0) {
+                action.accessibilityLanguage = self.accessibilityLanguage;
+            }
+        }
         [items addObject:action];
     }
     
@@ -354,6 +384,13 @@ static char const kAlignmentRectInsetsKey;
             }
         });
     }];
+    
+    if (self.accessibilityLabel.length > 0) {
+        item.accessibilityLabel = self.accessibilityLabel;
+        if (self.accessibilityLanguage.length > 0) {
+            item.accessibilityLanguage = self.accessibilityLanguage;
+        }
+    }
     return item;
 }
 
