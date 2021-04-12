@@ -74,6 +74,11 @@
     if (nil != self.textColor) {
         attributes[NSForegroundColorAttributeName] = self.textColor;
     }
+    if (@available(iOS 13, *)) {
+        if (nil != self.accessibilityTextualContext) {
+            attributes[UIAccessibilityTextAttributeContext] = self.accessibilityTextualContext;
+        }
+    }
 
    return [[NSMutableAttributedString alloc] initWithString:text attributes:attributes];
 }
