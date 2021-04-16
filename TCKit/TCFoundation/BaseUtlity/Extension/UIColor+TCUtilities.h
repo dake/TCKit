@@ -46,6 +46,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+
 // Color Space
 extern CGColorSpaceRef tcDeviceRGBSpace(void);
 extern CGColorSpaceRef tcDeviceGraySpace(void);
@@ -78,7 +79,7 @@ extern UIColor *tcInterpolateColors(UIColor *c1, UIColor *c2, CGFloat percent);
 + (nullable UIImage *)colorWheelOfSize:(CGFloat)side border:(BOOL)yorn;
 
 #pragma mark - Color Space
-+ (NSString *)colorSpaceString:(CGColorSpaceModel)model;
++ (nullable NSString *)colorSpaceString:(CGColorSpaceModel)model;
 @property (nonatomic, readonly) NSString *colorSpaceString;
 @property (nonatomic, readonly) CGColorSpaceModel colorSpaceModel;
 @property (nonatomic, readonly) BOOL canProvideRGBComponents;

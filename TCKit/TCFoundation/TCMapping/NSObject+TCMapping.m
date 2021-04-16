@@ -623,7 +623,7 @@ static id databaseInstanceWithValue(NSDictionary *value, NSDictionary *primaryKe
 
 NS_INLINE dispatch_queue_t tc_mappingQueue(void)
 {
-    return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
+    return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0);
 }
 
 

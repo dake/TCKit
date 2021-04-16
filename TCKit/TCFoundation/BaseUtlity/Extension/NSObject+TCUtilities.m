@@ -1045,3 +1045,38 @@ static void tcPerformBlockAfterDelay(dispatch_block_t block, NSTimeInterval dela
 }
 
 @end
+
+
+dispatch_queue_global_t tc_dispatch_get_global_queue_bg(BOOL force)
+{
+    // !!!: there is no way to execute the background queue when the battery is very low
+    static BOOL bgValid = NO;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+            bgValid = YES;
+        });
+    });
+    return dispatch_get_global_queue((force || bgValid) ? DISPATCH_QUEUE_PRIORITY_BACKGROUND : DISPATCH_QUEUE_PRIORITY_LOW, 0);
+}
+
+BOOL IS_MAC(void)
+{
+    static BOOL flag = NO;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        if (@available(iOS 14, macOS 11, *)) {
+            if (UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomMac
+                || ([NSProcessInfo.processInfo respondsToSelector:@selector(isiOSAppOnMac)] && NSProcessInfo.processInfo.isiOSAppOnMac)
+                || NSProcessInfo.processInfo.macCatalystApp) {
+                flag = YES;
+            }
+        } else if (@available(iOS 13, macOS 10.15, *)) {
+            if (NSProcessInfo.processInfo.macCatalystApp) {
+                flag = YES;
+            }
+        }
+    });
+
+    return flag;
+}

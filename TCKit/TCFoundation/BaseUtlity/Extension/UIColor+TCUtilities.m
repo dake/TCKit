@@ -136,23 +136,27 @@ UIColor *tcInterpolateColors(UIColor *c1, UIColor *c2, CGFloat amt)
 {
     switch (model) {
         case kCGColorSpaceModelUnknown:
-            return @"kCGColorSpaceModelUnknown";
+            return nil;
         case kCGColorSpaceModelMonochrome:
-            return @"kCGColorSpaceModelMonochrome";
+            return (__bridge NSString *)kCGColorSpaceGenericGray;
         case kCGColorSpaceModelRGB:
-            return @"kCGColorSpaceModelRGB";
+            return (__bridge NSString *)kCGColorSpaceGenericRGB;
         case kCGColorSpaceModelCMYK:
-            return @"kCGColorSpaceModelCMYK";
+            return (__bridge NSString *)kCGColorSpaceGenericCMYK;
         case kCGColorSpaceModelLab:
-            return @"kCGColorSpaceModelLab";
+            if (@available(iOS 11, macOS 10.13, *)) {
+                return (__bridge NSString *)kCGColorSpaceGenericLab;
+            }
+            return @"kCGColorSpaceGenericLab";
+            
         case kCGColorSpaceModelDeviceN:
-            return @"kCGColorSpaceModelDeviceN";
+            return @"DeviceN";
         case kCGColorSpaceModelIndexed:
-            return @"kCGColorSpaceModelIndexed";
+            return @"Indexed";
         case kCGColorSpaceModelPattern:
-            return @"kCGColorSpaceModelPattern";
+            return @"Pattern";
         default:
-            return @"Not a valid color space";
+            return nil;
     }
 }
 
@@ -1018,20 +1022,20 @@ void tcYUV2RGB_f(CGFloat y, CGFloat u, CGFloat v, CGFloat *r, CGFloat *g, CGFloa
 
 // Pick two colors more colors such that all three are equidistant on the color wheel
 // (120 degrees and 240 degress difference in hue from self)
-- (NSArray *)triadicColors
+- (NSArray<UIColor *> *)triadicColors
 {
     return [self analogousColorsWithStepAngle:120.0f pairCount:1];
 }
 
 // Pick n pairs of colors, stepping in increasing steps away from this color around the wheel
-- (NSArray *)analogousColorsWithStepAngle:(CGFloat)stepAngle pairCount:(NSUInteger)pairs
+- (NSArray<UIColor *> *)analogousColorsWithStepAngle:(CGFloat)stepAngle pairCount:(NSUInteger)pairs
 {
     // Convert to HSB
     CGFloat h = self.hue * 360.0f;
     CGFloat s = self.saturation;
     CGFloat v = self.brightness;
     
-    NSMutableArray *colors = [NSMutableArray arrayWithCapacity:pairs * 2];
+    NSMutableArray<UIColor *> *colors = [NSMutableArray arrayWithCapacity:pairs * 2];
     
     if (stepAngle < 0.0f) {
         stepAngle *= -1.0f;
@@ -1676,7 +1680,11 @@ static NSDictionary *s_kelvin = nil;
 
 - (CGColorSpaceModel)colorSpaceModel
 {
-    return CGColorSpaceGetModel(self.colorSpace);
+    CGColorSpaceRef colorSpace = self.colorSpace;
+    if (NULL == colorSpace) {
+        return kCGColorSpaceModelUnknown;
+    }
+    return CGColorSpaceGetModel(colorSpace);
 }
 
 - (NSString *)colorSpaceString

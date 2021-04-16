@@ -16,8 +16,10 @@ typedef struct _TCSwizzleInput {
     
 } TCSwizzleInput;
 
-extern BOOL tcSwizzleMethod(TCSwizzleInput input, _Nullable id block, _Nullable IMP *_Nullable origIMP, NSError **err);
+extern BOOL IS_MAC(void);
+extern dispatch_queue_global_t tc_dispatch_get_global_queue_bg(BOOL force);
 
+extern BOOL tcSwizzleMethod(TCSwizzleInput input, _Nullable id block, _Nullable IMP *_Nullable origIMP, NSError **err);
 
 
 @interface NSObject (TCUtilities)

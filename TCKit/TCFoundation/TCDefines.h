@@ -44,6 +44,8 @@ __strong void(^block)(void) __attribute__((cleanup(_tc_blockCleanUp), unused)) =
 
 #pragma mark - UIDevice Helpers
 
+extern BOOL IS_MAC(void);
+
 NS_INLINE BOOL IS_IPHONE(void)
 {
     /*
@@ -62,26 +64,6 @@ NS_INLINE BOOL IS_IPAD(void)
     return UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad;
 }
 
-NS_INLINE BOOL IS_MAC(void)
-{
-    static BOOL flag = NO;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        if (@available(iOS 14, macOS 11, *)) {
-            if (UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomMac
-                || ([NSProcessInfo.processInfo respondsToSelector:@selector(isiOSAppOnMac)] && NSProcessInfo.processInfo.isiOSAppOnMac)
-                || NSProcessInfo.processInfo.macCatalystApp) {
-                flag = YES;
-            }
-        } else if (@available(iOS 13, macOS 10.15, *)) {
-            if (NSProcessInfo.processInfo.macCatalystApp) {
-                flag = YES;
-            }
-        }
-    });
-
-    return flag;
-}
 
 NS_INLINE NSComparisonResult COMPARE_SYSTEM_VERSION(NSString *v)
 {
@@ -112,6 +94,11 @@ NS_INLINE BOOL SYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(NSString *v)
 {
     return COMPARE_SYSTEM_VERSION(v) != NSOrderedDescending;
 }
+
+
+
+
+extern dispatch_queue_global_t tc_dispatch_get_global_queue_bg(BOOL force);
 
 
 NS_INLINE dispatch_queue_t tc_dispatch_get_current_queue(void)
@@ -154,7 +141,8 @@ NS_INLINE void tc_dispatch_global_async_low(dispatch_block_t block)
 
 NS_INLINE void tc_dispatch_global_async_bg(dispatch_block_t block)
 {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), block);
+    // !!!: there is no way to execute the background queue when the battery is very low
+    dispatch_async(tc_dispatch_get_global_queue_bg(NO), block);
 }
 
 #endif // TCDefines_h

@@ -853,7 +853,7 @@
 				B72A5FA61F1F4093002D900D /* UIImage */,
 			);
 			name = TCFoundation;
-			path = ../../TCKit/TCFoundation;
+			path = ../TCKit/TCFoundation;
 			sourceTree = "<group>";
 		};
 		B72A5F641F1F4093002D900D /* BaseUtlity */ = {
@@ -1179,7 +1179,8 @@
 				B76A7F911F13568F0010FBD3 /* TCMapping+Extra */,
 				B76A7F961F13568F0010FBD3 /* UIImage */,
 			);
-			path = TCFoundation;
+			name = TCFoundation;
+			path = TCKit/TCFoundation;
 			sourceTree = "<group>";
 		};
 		B76A7F541F13568F0010FBD3 /* BaseUtlity */ = {
