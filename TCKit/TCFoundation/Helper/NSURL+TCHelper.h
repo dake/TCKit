@@ -60,6 +60,7 @@ case CC_SHA512_DIGEST_LENGTH:
 - (unsigned long)fileAdler32;
 - (nullable NSString *)fileAdler32String;
 
+- (BOOL)isSymbolicLink;
 - (NSURL *)safeURLByResolvingSymlinksInPath;
 + (nullable NSURL *)availableURLWithName:(NSString *)fileName at:(NSURL *)dir;
 + (nullable NSURL *)availableURLWithName:(NSString *)name at:(NSURL *)dir isDirectory:(BOOL)isDir;

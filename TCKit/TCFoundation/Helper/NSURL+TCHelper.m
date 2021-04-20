@@ -309,6 +309,11 @@ static uLong tc_file_crc(NSURL *url, uLong (*fun_init)(uLong crc, const Bytef *b
     return url;
 }
 
+- (BOOL)isSymbolicLink
+{
+    return self != self.safeURLByResolvingSymlinksInPath;
+}
+
 + (nullable NSURL *)availableURLWithName:(NSString *)name at:(NSURL *)dir
 {
     return [self availableURLWithName:name at:dir isDirectory:NO];
@@ -790,7 +795,7 @@ static int tc_CCHmacUpdate(void *c, const void *data, CC_LONG len)
     NSString *utiMust = nil;
     if (NULL == uti || (*uti).length < 1) {
         if (isURL) {
-            utiMust = ((NSURL *)item).isFileURL ? (__bridge NSString *)kUTTypeFileURL : (__bridge NSString *)kUTTypeURL;
+            utiMust = ((NSURL *)item).isFileURL ? (__bridge NSString *)kUTTypeData : (__bridge NSString *)kUTTypeURL;
         } else {
             utiMust = (__bridge NSString *)kUTTypeData;
         }
@@ -800,7 +805,7 @@ static int tc_CCHmacUpdate(void *c, const void *data, CC_LONG len)
     }
 
     if (@available(iOS 11, *)) {
-        NSItemProvider *fileProvider = [[NSItemProvider alloc] initWithItem:item typeIdentifier:utiMust];
+        NSItemProvider *fileProvider = [[NSItemProvider alloc] initWithItem:(isURL && ((NSURL *)item).isFileURL) ? ((NSURL *)item).safeURLByResolvingSymlinksInPath : item typeIdentifier:utiMust];
         fileProvider.suggestedName = TCPercentEscapedStringFromFileName(suggestedName) ?: (isURL ? ((NSURL *)item).lastPathComponent : nil);
         [self setItemProviders:@[fileProvider] localOnly:YES expirationDate:[NSDate dateWithMinutesFromNow:10]];
     } else {

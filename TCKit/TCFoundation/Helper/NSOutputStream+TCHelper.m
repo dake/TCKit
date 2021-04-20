@@ -290,6 +290,7 @@
             if (_range.location > 0 || _rawFile == _handle) {
                 if (0 != fseek(_handle, (long)_range.location, SEEK_SET)) {
                     err = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:nil];
+                    NSCParameterAssert(nil == err);
                     if (_rawFile != _handle) {
                         fclose(_handle);
                     }
