@@ -909,11 +909,18 @@ static int tc_CCHmacUpdate(void *c, const void *data, CC_LONG len)
 
 + (instancetype)URLWithNSURL:(NSURL *)url
 {
+    return [self URLWithNSURL:url autoDelete:NO];
+}
+
++ (instancetype)URLWithNSURL:(NSURL *)url autoDelete:(BOOL)autoDelete
+{
     NSCParameterAssert(url);
     if (url.isFileURL) {
-        return (TCURL *)[self fileURLWithPath:url.path isDirectory:url.hasDirectoryPath];
+        TCURL *tcURL = [[self alloc] initFileURLWithPath:url.path isDirectory:url.hasDirectoryPath];
+        tcURL.autoDelete = autoDelete;
+        return tcURL;
     }
-    return (TCURL *)[self URLWithString:url.absoluteString];
+    return [self URLWithString:url.absoluteString];
 }
 
 @end

@@ -97,7 +97,8 @@ case CC_SHA512_DIGEST_LENGTH:
 @property (nonatomic, assign) BOOL autoDelete; // NO
 @property (nullable, nonatomic, strong) id extraInfo;
 
-+ (instancetype)URLWithNSURL:(NSURL *)url;
++ (nullable instancetype)URLWithNSURL:(NSURL *)url; // autoDelete NO
++ (nullable instancetype)URLWithNSURL:(NSURL *)url autoDelete:(BOOL)autoDelete;
 
 @end
 
