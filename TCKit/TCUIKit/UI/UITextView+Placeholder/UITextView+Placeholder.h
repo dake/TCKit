@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface UITextView (Placeholder)
 
-@property (nullable, nonatomic, retain, readonly) UILabel *placeholderLabel;
+@property (nullable, nonatomic, strong, readonly) UILabel *placeholderLabel;
 
 @property (nullable, nonatomic, strong) NSString *placeholder;
 @property (nullable, nonatomic, strong) UIColor *placeholderColor;
