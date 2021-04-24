@@ -730,7 +730,7 @@ static NSString *_defaultService;
 - (BOOL)removeAllItemsWithError:(NSError *__autoreleasing *)error
 {
     NSMutableDictionary *query = [self query];
-#if !TARGET_OS_IPHONE
+#if !TARGET_OS_IPHONE && !TARGET_OS_MACCATALYST
     query[(__bridge id)kSecMatchLimit] = (__bridge id)kSecMatchLimitAll;
 #endif
     
