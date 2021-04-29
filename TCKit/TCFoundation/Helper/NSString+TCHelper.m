@@ -682,7 +682,7 @@ bool tc_is_ip_addr(char const *host, bool *ipv6)
 - (BOOL)wrongEncoding
 {
     NSUInteger len = self.length;
-    if (self.length < 1) {
+    if (len < 1) {
         return NO;
     }
     // \0਀Ȁ\0\0\0\0\0\0\0\0Ā\0累栐ꮑࠀ⬧동　\0ꁒ\0ऀ\0Ā\0倀\0Ȁ\0堀\0̀\0搀\0Ѐ\0瀀\0Ԁ\0蠀\0؀\0᠂\0܀\0␂\0ሀ\0簂\0ᄀ�ꯋ뻏響�ꢷ훐ꎣꤾ‼럖
