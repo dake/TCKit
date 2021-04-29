@@ -1073,10 +1073,13 @@ static NSDictionary<NSNumber *, NSString *> *tc_ifMap(void)
     NSArray<NSString *> *ipv6Dns = nil;
     [self sysDNSServersIpv4:&ipv4Dns ipv6:&ipv6Dns];
     NSMutableArray<NSString *> *dnsServers = NSMutableArray.array;
-    [dnsServers addObjectsFromArray:ipv4Dns];
-    [dnsServers addObjectsFromArray:ipv6Dns];
-    
-    return dnsServers.count > 0 ? dnsServers : nil;
+    if (nil != ipv4Dns) {
+        [dnsServers addObjectsFromArray:ipv4Dns];
+    }
+    if (nil != ipv6Dns) {
+        [dnsServers addObjectsFromArray:ipv6Dns];
+    }
+    return dnsServers.count > 0 ? dnsServers.copy : nil;
 }
 
 + (BOOL)isVPNOn
@@ -1089,7 +1092,7 @@ static NSDictionary<NSNumber *, NSString *> *tc_ifMap(void)
     if (dic.count < 1) {
         return NO;
     }
-    NSArray *keys = [dic[@"__SCOPED__"] allKeys];
+    NSArray<NSString *> *keys = [dic[@"__SCOPED__"] allKeys];
     for (NSString *key in keys) {
         if ([key containsString:@"tap"]
             || [key containsString:@"tun"]
