@@ -302,7 +302,7 @@ static uLong tc_file_crc(NSURL *url, uLong (*fun_init)(uLong crc, const Bytef *b
 - (NSURL *)safeURLByResolvingSymlinksInPath
 {
     NSURL *url = self.URLByResolvingSymlinksInPath;
-    if (nil == url || [url isEqualToFile:self]) {
+    if (nil == url || [url isEqual:self]) {
         return self;
     }
     
@@ -898,12 +898,22 @@ static int tc_CCHmacUpdate(void *c, const void *data, CC_LONG len)
 @end
 
 
-@implementation TCURL : NSURL
+@implementation TCURL
+{
+@public
+    NSURL *_rawURL;
+}
 
 - (void)dealloc
 {
     if (self.autoDelete && self.isFileURL) {
-        [NSFileManager.defaultManager removeItemAtURL:self error:NULL];
+        NSURL *const url = _rawURL;
+        _rawURL = nil;
+        tc_dispatch_global_async_bg(^{
+            @autoreleasepool {
+                [NSFileManager.defaultManager removeItemAtURL:url error:NULL];
+            }
+        });
     }
 }
 
@@ -917,6 +927,7 @@ static int tc_CCHmacUpdate(void *c, const void *data, CC_LONG len)
     NSCParameterAssert(url);
     if (url.isFileURL) {
         TCURL *tcURL = [[self alloc] initFileURLWithPath:url.path isDirectory:url.hasDirectoryPath];
+        tcURL->_rawURL = url;
         tcURL.autoDelete = autoDelete;
         return tcURL;
     }
