@@ -632,8 +632,6 @@
 		B76D74B41F13198800CF77FA /* NSManagedObjectContext+TCMapping.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSManagedObjectContext+TCMapping.m"; sourceTree = "<group>"; };
 		B76D74B51F13198800CF77FA /* NSObject+TCMappingExtra.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+TCMappingExtra.h"; sourceTree = "<group>"; };
 		B76D74B61F13198800CF77FA /* NSObject+TCMappingExtra.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+TCMappingExtra.m"; sourceTree = "<group>"; };
-		B76D74B91F13198800CF77FA /* AnimatedGIFImageSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnimatedGIFImageSerialization.h; sourceTree = "<group>"; };
-		B76D74BA1F13198800CF77FA /* AnimatedGIFImageSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AnimatedGIFImageSerialization.m; sourceTree = "<group>"; };
 		B76D74BB1F13198800CF77FA /* UIImage+CGImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+CGImage.h"; sourceTree = "<group>"; };
 		B76D74BC1F13198800CF77FA /* UIImage+CGImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+CGImage.m"; sourceTree = "<group>"; };
 		B76D74BD1F13198800CF77FA /* UIImage+Resize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Resize.h"; sourceTree = "<group>"; };
@@ -1586,22 +1584,12 @@
 		B76D74B71F13198800CF77FA /* UIImage */ = {
 			isa = PBXGroup;
 			children = (
-				B76D74B81F13198800CF77FA /* AnimatedGIFImageSerialization */,
 				B76D74BB1F13198800CF77FA /* UIImage+CGImage.h */,
 				B76D74BC1F13198800CF77FA /* UIImage+CGImage.m */,
 				B76D74BD1F13198800CF77FA /* UIImage+Resize.h */,
 				B76D74BE1F13198800CF77FA /* UIImage+Resize.m */,
 			);
 			path = UIImage;
-			sourceTree = "<group>";
-		};
-		B76D74B81F13198800CF77FA /* AnimatedGIFImageSerialization */ = {
-			isa = PBXGroup;
-			children = (
-				B76D74B91F13198800CF77FA /* AnimatedGIFImageSerialization.h */,
-				B76D74BA1F13198800CF77FA /* AnimatedGIFImageSerialization.m */,
-			);
-			path = AnimatedGIFImageSerialization;
 			sourceTree = "<group>";
 		};
 		B76D75041F131B8000CF77FA /* TCUIKit */ = {
