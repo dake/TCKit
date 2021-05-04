@@ -175,7 +175,7 @@
         || NSOrderedSame == [pathExt compare:@"mou" options:NSCaseInsensitiveSearch]) {
         NSString *tmpExt = path.pathExtension;
         NSUInteger len = tmpExt.length;
-        if (len > 1 && isnumber([tmpExt characterAtIndex:len - 1])) {
+        if (len > 4 && [tmpExt hasInCasePrefix:@"part"] && [tmpExt substringFromIndex:4].isInteger) {
             return path.stringByDeletingPathExtension;
         }
     }
