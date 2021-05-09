@@ -142,6 +142,8 @@
             label.lineBreakMode = self.textContainer.lineBreakMode;
             label.numberOfLines = 0;
             label.font = self.font;
+            label.isAccessibilityElement = NO;
+            label.accessibilityElementsHidden = YES;
 //            label.userInteractionEnabled = NO;
             objc_setAssociatedObject(self, @selector(placeholderLabel), label, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
             
