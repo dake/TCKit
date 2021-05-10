@@ -231,6 +231,8 @@ static char const kAlignmentRectInsetsKey;
         return @[];
     }
     
+    NSCParameterAssert(!self.hasNextLevelMenu || nil != self.handler);
+    
     if (self.hasNextLevelMenu && nil != self.handler) {
         TCMenuElementAttributes attr = nil != self.attributesWithoutIcon ? self.attributesWithoutIcon.unsignedIntegerValue : self.attributes;
         UIAlertActionStyle style = 0 != (TCMenuOptionsDestructive & self.options) ? UIAlertActionStyleDestructive : (0 != (TCMenuElementAttributesCancel & attr) ? UIAlertActionStyleCancel : UIAlertActionStyleDefault);
@@ -253,6 +255,87 @@ static char const kAlignmentRectInsetsKey;
     }
     
     return items;
+}
+
+- (NSArray<UIAccessibilityCustomAction *> *)UIAccessibilityCustomActions
+{
+    if (self.menuOnly) {
+        return @[];
+    }
+    
+    NSCParameterAssert(!self.hasNextLevelMenu || nil != self.handler);
+    
+    if (self.hasNextLevelMenu && nil != self.handler) {
+        TCMenuElementAttributes attr = nil != self.attributesWithoutIcon ? self.attributesWithoutIcon.unsignedIntegerValue : self.attributes;
+        UIAlertActionStyle style = 0 != (TCMenuOptionsDestructive & self.options) ? UIAlertActionStyleDestructive : (0 != (TCMenuElementAttributesCancel & attr) ? UIAlertActionStyleCancel : UIAlertActionStyleDefault);
+        UIAccessibilityCustomAction *action = [self _convert2UIAccessibilityCustomAction:style attr:attr];
+        return @[action];
+    }
+    
+    NSMutableArray<UIAccessibilityCustomAction *> *items = NSMutableArray.array;
+    if (self.title.length > 0 && (nil != self.handler || self.children.count < 1)) {
+        TCMenuElementAttributes attr = nil != self.attributesWithoutIcon ? self.attributesWithoutIcon.unsignedIntegerValue : self.attributes;
+        UIAlertActionStyle style = 0 != (TCMenuElementAttributesDestructive & attr) ? UIAlertActionStyleDestructive : (0 != (TCMenuElementAttributesCancel & attr) ? UIAlertActionStyleCancel : UIAlertActionStyleDefault);
+        UIAccessibilityCustomAction *action = [self _convert2UIAccessibilityCustomAction:style attr:attr];
+        [items addObject:action];
+    }
+    
+    BOOL reverse = self.reverseOrder;
+    for (TCUIAction *action in (reverse ? self.children.reverseObjectEnumerator : self.children)) {
+        action.reverseOrder = reverse;
+        [items addObjectsFromArray:action.UIAccessibilityCustomActions];
+    }
+    
+    return items;
+}
+
+- (UIAccessibilityCustomAction *)_convert2UIAccessibilityCustomAction:(UIAlertActionStyle)style attr:(TCMenuElementAttributes)attr
+{
+    NSString *title = self.accessibilityLabel;
+    if (nil == title) {
+        if (@available(iOS 13, *)) {
+            title = self.title ?: self.titleWithoutIcon;
+        } else {
+            title = self.titleWithoutIcon ?: self.title;
+        }
+    }
+
+    UIAccessibilityCustomAction *action = nil;
+    
+    if (@available(iOS 13, tvOS 13, *)) {
+        action = [UIAccessibilityCustomAction.alloc initWithName:title actionHandler:^BOOL(UIAccessibilityCustomAction * _Nonnull customAction) {
+            // force retain
+            if (nil != self.handler) {
+                self.handler(self);
+                return YES;
+            }
+            return NO;
+        }];
+    } else {
+        action = [UIAccessibilityCustomAction.alloc initWithName:title target:self selector:@selector(tcUIAccessibilityCustomActionHandle:)];
+        // force retain
+        action.tcUserInfo = self;
+    }
+
+    if (self.accessibilityLanguage.length > 0) {
+        action.accessibilityLanguage = self.accessibilityLanguage;
+    }
+    
+    if (nil != self.imageBlock) {
+        UIImage *icon = self.imageBlock();
+        if (nil != icon) {
+            action.image = icon;
+        }
+    }
+
+    return action;
+}
+
+- (void)tcUIAccessibilityCustomActionHandle:(UIAccessibilityCustomAction *)action
+{
+    if (nil != self.handler) {
+        self.handler(self);
+    }
 }
 
 - (UIAlertAction *)_convert2UIAlerAction:(UIAlertActionStyle)style attr:(TCMenuElementAttributes)attr
