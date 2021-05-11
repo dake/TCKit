@@ -301,7 +301,6 @@ static char const kAlignmentRectInsetsKey;
     }
 
     UIAccessibilityCustomAction *action = nil;
-    
     if (@available(iOS 13, tvOS 13, *)) {
         action = [UIAccessibilityCustomAction.alloc initWithName:title actionHandler:^BOOL(UIAccessibilityCustomAction * _Nonnull customAction) {
             // force retain
