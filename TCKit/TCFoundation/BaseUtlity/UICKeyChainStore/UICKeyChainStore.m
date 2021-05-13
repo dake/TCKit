@@ -8,8 +8,7 @@
 
 #import "UICKeyChainStore.h"
 
-NSString * const UICKeyChainStoreErrorDomain = @"com.kishikawakatsumi.uickeychainstore";
-static NSString *_defaultService;
+NSString *const UICKeyChainStoreErrorDomain = @"com.kishikawakatsumi.uickeychainstore";
 
 @interface UICKeyChainStore ()
 
@@ -17,18 +16,23 @@ static NSString *_defaultService;
 
 @implementation UICKeyChainStore
 
+static NSString *_defaultService = nil;
 + (NSString *)defaultService
 {
-    if (!_defaultService) {
-        _defaultService = NSBundle.mainBundle.bundleIdentifier ?: @"";
+    @synchronized (_defaultService) {
+        if (nil == _defaultService) {
+            _defaultService = NSBundle.mainBundle.bundleIdentifier ?: @"";
+        }
+        
+        return _defaultService;
     }
-    
-    return _defaultService;
 }
 
 + (void)setDefaultService:(NSString *)defaultService
 {
-    _defaultService = defaultService;
+    @synchronized (_defaultService) {
+        _defaultService = defaultService;
+    }
 }
 
 #pragma mark -
@@ -78,7 +82,7 @@ static NSString *_defaultService;
     if (self) {
         _itemClass = UICKeyChainStoreItemClassGenericPassword;
         
-        if (!service) {
+        if (nil == service) {
             service = [self.class defaultService];
         }
         _service = service.copy;
@@ -448,34 +452,36 @@ static NSString *_defaultService;
 
 - (NSData *)dataForKey:(NSString *)key error:(NSError *__autoreleasing *)error
 {
-    NSMutableDictionary *query = [self query];
-    query[(__bridge __strong id)kSecMatchLimit] = (__bridge id)kSecMatchLimitOne;
-    query[(__bridge __strong id)kSecReturnData] = (__bridge id)kCFBooleanTrue;
-    
-    query[(__bridge __strong id)kSecAttrAccount] = key;
-    
-    CFTypeRef data = nil;
-    OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, &data);
-    
-    if (status == errSecSuccess) {
-        if (NULL != data) {
-            return (__bridge_transfer NSData *)data;
-        } else {
-            NSError *e = [self.class unexpectedError:NSLocalizedString(@"Unexpected error has occurred.", nil)];
-            if (error) {
-                *error = e;
+    @synchronized (self) {
+        NSMutableDictionary *query = [self query];
+        query[(__bridge __strong id)kSecMatchLimit] = (__bridge id)kSecMatchLimitOne;
+        query[(__bridge __strong id)kSecReturnData] = (__bridge id)kCFBooleanTrue;
+        
+        query[(__bridge __strong id)kSecAttrAccount] = key;
+        
+        CFTypeRef data = nil;
+        OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, &data);
+        
+        if (status == errSecSuccess) {
+            if (NULL != data) {
+                return (__bridge_transfer NSData *)data;
+            } else {
+                NSError *e = [self.class unexpectedError:NSLocalizedString(@"Unexpected error has occurred.", nil)];
+                if (error) {
+                    *error = e;
+                }
+                return nil;
             }
+        } else if (status == errSecItemNotFound) {
             return nil;
         }
-    } else if (status == errSecItemNotFound) {
+        
+        NSError *e = [self.class securityError:status];
+        if (error) {
+            *error = e;
+        }
         return nil;
     }
-    
-    NSError *e = [self.class securityError:status];
-    if (error) {
-        *error = e;
-    }
-    return nil;
 }
 
 #pragma mark -
@@ -512,6 +518,7 @@ static NSString *_defaultService;
 
 - (BOOL)setData:(NSData *)data forKey:(NSString *)key genericAttribute:(id)genericAttribute label:(NSString *)label comment:(NSString *)comment error:(NSError *__autoreleasing *)error
 {
+    
     if (!key) {
         NSError *e = [self.class argumentError:NSLocalizedString(@"the key must not to be nil", nil)];
         if (error) {
@@ -523,100 +530,102 @@ static NSString *_defaultService;
         return [self removeItemForKey:key error:error];
     }
     
-    NSMutableDictionary *query = [self query];
-    query[(__bridge __strong id)kSecAttrAccount] = key;
-#if TARGET_OS_IOS
-    if (floor(NSFoundationVersionNumber) > floor(1144.17)) { // iOS 9+
-        query[(__bridge __strong id)kSecUseAuthenticationUI] = (__bridge id)kSecUseAuthenticationUIFail;
-#if  __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_9_0
-    } else if (floor(NSFoundationVersionNumber) > floor(1047.25)) { // iOS 8+
-        query[(__bridge __strong id)kSecUseNoAuthenticationUI] = (__bridge id)kCFBooleanTrue;
-#endif
-    }
-#elif TARGET_OS_WATCH || TARGET_OS_TV
-    query[(__bridge __strong id)kSecUseAuthenticationUI] = (__bridge id)kSecUseAuthenticationUIFail;
-#endif
-    
-    OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, NULL);
-    if (status == errSecSuccess || status == errSecInteractionNotAllowed) {
-        query = [self query];
+    @synchronized (self) {
+        NSMutableDictionary *query = [self query];
         query[(__bridge __strong id)kSecAttrAccount] = key;
-        
-        NSError *unexpectedError = nil;
-        NSMutableDictionary *attributes = [self attributesWithKey:nil value:data error:&unexpectedError];
-        
-        if (genericAttribute) {
-            attributes[(__bridge __strong id)kSecAttrGeneric] = genericAttribute;
+#if TARGET_OS_IOS
+        if (floor(NSFoundationVersionNumber) > floor(1144.17)) { // iOS 9+
+            query[(__bridge __strong id)kSecUseAuthenticationUI] = (__bridge id)kSecUseAuthenticationUIFail;
+#if  __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_9_0
+        } else if (floor(NSFoundationVersionNumber) > floor(1047.25)) { // iOS 8+
+            query[(__bridge __strong id)kSecUseNoAuthenticationUI] = (__bridge id)kCFBooleanTrue;
+#endif
         }
-        if (label) {
-            attributes[(__bridge __strong id)kSecAttrLabel] = label;
-        }
-        if (comment) {
-            attributes[(__bridge __strong id)kSecAttrComment] = comment;
-        }
+#elif TARGET_OS_WATCH || TARGET_OS_TV
+        query[(__bridge __strong id)kSecUseAuthenticationUI] = (__bridge id)kSecUseAuthenticationUIFail;
+#endif
         
-        if (unexpectedError) {
-            NSLog(@"error: [%@] %@", @(unexpectedError.code), NSLocalizedString(@"Unexpected error has occurred.", nil));
-            if (error) {
-                *error = unexpectedError;
-            }
-            return NO;
-        } else {
+        OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, NULL);
+        if (status == errSecSuccess || status == errSecInteractionNotAllowed) {
+            query = [self query];
+            query[(__bridge __strong id)kSecAttrAccount] = key;
             
-            if (status == errSecInteractionNotAllowed && floor(NSFoundationVersionNumber) <= floor(1140.11)) { // iOS 8.0.x
-                if ([self removeItemForKey:key error:error]) {
-                    return [self setData:data forKey:key label:label comment:comment error:error];
-                }
-            } else {
-                status = SecItemUpdate((__bridge CFDictionaryRef)query, (__bridge CFDictionaryRef)attributes);
+            NSError *unexpectedError = nil;
+            NSMutableDictionary *attributes = [self attributesWithKey:nil value:data error:&unexpectedError];
+            
+            if (genericAttribute) {
+                attributes[(__bridge __strong id)kSecAttrGeneric] = genericAttribute;
             }
-            if (status != errSecSuccess) {
-                NSError *e = [self.class securityError:status];
+            if (label) {
+                attributes[(__bridge __strong id)kSecAttrLabel] = label;
+            }
+            if (comment) {
+                attributes[(__bridge __strong id)kSecAttrComment] = comment;
+            }
+            
+            if (unexpectedError) {
+                NSLog(@"error: [%@] %@", @(unexpectedError.code), NSLocalizedString(@"Unexpected error has occurred.", nil));
                 if (error) {
-                    *error = e;
+                    *error = unexpectedError;
                 }
                 return NO;
+            } else {
+                
+                if (status == errSecInteractionNotAllowed && floor(NSFoundationVersionNumber) <= floor(1140.11)) { // iOS 8.0.x
+                    if ([self removeItemForKey:key error:error]) {
+                        return [self setData:data forKey:key label:label comment:comment error:error];
+                    }
+                } else {
+                    status = SecItemUpdate((__bridge CFDictionaryRef)query, (__bridge CFDictionaryRef)attributes);
+                }
+                if (status != errSecSuccess) {
+                    NSError *e = [self.class securityError:status];
+                    if (error) {
+                        *error = e;
+                    }
+                    return NO;
+                }
             }
-        }
-    } else if (status == errSecItemNotFound) {
-        NSError *unexpectedError = nil;
-        NSMutableDictionary *attributes = [self attributesWithKey:key value:data error:&unexpectedError];
-        
-        if (genericAttribute) {
-            attributes[(__bridge __strong id)kSecAttrGeneric] = genericAttribute;
-        }
-        if (label) {
-            attributes[(__bridge __strong id)kSecAttrLabel] = label;
-        }
-        if (comment) {
-            attributes[(__bridge __strong id)kSecAttrComment] = comment;
-        }
-        
-        if (unexpectedError) {
-            NSLog(@"error: [%@] %@", @(unexpectedError.code), NSLocalizedString(@"Unexpected error has occurred.", nil));
+        } else if (status == errSecItemNotFound) {
+            NSError *unexpectedError = nil;
+            NSMutableDictionary *attributes = [self attributesWithKey:key value:data error:&unexpectedError];
+            
+            if (genericAttribute) {
+                attributes[(__bridge __strong id)kSecAttrGeneric] = genericAttribute;
+            }
+            if (label) {
+                attributes[(__bridge __strong id)kSecAttrLabel] = label;
+            }
+            if (comment) {
+                attributes[(__bridge __strong id)kSecAttrComment] = comment;
+            }
+            
+            if (unexpectedError) {
+                NSLog(@"error: [%@] %@", @(unexpectedError.code), NSLocalizedString(@"Unexpected error has occurred.", nil));
+                if (error) {
+                    *error = unexpectedError;
+                }
+                return NO;
+            } else {
+                status = SecItemAdd((__bridge CFDictionaryRef)attributes, NULL);
+                if (status != errSecSuccess) {
+                    NSError *e = [self.class securityError:status];
+                    if (error) {
+                        *error = e;
+                    }
+                    return NO;
+                }
+            }
+        } else {
+            NSError *e = [self.class securityError:status];
             if (error) {
-                *error = unexpectedError;
+                *error = e;
             }
             return NO;
-        } else {
-            status = SecItemAdd((__bridge CFDictionaryRef)attributes, NULL);
-            if (status != errSecSuccess) {
-                NSError *e = [self.class securityError:status];
-                if (error) {
-                    *error = e;
-                }
-                return NO;
-            }
         }
-    } else {
-        NSError *e = [self.class securityError:status];
-        if (error) {
-            *error = e;
-        }
-        return NO;
+        
+        return YES;
     }
-    
-    return YES;
 }
 
 #pragma mark -
@@ -705,19 +714,21 @@ static NSString *_defaultService;
 
 - (BOOL)removeItemForKey:(NSString *)key error:(NSError *__autoreleasing *)error
 {
-    NSMutableDictionary *query = [self query];
-    query[(__bridge __strong id)kSecAttrAccount] = key;
-    
-    OSStatus status = SecItemDelete((__bridge CFDictionaryRef)query);
-    if (status != errSecSuccess && status != errSecItemNotFound) {
-        NSError *e = [self.class securityError:status];
-        if (error) {
-            *error = e;
+    @synchronized (self) {
+        NSMutableDictionary *query = [self query];
+        query[(__bridge __strong id)kSecAttrAccount] = key;
+        
+        OSStatus status = SecItemDelete((__bridge CFDictionaryRef)query);
+        if (status != errSecSuccess && status != errSecItemNotFound) {
+            NSError *e = [self.class securityError:status];
+            if (error) {
+                *error = e;
+            }
+            return NO;
         }
-        return NO;
+        
+        return YES;
     }
-    
-    return YES;
 }
 
 #pragma mark -
@@ -729,21 +740,23 @@ static NSString *_defaultService;
 
 - (BOOL)removeAllItemsWithError:(NSError *__autoreleasing *)error
 {
-    NSMutableDictionary *query = [self query];
+    @synchronized (self) {
+        NSMutableDictionary *query = [self query];
 #if !TARGET_OS_IPHONE && !TARGET_OS_MACCATALYST
-    query[(__bridge id)kSecMatchLimit] = (__bridge id)kSecMatchLimitAll;
+        query[(__bridge id)kSecMatchLimit] = (__bridge id)kSecMatchLimitAll;
 #endif
-    
-    OSStatus status = SecItemDelete((__bridge CFDictionaryRef)query);
-    if (status != errSecSuccess && status != errSecItemNotFound) {
-        NSError *e = [self.class securityError:status];
-        if (error) {
-            *error = e;
+        
+        OSStatus status = SecItemDelete((__bridge CFDictionaryRef)query);
+        if (status != errSecSuccess && status != errSecItemNotFound) {
+            NSError *e = [self.class securityError:status];
+            if (error) {
+                *error = e;
+            }
+            return NO;
         }
-        return NO;
+        
+        return YES;
     }
-    
-    return YES;
 }
 
 #pragma mark -
@@ -1219,7 +1232,7 @@ static NSString *_defaultService;
         }
     }
     
-    if (floor(NSFoundationVersionNumber) > floor(993.00)) { // iOS 7+
+    if (floor(NSFoundationVersionNumber) > floor(NSFoundationVersionNumber_iOS_6_1)) { // iOS 7+
         attributes[(__bridge __strong id)kSecAttrSynchronizable] = @(_synchronizable);
     }
     
