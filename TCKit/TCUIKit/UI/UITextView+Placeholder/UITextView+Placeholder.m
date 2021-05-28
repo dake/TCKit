@@ -131,7 +131,7 @@
 
 - (UILabel *)placeholderLabel {
     UILabel *(^block) (void) = ^{
-        UILabel *label = objc_getAssociatedObject(self, @selector(placeholderLabel));
+        UILabel *label = objc_getAssociatedObject(self, _cmd);
         if (nil == label) {
             NSAttributedString *originalText = self.attributedText;
             self.text = @" "; // lazily set font of `UITextView`.
@@ -145,7 +145,7 @@
             label.isAccessibilityElement = NO;
             label.accessibilityElementsHidden = YES;
 //            label.userInteractionEnabled = NO;
-            objc_setAssociatedObject(self, @selector(placeholderLabel), label, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            objc_setAssociatedObject(self, _cmd, label, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
             
             [NSNotificationCenter.defaultCenter addObserver:self
                                                    selector:@selector(updatePlaceholderLabel)
@@ -160,16 +160,15 @@
         return label;
     };
     
-    if (!NSThread.isMainThread) {
-        __block UILabel *label = nil;
+    __block UILabel *label = nil;
+    if (NSThread.isMainThread) {
+        label = block();
+    } else {
         dispatch_sync(dispatch_get_main_queue(), ^{
             label = block();
         });
-        
-        return label;
     }
-    
-    return block();
+    return label;
 }
 
 
@@ -221,7 +220,8 @@
 
 - (void)updatePlaceholderLabel {
     if (self.text.length > 0) {
-        [self.placeholderLabel removeFromSuperview];
+        UILabel *label = objc_getAssociatedObject(self, @selector(placeholderLabel));
+        [label removeFromSuperview];
         return;
     }
 
@@ -282,7 +282,6 @@
 #endif
 
 @end
-
 
 
 @interface TCTextViewTarget : NSObject
