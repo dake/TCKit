@@ -672,17 +672,17 @@ static NSString * const AFNSURLSessionTaskDidSuspendNotification = @"com.alamofi
 
 #pragma mark -
 
-- (NSArray *)tasksForKeyPath:(NSString *)keyPath {
+- (NSArray *)tasksForKeyPath:(SEL)keyPath {
     __block NSArray *tasks = nil;
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-    [self.session getTasksWithCompletionHandler:^(NSArray *dataTasks, NSArray *uploadTasks, NSArray *downloadTasks) {
-        if ([keyPath isEqualToString:NSStringFromSelector(@selector(dataTasks))]) {
+    [self.session getTasksWithCompletionHandler:^(NSArray<NSURLSessionDataTask *> *dataTasks, NSArray<NSURLSessionUploadTask *> *uploadTasks, NSArray<NSURLSessionDownloadTask *> *downloadTasks) {
+        if (keyPath == @selector(dataTasks)) {
             tasks = dataTasks;
-        } else if ([keyPath isEqualToString:NSStringFromSelector(@selector(uploadTasks))]) {
+        } else if (keyPath == @selector(uploadTasks)) {
             tasks = uploadTasks;
-        } else if ([keyPath isEqualToString:NSStringFromSelector(@selector(downloadTasks))]) {
+        } else if (keyPath == @selector(downloadTasks)) {
             tasks = downloadTasks;
-        } else if ([keyPath isEqualToString:NSStringFromSelector(@selector(tasks))]) {
+        } else if (keyPath == @selector(tasks)) {
             tasks = [@[dataTasks, uploadTasks, downloadTasks] valueForKeyPath:@"@unionOfArrays.self"];
         }
 
@@ -695,19 +695,19 @@ static NSString * const AFNSURLSessionTaskDidSuspendNotification = @"com.alamofi
 }
 
 - (NSArray *)tasks {
-    return [self tasksForKeyPath:NSStringFromSelector(_cmd)];
+    return [self tasksForKeyPath:_cmd];
 }
 
 - (NSArray *)dataTasks {
-    return [self tasksForKeyPath:NSStringFromSelector(_cmd)];
+    return [self tasksForKeyPath:_cmd];
 }
 
 - (NSArray *)uploadTasks {
-    return [self tasksForKeyPath:NSStringFromSelector(_cmd)];
+    return [self tasksForKeyPath:_cmd];
 }
 
 - (NSArray *)downloadTasks {
-    return [self tasksForKeyPath:NSStringFromSelector(_cmd)];
+    return [self tasksForKeyPath:_cmd];
 }
 
 #pragma mark -
