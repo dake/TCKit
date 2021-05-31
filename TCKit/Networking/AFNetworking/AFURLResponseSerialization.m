@@ -632,7 +632,7 @@ static UIImage * AFInflatedImageFromResponseWithDataAtScale(NSHTTPURLResponse *r
         return image;
     }
 
-    CGContextDrawImage(context, CGRectMake(0.0f, 0.0f, width, height), imageRef);
+    CGContextDrawImage(context, CGRectMake(0, 0, width, height), imageRef);
     CGImageRef inflatedImageRef = CGBitmapContextCreateImage(context);
 
     CGContextRelease(context);
