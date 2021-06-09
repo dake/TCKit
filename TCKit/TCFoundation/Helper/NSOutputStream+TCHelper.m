@@ -284,7 +284,7 @@
         if (NULL != _rawFile) {
             _handle = _rawFile;
         } else {
-            _handle = fopen(_innerFileURL.fileSystemRepresentation, "r");
+            _handle = fopen(_innerFileURL.fileSystemRepresentation, "rb");
         }
         if (NULL != _handle) {
             if (_range.location > 0 || _rawFile == _handle) {
