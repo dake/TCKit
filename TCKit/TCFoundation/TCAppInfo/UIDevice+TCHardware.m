@@ -503,15 +503,17 @@ static NSString *s_device_names[kTCDeviceCount] = {
         type = kTCDeviceUnknown;
     }
     
-    if (type == kTCDeviceUnknown ||
-        type == kTCDeviceUnknowniPhone ||
-        type == kTCDeviceUnknowniPod ||
-        type == kTCDeviceUnknowniPad ||
-        type == kTCDeviceUnknownAppleTV) {
-        return self.platform;
+    switch (type) {
+        case kTCDeviceUnknown:
+        case kTCDeviceUnknowniPhone:
+        case kTCDeviceUnknowniPod:
+        case kTCDeviceUnknowniPad:
+        case kTCDeviceUnknownAppleTV:
+            return self.platform;
+            
+        default:
+            return s_device_names[type];
     }
-    
-    return s_device_names[type];
 }
 
 + (TCDeviceScreen)screenMode
