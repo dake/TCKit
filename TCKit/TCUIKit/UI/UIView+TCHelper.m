@@ -231,7 +231,7 @@ static char const kAlignmentRectInsetsKey;
         return @[];
     }
     
-    NSCParameterAssert(!self.hasNextLevelMenu || nil != self.handler);
+//    NSCParameterAssert(!self.hasNextLevelMenu || nil != self.handler);
     
     if (self.hasNextLevelMenu && nil != self.handler) {
         TCMenuElementAttributes attr = nil != self.attributesWithoutIcon ? self.attributesWithoutIcon.unsignedIntegerValue : self.attributes;

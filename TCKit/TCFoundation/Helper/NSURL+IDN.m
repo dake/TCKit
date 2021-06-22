@@ -371,6 +371,9 @@ NS_INLINE BOOL validIDNCodeValue(unsigned int codepoint, BOOL *needMore)
 
 + (NSString *)IDNDecodedHostname:(NSString *)anIDNHostname;
 {
+    if (anIDNHostname.length < 1) {
+        return anIDNHostname;
+    }
     BOOL wasEncoded = NO;
     NSMutableArray<NSString *> *decodedLabels = NSMutableArray.array;
     for (NSString *label in [anIDNHostname componentsSeparatedByString:@"."]) {
