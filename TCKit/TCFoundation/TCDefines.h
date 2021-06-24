@@ -64,6 +64,13 @@ NS_INLINE BOOL IS_IPAD(void)
     return UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad;
 }
 
+// https://stackoverflow.com/questions/41376175/suppress-user-facing-text-should-use-localized-string-macro-warning
+__attribute__((annotate("returns_localized_nsstring")))
+NS_INLINE NSString *LocalizationNotNeeded(NSString *s)
+{
+    return s;
+}
+
 
 NS_INLINE NSComparisonResult COMPARE_SYSTEM_VERSION(NSString *v)
 {
@@ -94,8 +101,6 @@ NS_INLINE BOOL SYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(NSString *v)
 {
     return COMPARE_SYSTEM_VERSION(v) != NSOrderedDescending;
 }
-
-
 
 
 extern dispatch_queue_global_t tc_dispatch_get_global_queue_bg(BOOL force);

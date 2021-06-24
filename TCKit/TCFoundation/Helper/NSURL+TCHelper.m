@@ -902,6 +902,7 @@ static int tc_CCHmacUpdate(void *c, const void *data, CC_LONG len)
 {
 @public
     NSURL *_rawURL;
+    BOOL _startedAccess;
 }
 
 - (void)dealloc
@@ -914,6 +915,10 @@ static int tc_CCHmacUpdate(void *c, const void *data, CC_LONG len)
                 [NSFileManager.defaultManager removeItemAtURL:url error:NULL];
             }
         });
+    }
+    
+    if (_startedAccess) {
+        [self stopAccessingSecurityScopedResource];
     }
 }
 
@@ -932,6 +937,33 @@ static int tc_CCHmacUpdate(void *c, const void *data, CC_LONG len)
         return tcURL;
     }
     return [self URLWithString:url.absoluteString];
+}
+
+- (void)stopAccessingSecurityScopedResource
+{
+    if (nil != _rawURL) {
+        [_rawURL stopAccessingSecurityScopedResource];
+    } else {
+        [super stopAccessingSecurityScopedResource];
+    }
+    _startedAccess = NO;
+}
+
+- (BOOL)startAccessingSecurityScopedResource
+{
+    if (nil != _rawURL) {
+        if ([_rawURL startAccessingSecurityScopedResource]) {
+            _startedAccess = YES;
+            return YES;
+        }
+        return NO;
+    }
+    
+    if ([super startAccessingSecurityScopedResource]) {
+        _startedAccess = YES;
+        return YES;
+    }
+    return NO;
 }
 
 @end
