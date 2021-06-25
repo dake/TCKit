@@ -368,12 +368,12 @@
     
     __block NSURLSessionTask *task = nil;
     
-    NSURL * (^destination)(NSURL *targetPath, NSURLResponse *response) = ^(NSURL * _Nonnull targetPath, NSURLResponse * _Nonnull response) {
+    NSURL * (^destination)(NSURL *, NSURLResponse *) = ^(NSURL * _Nonnull targetPath, NSURLResponse * _Nonnull response) {
         return request.streamPolicy.downloadDestinationPath;
     };
     
     __weak typeof(self) wSelf = self;
-    void (^completionHandler)(NSURLResponse *response, NSURL *filePath, NSError *error) = ^(NSURLResponse * _Nonnull response, NSURL * _Nullable filePath, NSError * _Nullable error) {
+    void (^completionHandler)(NSURLResponse *, NSURL *, NSError *) = ^(NSURLResponse * _Nonnull response, NSURL * _Nullable filePath, NSError * _Nullable error) {
         if (nil != error || nil == filePath) {
             if (nil != error && request.streamPolicy.shouldResumeDownload) {
                 if (ENOENT == error.code && [error.domain isEqualToString:NSPOSIXErrorDomain]) {
@@ -430,12 +430,12 @@
 - (void)generateTaskFor:(id<TCHTTPRequest, TCHTTPReqAgentDelegate>)request polling:(BOOL)polling
 {
     __weak typeof(self) wSelf = self;
-    void (^successBlock)(NSURLSessionTask *task, id responseObject) = ^(NSURLSessionTask *task, id responseObject) {
+    void (^successBlock)(NSURLSessionTask *, id) = ^(NSURLSessionTask *task, id responseObject) {
         NSCAssert(NSThread.isMainThread, @"not main thread");
         request.rawResponseObject = responseObject;
         [wSelf handleRequestResult:request success:YES error:nil];
     };
-    void (^failureBlock)(NSURLSessionTask *task, NSError *error) = ^(NSURLSessionTask *task, NSError *error) {
+    void (^failureBlock)(NSURLSessionTask *, NSError *) = ^(NSURLSessionTask *task, NSError *error) {
         NSCAssert(NSThread.isMainThread, @"not main thread");
         [wSelf handleRequestResult:request success:NO error:error];
     };

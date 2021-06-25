@@ -31,7 +31,7 @@ NSString *const kTCApplicationDidReceiveDiskSpaceWarning = @"TCApplicationDidRec
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        void (^block)(NSNotification *note) = ^(NSNotification * _Nonnull note) {
+        void (^block)(NSNotification *) = ^(NSNotification * _Nonnull note) {
             NSDictionary *fattributes = [NSFileManager.defaultManager attributesOfFileSystemForPath:NSHomeDirectory() error:NULL];
             NSNumber *size = fattributes[NSFileSystemFreeSize];
             if (nil != size && size.unsignedLongLongValue < 500e6) {

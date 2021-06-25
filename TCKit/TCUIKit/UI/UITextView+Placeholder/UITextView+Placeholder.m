@@ -130,7 +130,7 @@
 #pragma mark `placeholderLabel`
 
 - (UILabel *)placeholderLabel {
-    UILabel *(^block) (void) = ^{
+    UILabel *(^block)(void) = ^{
         UILabel *label = objc_getAssociatedObject(self, _cmd);
         if (nil == label) {
             NSAttributedString *originalText = self.attributedText;
