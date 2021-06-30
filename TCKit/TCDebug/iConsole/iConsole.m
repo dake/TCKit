@@ -162,13 +162,13 @@ static void exceptionHandler(NSException *exception)
     [self findAndResignFirstResponder:[self mainWindow]];
     
 #ifdef TC_IOS_DEBUG
-    NSString *title = [@"测试环境 " stringByAppendingString:[NSBundle.mainBundle objectForInfoDictionaryKey:(NSString *)kCFBundleVersionKey]];
+    NSString *title = [@"测试环境 " stringByAppendingString:[NSBundle.mainBundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]];
 #else
     
 #if defined(TC_IOS_RELEASE) || !(defined(TC_IOS_DEBUG) || defined(TC_IOS_PUBLISH))
-    NSString *title = [self.isProductionEnv ? @"生产环境 " : @"预发布环境 " stringByAppendingString:[NSBundle.mainBundle objectForInfoDictionaryKey:(NSString *)kCFBundleVersionKey]];
+    NSString *title = [self.isProductionEnv ? @"生产环境 " : @"预发布环境 " stringByAppendingString:[NSBundle.mainBundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]];
 #else
-    NSString *title = [@"生产环境 " stringByAppendingString:[NSBundle.mainBundle objectForInfoDictionaryKey:(NSString *)kCFBundleVersionKey]];
+    NSString *title = [@"生产环境 " stringByAppendingString:[NSBundle.mainBundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]];
 #endif
     
 #endif // TC_IOS_DEBUG
