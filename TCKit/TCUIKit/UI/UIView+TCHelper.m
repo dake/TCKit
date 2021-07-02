@@ -320,7 +320,9 @@ static char const kAlignmentRectInsetsKey;
         action.accessibilityLanguage = self.accessibilityLanguage;
     }
     
-    if (nil != self.imageBlock) {
+    if (nil != self.imageBlock
+        // !!!: fuck available iOS 14.0 没声明
+        && [action respondsToSelector:@selector(setImage:)]) {
         UIImage *icon = self.imageBlock();
         if (nil != icon) {
             action.image = icon;
